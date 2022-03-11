@@ -38,42 +38,32 @@
 	}
 	end {
 		$successFullConnected = $false
-		$connection = Get-ARAHConnection -Url $Url -APISubPath "/jsonrpc"
+		$connection = Get-ARAHConnection -Url $Url -APISubPath ""
+		Add-Member -InputObject $connection -MemberType NoteProperty -Name "forti" -Value @{
+			requestId = 1
+			session   = $null
+		}
 		$connection.ContentType = "application/json;charset=UTF-8"
 
 		Write-PSFMessage "Stelle Verbindung her zu $Url" -Target $Url
 		Invoke-PSFProtectedCommand -ActionString "Connect-FMgr.Connecting" -ActionStringValues $Url -Target $Url -ScriptBlock {
-			$apiCallParameter = @{
-				Connection = $Connection
-				method     = "Post"
-				Path       = ""
-				Body       =
-				@{
-					"id"      = 1
-					"method"  = "exec"
-					"params"  = @(
-						@{
-							"data" = @(
-								@{
-									"passwd" = $Credential.GetNetworkCredential().Password
-									"user"   = $Credential.UserName
-								}
-							)
-							"url"  = "sys/login/user"
-						}
-					)
-					"session" = $null
-					"verbose" = 1
-				}
 
+			$apiCallParameter = @{
+				Connection     = $Connection
+				method         = "exec"
+				Path           = "sys/login/user"
+				ParameterData = @{
+					"passwd" = $Credential.GetNetworkCredential().Password
+					"user"   = $Credential.UserName
+				}
 			}
+
 			$result = Invoke-FMgrAPI @apiCallParameter
 			$connection.authenticatedUser = $Credential.UserName
 			if ($result.session) {
 				$successFullConnected = $true
-				$connection.headers.Add("session", $result.session)
+				$connection.forti.session= $result.session
 			}
-
 		} -PSCmdlet $PSCmdlet  -EnableException $EnableException
 		if (Test-PSFFunctionInterrupt) { return }
 		if ($successFullConnected) {

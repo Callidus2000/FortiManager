@@ -42,6 +42,7 @@
 	# Functions to export from this module
 	FunctionsToExport = @(
 		'Connect-FMgr'
+		'Disconnect-FMgr'
 		'Invoke-FMgrAPI'
 	)
 

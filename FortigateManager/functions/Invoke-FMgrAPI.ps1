@@ -57,22 +57,35 @@
         $Connection,
         [parameter(Mandatory)]
         [string]$Path,
-        [Hashtable] $Body,
-        [Hashtable] $Header,
-        [Alias("Query")]
-        [Hashtable] $URLParameter,
+        [Hashtable[]]$ParameterData,
         [parameter(Mandatory)]
-        [Microsoft.Powershell.Commands.WebRequestMethod]$Method,
-        [string]$ContentType = "application/json;charset=UTF-8",
+        [ValidateSet("get", "set", "add", "update", "delete", "clone", "exec")]
+        $Method,
         [bool]$EnableException=$true,
         [switch]$EnablePaging
     )
-    # Header parameter is dropped, see parameter help
-    $requestParameter = $PSBoundParameters | ConvertTo-PSFHashtable -exclude "Header"
-    # if ($requestParameter.Path -notlike '/v4/*'){
-    #     Write-PSFMessage "Function-Call from an AutoRest-Function"
-    #     $requestParameter.Path = "/v4/" + $requestParameter.Path
-    #     $requestParameter.EnablePaging=$true
-    # }
-    return Invoke-ARAHRequest @requestParameter #-PagingHandler 'FMgr.PagingHandler'
+    $existingSession = $connection.forti.session
+    $requestId = $connection.forti.requestId
+    $connection.forti.requestId = $connection.forti.requestId + 1
+
+    $apiCallParameter = @{
+        Connection = $Connection
+        method     = "Post"
+        Path       = "/jsonrpc"
+        Body       =  @{
+            "id"      = $requestId
+            "method"  = "$Method"
+            "params"  = @(
+                @{
+                    "data" = @($ParameterData                    )
+                    "url"  = "$Path"
+                }
+            )
+            "session" = $existingSession
+            "verbose" = 1
+        }
+    }
+
+    # $apiCallParameter.Body.params[0].url=$Path
+    return Invoke-ARAHRequest @apiCallParameter #-PagingHandler 'FMgr.PagingHandler'
 }
