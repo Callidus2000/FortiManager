@@ -1,0 +1,11 @@
+﻿TOPIC
+	about_FortigateManager
+	
+SHORT DESCRIPTION
+	Explains how to use the FortigateManager powershell module
+	
+LONG DESCRIPTION
+	<Insert Content here>
+
+KEYWORDS
+	FortigateManager

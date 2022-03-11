@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2010
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{18FDD516-4FF0-4177-8B1F-40F88FF872E7}") = "FortigateManager", "FortigateManager\FortigateManager.csproj", "{7A3573F6-643E-4488-B5A5-64AFD65468F9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7A3573F6-643E-4488-B5A5-64AFD65468F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A3573F6-643E-4488-B5A5-64AFD65468F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A3573F6-643E-4488-B5A5-64AFD65468F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A3573F6-643E-4488-B5A5-64AFD65468F9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D815DF28-599E-4D15-964A-4B6C61CF8D5B}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,22 @@
+﻿
+# ignore the settings folder and files for VSCode and PSS
+.vscode/*
+*.psproj
+*TempPoint*
+
+# Ignore staging info from Visual Studio
+library/FortigateManager/.vs/*
+library/FortigateManager/FortigateManager/bin/*
+library/FortigateManager/FortigateManager/obj/*
+
+# ignore PowerShell Studio MetaData
+FortigateManager/FortigateManager.psproj
+FortigateManager/FortigateManager.psproj.bak
+FortigateManager/FortigateManager.psprojs
+FortigateManager/FortigateManager.psproj
+
+# ignore the TestResults
+TestResults/*
+
+# ignore the publishing Directory
+publish/*
