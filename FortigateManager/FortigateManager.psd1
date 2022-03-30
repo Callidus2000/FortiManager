@@ -43,6 +43,7 @@
 	FunctionsToExport = @(
 		'Connect-FM'
 		'Disconnect-FM'
+		'Get-FMAddressGroup'
 		'Get-FMAdomLockStatus'
 		'Get-FMSystemStatus'
 		'Invoke-FMAPI'
