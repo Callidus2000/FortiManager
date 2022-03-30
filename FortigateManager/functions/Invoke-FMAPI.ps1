@@ -1,4 +1,4 @@
-﻿function Invoke-FMgrAPI {
+﻿function Invoke-FMAPI {
     <#
     .SYNOPSIS
     Generic API Call to the Fortigate Manager API.
@@ -11,7 +11,7 @@
     - Paging for API endpoints which do only provide limited amounts of datasets
 
     .PARAMETER Connection
-    Object of Class , stores the authentication Token and the API Base-URL. Can be obtained with Connect-FMgr.
+    Object of Class , stores the authentication Token and the API Base-URL. Can be obtained with Connect-FM.
 
     .PARAMETER Path
     API Path to the REST function
@@ -20,7 +20,7 @@
     Parameter for the API call; The hashtable is Converted to the POST body by using ConvertTo-Json
 
     .PARAMETER Header
-    Additional Header Parameter for the API call; currently dropped but needed as a parameter for the *-FMgrAR* functions
+    Additional Header Parameter for the API call; currently dropped but needed as a parameter for the *-FMAR* functions
 
     .PARAMETER URLParameter
     Parameter for the API call; Converted to the GET URL parameter set.
@@ -44,7 +44,7 @@
     If set to true, inner exceptions will be rethrown. Otherwise the an empty result will be returned.
 
     .EXAMPLE
-    $result = Invoke-FMgrAPI -connection $this -path "" -method POST -body @{login = $credentials.UserName; password = $credentials.GetNetworkCredential().Password; language = "1"; authType = "sql" } -hideparameters $true
+    $result = Invoke-FMAPI -connection $this -path "" -method POST -body @{login = $credentials.UserName; password = $credentials.GetNetworkCredential().Password; language = "1"; authType = "sql" } -hideparameters $true
 
     Login to the service
 
@@ -87,5 +87,5 @@
     }
 
     # $apiCallParameter.Body.params[0].url=$Path
-    return Invoke-ARAHRequest @apiCallParameter #-PagingHandler 'FMgr.PagingHandler'
+    return Invoke-ARAHRequest @apiCallParameter #-PagingHandler 'FM.PagingHandler'
 }

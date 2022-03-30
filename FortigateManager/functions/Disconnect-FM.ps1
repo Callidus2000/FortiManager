@@ -1,4 +1,4 @@
-﻿function Disconnect-FMgr {
+﻿function Disconnect-FM {
     <#
     .SYNOPSIS
     Disconnects from an existing connection
@@ -27,5 +27,5 @@
         Path         ="sys/logout"
     }
 
-    Invoke-FMgrAPI @apiCallParameter
+    Invoke-FMAPI @apiCallParameter
 }

@@ -41,9 +41,10 @@
 
 	# Functions to export from this module
 	FunctionsToExport = @(
-		'Connect-FMgr'
-		'Disconnect-FMgr'
-		'Invoke-FMgrAPI'
+		'Connect-FM'
+		'Disconnect-FM'
+		'Get-FMSystemStatus'
+		'Invoke-FMAPI'
 	)
 
 	# Cmdlets to export from this module

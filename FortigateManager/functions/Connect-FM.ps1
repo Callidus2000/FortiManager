@@ -1,4 +1,4 @@
-﻿function Connect-FMgr {
+﻿function Connect-FM {
 	<#
 	.SYNOPSIS
 	Creates a new Connection Object to a Fortigate Manager instance.
@@ -16,7 +16,7 @@
 	Should Exceptions been thrown?
 
 	.EXAMPLE
-	$connection=Connect-FMgr -Url $url -Credential $cred
+	$connection=Connect-FM -Url $url -Credential $cred
 
 	Connect directly with a Credential-Object
 
@@ -28,7 +28,7 @@
 	[CmdletBinding(DefaultParameterSetName = "credential")]
 	Param (
 		[parameter(mandatory = $true, ParameterSetName = "credential")]
-		[PSFramework.TabExpansion.PsfArgumentCompleterAttribute("FMgr.url")]
+		[PSFramework.TabExpansion.PsfArgumentCompleterAttribute("FM.url")]
 		[string]$Url,
 		[parameter(mandatory = $true, ParameterSetName = "credential")]
 		[pscredential]$Credential,
@@ -46,7 +46,7 @@
 		$connection.ContentType = "application/json;charset=UTF-8"
 
 		Write-PSFMessage "Stelle Verbindung her zu $Url" -Target $Url
-		Invoke-PSFProtectedCommand -ActionString "Connect-FMgr.Connecting" -ActionStringValues $Url -Target $Url -ScriptBlock {
+		Invoke-PSFProtectedCommand -ActionString "Connect-FM.Connecting" -ActionStringValues $Url -Target $Url -ScriptBlock {
 
 			$apiCallParameter = @{
 				Connection     = $Connection
@@ -58,7 +58,7 @@
 				}
 			}
 
-			$result = Invoke-FMgrAPI @apiCallParameter
+			$result = Invoke-FMAPI @apiCallParameter
 			$connection.authenticatedUser = $Credential.UserName
 			if ($result.session) {
 				$successFullConnected = $true
@@ -67,9 +67,9 @@
 		} -PSCmdlet $PSCmdlet  -EnableException $EnableException
 		if (Test-PSFFunctionInterrupt) { return }
 		if ($successFullConnected) {
-			Write-PSFMessage -string "Connect-FMgr.Connected"
+			Write-PSFMessage -string "Connect-FM.Connected"
 			return $connection
 		}
-		Write-PSFMessage -string "Connect-FMgr.NotConnected" -Level Warning
+		Write-PSFMessage -string "Connect-FM.NotConnected" -Level Warning
 	}
 }
