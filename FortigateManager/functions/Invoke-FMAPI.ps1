@@ -40,6 +40,9 @@
     .PARAMETER EnablePaging
     If the API makes use of paging (therefor of limit/offset URLParameter) setting EnablePaging to $true will not return the raw data but a combination of all data sets.
 
+    .PARAMETER ADOM
+	The (non-default) ADOM for the requests.
+
     .PARAMETER EnableException
     If set to true, inner exceptions will be rethrown. Otherwise the an empty result will be returned.
 
@@ -61,12 +64,17 @@
         [parameter(Mandatory)]
         [ValidateSet("get", "set", "add", "update", "delete", "clone", "exec")]
         $Method,
+        [string]$ADOM,
         [bool]$EnableException=$true,
         [switch]$EnablePaging
     )
     $existingSession = $connection.forti.session
     $requestId = $connection.forti.requestId
     $connection.forti.requestId = $connection.forti.requestId + 1
+    if ([string]::IsNullOrEmpty($ADOM) -and -not [string]::IsNullOrEmpty($connection.forti.defaultADOM)){
+        $ADOM = $connection.forti.defaultADOM
+        Write-PSFMessage "Setze Default ADOM $ADOM"
+    }
 
     $apiCallParameter = @{
         Connection = $Connection

@@ -12,6 +12,9 @@
 	.PARAMETER Url
 	The server root URL.
 
+	.PARAMETER ADOM
+	The default ADOM for the requests.
+
 	.PARAMETER EnableException
 	Should Exceptions been thrown?
 
@@ -30,6 +33,8 @@
 		[parameter(mandatory = $true, ParameterSetName = "credential")]
 		[PSFramework.TabExpansion.PsfArgumentCompleterAttribute("FM.url")]
 		[string]$Url,
+		[parameter(mandatory = $false, ParameterSetName = "credential")]
+		[string]$ADOM,
 		[parameter(mandatory = $true, ParameterSetName = "credential")]
 		[pscredential]$Credential,
 		[switch]$EnableException
@@ -63,6 +68,9 @@
 			if ($result.session) {
 				$successFullConnected = $true
 				$connection.forti.session= $result.session
+			}
+			if($ADOM){
+				$connection.forti.defaultADOM= $ADOM
 			}
 		} -PSCmdlet $PSCmdlet  -EnableException $EnableException
 		if (Test-PSFFunctionInterrupt) { return }

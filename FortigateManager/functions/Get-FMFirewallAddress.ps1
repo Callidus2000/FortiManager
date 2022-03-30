@@ -1,4 +1,4 @@
-﻿function Get-FMrFirewallAddress {
+﻿function Get-FMFirewallAddress {
     <#
     .SYNOPSIS
     Get list of all "address"
