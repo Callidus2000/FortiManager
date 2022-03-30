@@ -43,8 +43,11 @@
 	FunctionsToExport = @(
 		'Connect-FM'
 		'Disconnect-FM'
+		'Get-FMAdomLockStatus'
 		'Get-FMSystemStatus'
 		'Invoke-FMAPI'
+		'Lock-FMAdom'
+		'Unlock-FMAdom'
 	)
 
 	# Cmdlets to export from this module

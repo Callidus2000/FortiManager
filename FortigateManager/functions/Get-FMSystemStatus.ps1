@@ -7,7 +7,7 @@
     Disconnects from an existing connection
 
     .PARAMETER Connection
-    Parameter description
+    The API connection object.
 
     .EXAMPLE
     To be added
