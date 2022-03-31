@@ -27,7 +27,7 @@
         [string]$ADOM,
         [bool]$EnableException = $true
     )
-    $explicitADOM = Resolve-FMAdom -Connection $Connection -Adom $ADOM
+    $explicitADOM = Resolve-FMAdom -Connection $Connection -Adom $ADOM -EnableException $EnableException
     Write-PSFMessage "`$explicitADOM=$explicitADOM"
     $apiCallParameter = @{
         Connection = $Connection
