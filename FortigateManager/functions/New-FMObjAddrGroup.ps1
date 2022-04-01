@@ -13,7 +13,7 @@
         [string]$ImageBase64,
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [System.Object[]]$Tagging,
-        [parameter(mandatory = $false, ParameterSetName = "default")]
+        [parameter(mandatory = $true, ParameterSetName = "default")]
         [System.Object[]]$Member,
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$FabricObject,
@@ -23,17 +23,19 @@
         [string]$Uuid,
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$AllowRouting,
-        [parameter(mandatory = $false, ParameterSetName = "default")]
+        [parameter(mandatory = $true, ParameterSetName = "default")]
         [string]$Name,
         [parameter(mandatory = $false, ParameterSetName = "default")]
-        [long]$Color,
+        [long]$Color = -1,
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$Exclude,
-        [switch]$RemoveEmptyAttribute
+        [ValidateSet("Keep", "RemoveAttribute", "ClearContent")]
+        [parameter(mandatory = $false, ValueFromPipeline = $false, ParameterSetName = "default")]
+        $NullHandler = "RemoveAttribute"
     )
     $data = @{
         'dynamic_mapping' = @($Dynamic_mapping)
-        'type'            = $Type
+        'type'            = "$Type"
         'comment'         = "$Comment"
         'exclude-member'  = @($ExcludeMember)
         '_image-base64'   = "$ImageBase64"
@@ -46,10 +48,7 @@
         'name'            = "$Name"
         'color'           = $Color
         'exclude'         = "$Exclude"
+
     }
-    # return $data|Remove-FMNullValuesFromHashtable -ClearEmptyArrays:$ClearEmptyArrays -RemoveEmptyAttribute:$RemoveEmptyAttribute
-    if ($RemoveEmptyAttribute) {
-        return $data | Remove-FMNullValuesFromHashtable -RemoveEmptyAttribute
-    }
-    return $data | Remove-FMNullValuesFromHashtable -ClearEmptyArrays
+    return $data | Remove-FMNullValuesFromHashtable -NullHandler $NullHandler
 }
