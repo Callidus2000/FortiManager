@@ -57,9 +57,11 @@
 				Connection     = $Connection
 				method         = "exec"
 				Path           = "sys/login/user"
-				ParameterData = @{
+				Parameter = @{
+					"data"=@{
 					"passwd" = $Credential.GetNetworkCredential().Password
 					"user"   = $Credential.UserName
+					}
 				}
 			}
 

@@ -73,7 +73,7 @@
         [ValidateSet("count", "scope member", "datasrc", "get reserved", "syntax")]
         [string]$Option,
         [parameter(mandatory = $false, ParameterSetName = "default")]
-        [System.Object[]]$Filter,
+        [string[]]$Filter,
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [long]$GetUsed = -1,
         [parameter(mandatory = $false, ParameterSetName = "default")]
@@ -85,13 +85,13 @@
         [parameter(mandatory = $false, ValueFromPipeline = $false, ParameterSetName = "default")]
         $NullHandler = "RemoveAttribute"
     )
-    $ParameterData = @{
+    $Parameter = @{
         'url'      = "$Url"
         'attr'     = "$Attr"
         'sortings' = @($Sortings)
         'loadsub'  = $Loadsub
         'option'   = "$Option"
-        'filter'   = @($Filter)
+        'filter'   = ($Filter | ConvertTo-FMFilterArray)
         'get used' = $GetUsed
         'range'    = @($Range)
         'fields'   = @($Fields)
@@ -100,7 +100,7 @@
     $apiCallParameter = @{
         Connection    = $Connection
         method        = "get"
-        ParameterData = $parameterData
+        Parameter = $Parameter
         Path          = "/pm/config/adom/$explicitADOM/obj/firewall/address"
     }
 

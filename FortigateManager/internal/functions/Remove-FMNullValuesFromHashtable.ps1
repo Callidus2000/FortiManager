@@ -30,6 +30,9 @@
         }
         $keyList = $InputObject.Keys | ForEach-Object { "$_" }
         foreach ($key in $keyList) {
+            if ($null -eq $InputObject.$key){
+                continue
+            }
             $paramaterType = $InputObject.$key.gettype()
             switch ($paramaterType) {
                 "System.Object[]" {

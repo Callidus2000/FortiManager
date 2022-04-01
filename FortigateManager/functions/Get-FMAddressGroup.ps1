@@ -12,6 +12,9 @@
     .PARAMETER ADOM
     The (non-default) ADOM for the requests.
 
+    .PARAMETER EnableException
+    If set to True, errors will throw an exception
+
     .EXAMPLE
     To be added
 

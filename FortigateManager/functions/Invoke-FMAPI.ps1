@@ -57,7 +57,7 @@
         $Connection,
         [parameter(Mandatory)]
         [string]$Path,
-        [Hashtable[]]$ParameterData,
+        [Hashtable[]]$Parameter,
         [parameter(Mandatory)]
         [ValidateSet("get", "set", "add", "update", "delete", "clone", "exec")]
         $Method,
@@ -77,13 +77,18 @@
             "method"  = "$Method"
             "params"  = @(
                 @{
-                    "data" = @($ParameterData                    )
+                    # "data" = @($Parameter                    )
                     "url"  = "$Path"
                 }
             )
             "session" = $existingSession
             "verbose" = 1
         }
+    }
+    if ($Parameter){
+        $global:hubba=$apiCallParameter
+        $Parameter | ForEach-Object { $apiCallParameter.body.params[0] += $_}
+        # $apiCallParameter.body.params[0]+=$Parameter
     }
 
     # $apiCallParameter.Body.params[0].url=$Path
