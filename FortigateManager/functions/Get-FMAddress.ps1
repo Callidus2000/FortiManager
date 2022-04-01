@@ -33,10 +33,8 @@
     syntax - Return the attribute syntax of a table or an object, instead of the actual entry data. All filter parameters will be ignored.
 
     .PARAMETER Filter
-    Filter the result according to a set of criteria.
-
-    string
-    example: @(@("{attribute}", "==", "{value}"))
+    Filter the result according to a set of criteria. For detailed help
+    see about_FortigateManagerFilter
 
     .PARAMETER GetUsed
     Parameter description

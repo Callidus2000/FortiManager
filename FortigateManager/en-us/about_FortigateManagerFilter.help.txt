@@ -1,0 +1,23 @@
+﻿TOPIC
+	about_FortigateManagerFilter
+
+SHORT DESCRIPTION
+	Explains how to use the filter parameters of Get-FM* functions
+
+LONG DESCRIPTION
+	If you want to use a filter parameter you have to supply (an array of)
+	strings in the following format:
+	"{attribute} {operator} {value}"
+
+	- The attribute depends on the object model you are querying.
+	- the operator is one of the following:
+	  -eq
+	  -like   (use % as a wildcard)
+	  -contain
+	- The value is the value used for filtering
+
+	Example:
+	Get-FMAddress -Filter "name -eq srv123","name -like %.mydomain.com"
+
+KEYWORDS
+	Fortigate, Filter
