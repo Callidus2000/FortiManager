@@ -51,5 +51,5 @@
         return $false
     }
     Write-PSFMessage "ADOM $explicitADOM successfully unlocked"
-    return $true
+   if (-not $EnableException){return $true}
 }

@@ -44,5 +44,5 @@
         return $false
     }
     Write-PSFMessage "ADOM $explicitADOM successfully commited"
-    return $true
+   if (-not $EnableException){return $true}
 }

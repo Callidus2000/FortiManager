@@ -1,33 +1,33 @@
 ﻿@{
 	# Script module or binary module file associated with this manifest
-	RootModule = 'FortigateManager.psm1'
+	RootModule        = 'FortigateManager.psm1'
 
 	# Version number of this module.
-	ModuleVersion = '0.0.1'
+	ModuleVersion     = '0.0.1'
 
 	# ID used to uniquely identify this module
-	GUID = '6c74c0d7-80cf-4bef-8fe1-19ac4a89c438'
+	GUID              = '6c74c0d7-80cf-4bef-8fe1-19ac4a89c438'
 
 	# Author of this module
-	Author = 'Sascha Spiekermann'
+	Author            = 'Sascha Spiekermann'
 
 	# Company or vendor of this module
-	CompanyName = 'MyCompany'
+	CompanyName       = 'MyCompany'
 
 	# Copyright statement for this module
-	Copyright = 'Copyright (c) 2022 Sascha Spiekermann'
+	Copyright         = 'Copyright (c) 2022 Sascha Spiekermann'
 
 	# Description of the functionality provided by this module
-	Description = 'A module to interact with a fortigate manager appliance'
+	Description       = 'A module to interact with a fortigate manager appliance'
 
 	# Minimum version of the Windows PowerShell engine required by this module
 	PowerShellVersion = '5.0'
 
 	# Modules that must be imported into the global environment prior to importing
 	# this module
-	RequiredModules = @(
-		@{ ModuleName='PSFramework'; ModuleVersion='1.6.214' }
-		@{ ModuleName='ARAH'; ModuleVersion='1.3.2' }
+	RequiredModules   = @(
+		@{ ModuleName = 'PSFramework'; ModuleVersion = '1.6.214' }
+		@{ ModuleName = 'ARAH'; ModuleVersion = '1.3.2' }
 	)
 
 	# Assemblies that must be loaded prior to importing this module
@@ -41,6 +41,7 @@
 
 	# Functions to export from this module
 	FunctionsToExport = @(
+		'Add-FMAddress'
 		'Connect-FM'
 		'Disconnect-FM'
 		'Get-FMAddress'
@@ -50,6 +51,7 @@
 		'Get-FMSystemStatus'
 		'Invoke-FMAPI'
 		'Lock-FMAdom'
+		'New-FMObjAddress'
 		'New-FMObjAddrGroup'
 		'Publish-FMAdomChange'
 		'Unlock-FMAdom'
@@ -57,22 +59,22 @@
 	)
 
 	# Cmdlets to export from this module
-	CmdletsToExport = ''
+	CmdletsToExport   = ''
 
 	# Variables to export from this module
 	VariablesToExport = ''
 
 	# Aliases to export from this module
-	AliasesToExport = ''
+	AliasesToExport   = ''
 
 	# List of all modules packaged with this module
-	ModuleList = @()
+	ModuleList        = @()
 
 	# List of all files packaged with this module
-	FileList = @()
+	FileList          = @()
 
 	# Private data to pass to the module specified in ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
-	PrivateData = @{
+	PrivateData       = @{
 
 		#Support for PowerShellGet galleries.
 		PSData = @{
