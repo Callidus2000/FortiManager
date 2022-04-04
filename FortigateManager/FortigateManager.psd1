@@ -54,6 +54,7 @@
 		'New-FMObjAddress'
 		'New-FMObjAddrGroup'
 		'Publish-FMAdomChange'
+		'Remove-FMAddress'
 		'Unlock-FMAdom'
 		'ConvertTo-FMFilterArray'
 	)
