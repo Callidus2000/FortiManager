@@ -19,14 +19,20 @@
     #>
     param (
         [parameter(Mandatory)]
-        $Connection
+        $Connection,
+        [bool]$EnableException = $true
     )
     $apiCallParameter = @{
         EnableException = $EnableException
         Connection      = $Connection
+        LoggingAction       = "Disconnect-FM"
+        LoggingActionValues = ""
         method          = "exec"
         Path            = "sys/logout"
     }
 
-    Invoke-FMAPI @apiCallParameter
+    $result=Invoke-FMAPI @apiCallParameter
+    if (-not $EnableException) {
+        return ($null -ne $result)
+    }
 }
