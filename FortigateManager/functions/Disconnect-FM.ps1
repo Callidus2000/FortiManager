@@ -22,9 +22,10 @@
         $Connection
     )
     $apiCallParameter = @{
-        Connection   = $Connection
-        method       = "exec"
-        Path         ="sys/logout"
+        EnableException = $EnableException
+        Connection      = $Connection
+        method          = "exec"
+        Path            = "sys/logout"
     }
 
     Invoke-FMAPI @apiCallParameter

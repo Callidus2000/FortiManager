@@ -29,20 +29,15 @@
     $explicitADOM = Resolve-FMAdom -Connection $Connection -Adom $ADOM
     Write-PSFMessage "`$explicitADOM=$explicitADOM"
     $apiCallParameter = @{
-        Connection = $Connection
-        method     = "exec"
-        Path       = "/dvmdb/adom/$explicitADOM/workspace/commit"
+        EnableException     = $EnableException
+        Connection          = $Connection
+        LoggingAction       = "Publish-FMAdomChange"
+        method              = "exec"
+        Path                = "/dvmdb/adom/$explicitADOM/workspace/commit"
     }
 
     $result = Invoke-FMAPI @apiCallParameter
-    $statusCode = $result.result.status.code
-    if ($statusCode -ne 0) {
-        Write-PSFMessage -Level Warning "ADOM $explicitADOM could not be commited"
-        if ($EnableException) {
-            throw "ADOM $explicitADOM could not be commited, Error-Message: $($result.result.status.Message)"
-        }
-        return $false
+    if (-not $EnableException) {
+        return ($null -ne $result)
     }
-    Write-PSFMessage "ADOM $explicitADOM successfully commited"
-   if (-not $EnableException){return $true}
 }

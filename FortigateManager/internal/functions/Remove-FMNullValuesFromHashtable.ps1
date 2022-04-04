@@ -9,7 +9,7 @@
         [parameter(mandatory = $false, ValueFromPipeline = $false, ParameterSetName = "default")]
         $NullHandler = "RemoveAttribute",
         [parameter(mandatory = $false, ValueFromPipeline = $false, ParameterSetName = "default")]
-        [long]$LongNullValue=-1
+        [long]$LongNullValue = -1
         # ,
         # [parameter(mandatory = $false, ParameterSetName = "clearEmpty")]
         # [switch]$ClearEmptyArrays,
@@ -18,48 +18,55 @@
     )
 
     begin {
+        if ($NullHandler -eq "RemoveAttribute") {
+            $logLevel = "Debug"
+        }
+        else {
+            $logLevel = "Verbose"
+        }
     }
 
     process {
     }
 
     end {
-        if ($NullHandler -eq "Keep"){
-            Write-PSFMessage "Returning inputObject unchanged"
+        if ($NullHandler -eq "Keep") {
+            Write-PSFMessage "Returning inputObject unchanged" -Level $logLevel
             return $InputObject
         }
         $keyList = $InputObject.Keys | ForEach-Object { "$_" }
         foreach ($key in $keyList) {
-            if ($null -eq $InputObject.$key){
+            if ($null -eq $InputObject.$key) {
                 continue
             }
             $paramaterType = $InputObject.$key.gettype()
             switch ($paramaterType) {
                 "System.Object[]" {
-                    write-psfmessage "Prüfe Null-Arrays"
+                    write-psfmessage "Prüfe Null-Arrays" -Level $logLevel
                     if ($InputObject.$key.Count -gt 0 -and ($null -eq $InputObject.$key[0])) {
                         if ($NullHandler -eq "ClearContent") {
-                            write-psfmessage "Replacing Array Attribute $key with empty Array"
+                            write-psfmessage "Replacing Array Attribute $key with empty Array" -Level $logLevel
                             $InputObject.$key = @()
-                        }else{
-                            write-psfmessage "Removing Array Attribute $key"
+                        }
+                        else {
+                            write-psfmessage "Removing Array Attribute $key" -Level $logLevel
                             $InputObject.Remove($key)
                         }
                     }
                 }
                 "string" {
-                    if (($NullHandler -eq "RemoveAttribute") -and ([string]::IsNullOrEmpty($InputObject.$key))){
-                        write-psfmessage "Removing String Attribute $key"
+                    if (($NullHandler -eq "RemoveAttribute") -and ([string]::IsNullOrEmpty($InputObject.$key))) {
+                        write-psfmessage "Removing String Attribute $key" -Level $logLevel
                         $InputObject.Remove($key)
                     }
                 }
                 "long" {
-if($NullHandler -eq "RemoveAttribute" -and $InputObject.$key -eq $LongNullValue){
-                        write-psfmessage "Removing Long Attribute $key"
+                    if ($NullHandler -eq "RemoveAttribute" -and $InputObject.$key -eq $LongNullValue) {
+                        write-psfmessage "Removing Long Attribute $key" -Level $logLevel
                         $InputObject.Remove($key)
                     }
                 }
-                Default { Write-PSFMessage -Level Verbose "Unknown ParamaterType $paramaterType" }
+                Default { Write-PSFMessage "Unknown ParamaterType $paramaterType" -Level $logLevel }
             }
         }
         return $InputObject

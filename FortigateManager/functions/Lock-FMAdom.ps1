@@ -26,23 +26,22 @@
         [string]$ADOM,
         [bool]$EnableException = $true
     )
-    $explicitADOM = Resolve-FMAdom -Connection $Connection -Adom $ADOM
-    Write-PSFMessage "`$explicitADOM=$explicitADOM"
-    $apiCallParameter = @{
-        Connection = $Connection
-        method     = "exec"
-        Path       = "/dvmdb/adom/$explicitADOM/workspace/lock"
-    }
+    # $ErrorActionPreference = [System.Management.Automation.ActionPreference]::Stop
 
-    $result = Invoke-FMAPI @apiCallParameter
-    $statusCode = $result.result.status.code
-    if ($statusCode -ne 0) {
-        Write-PSFMessage -Level Warning "ADOM $explicitADOM could not be locked"
-        if ($EnableException) {
-            throw "ADOM $explicitADOM could not be locked, Error-Message: $($result.result.status.Message)"
-        }
-        return $false
+    $explicitADOM = Resolve-FMAdom -Connection $Connection -Adom $ADOM
+    # Write-PSFMessage "`$explicitADOM=$explicitADOM"
+    $apiCallParameter = @{
+        EnableException     = $EnableException
+        Connection          = $Connection
+        LoggingAction       = "Lock-FMAdom"
+        LoggingActionValues = $explicitADOM
+        method              = "exec"
+        Path                = "/dvmdb/adom/$explicitADOM/workspace/lock"
     }
-    Write-PSFMessage "ADOM $explicitADOM successfully locked"
-   if (-not $EnableException){return $true}
+    $result = Invoke-FMAPI @apiCallParameter
+
+    # If EnableException an exception would have be thrown, otherwise the function returns true for success or false for failure
+    if (-not $EnableException){
+        return ($null -ne $result)
+    }
 }

@@ -48,28 +48,24 @@
         Write-PSFMessage "`$explicitADOM=$explicitADOM"
     }
     process {
-        $Address|ForEach-Object {$addressList+=$_}
+        $Address | ForEach-Object { $addressList += $_ }
     }
     end {
         $apiCallParameter = @{
-            Connection = $Connection
-            method     = "add"
-            Path       = "/pm/config/adom/$explicitADOM/obj/firewall/address"
-            Parameter  = @{
+            EnableException     = $EnableException
+            Connection          = $Connection
+            LoggingAction       = "Add-FMAddress"
+            LoggingActionValues = @($addressList.count, $explicitADOM)
+            method              = "add"
+            Path                = "/pm/config/adom/$explicitADOM/obj/firewall/address"
+            Parameter           = @{
                 "data" = $addressList
             }
         }
 
         $result = Invoke-FMAPI @apiCallParameter
-        $statusCode = $result.result.status.code
-        if ($statusCode -ne 0) {
-            Write-PSFMessage -Level Warning "Error adding addresses: $($result.result.status.Message)"
-            if ($EnableException) {
-                throw "Error adding addresses: $($result.result.status.Message)"
-            }
-            return $false
+        if (-not $EnableException) {
+            return ($null -ne $result)
         }
-        Write-PSFMessage "$($addressList.count) addresses successfully added"
-        if (-not $EnableException){return $true}
     }
 }

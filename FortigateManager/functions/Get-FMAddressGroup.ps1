@@ -31,12 +31,12 @@
     )
     $explicitADOM = Resolve-FMAdom -Connection $Connection -Adom $ADOM -EnableException $EnableException
     $apiCallParameter = @{
-        Connection   = $Connection
-        method       = "get"
-        Path         ="/pm/config/adom/$explicitADOM/obj/firewall/addrgrp"
+        EnableException = $EnableException
+        Connection      = $Connection
+        method          = "get"
+        Path            = "/pm/config/adom/$explicitADOM/obj/firewall/addrgrp"
     }
 
-    $result=Invoke-FMAPI @apiCallParameter
-    Write-PSFMessage "Result-Status: $($result.result.status)"
+    $result = Invoke-FMAPI @apiCallParameter
     return $result.result.data
 }

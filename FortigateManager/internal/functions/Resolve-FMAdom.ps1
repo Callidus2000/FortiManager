@@ -29,20 +29,20 @@
         [bool]$EnableException = $true
     )
     $adomAvailable = "$([string]::IsNullOrEmpty($ADOM) -eq $false)/$([string]::IsNullOrEmpty($connection.forti.defaultADOM) -eq $false)".ToLower()
-    Write-PSFMessage "Checking ADOM availibility: $adomAvailable (explicit/default)"
+    Write-PSFMessage "Checking ADOM availibility: $adomAvailable (explicit/default)" -Level Debug
     Write-PSFMessage "`$ADOM=$ADOM" -Level Debug
     Write-PSFMessage "`$connection.forti.defaultADOM=$($connection.forti.defaultADOM)" -Level Debug
     switch -wildcard ($adomAvailable) {
         "true/*" {
-            Write-PSFMessage "Explicit ADOM found"
+            Write-PSFMessage "Explicit ADOM found" -Level Debug
             return $ADOM
         }
         "false/true" {
-            Write-PSFMessage "No explicit ADOM but Default found"
+            Write-PSFMessage "No explicit ADOM but Default found" -Level Debug
             return $connection.forti.defaultADOM
         }
         "false/false" {
-            Write-PSFMessage "Neither explicit nor Default ADOM found"
+            Write-PSFMessage "Neither explicit nor Default ADOM found" -Level Debug
             if ($EnableException) {
                 throw "Neither explicit nor Default ADOM found"
             }

@@ -77,14 +77,13 @@
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [System.Object[]]$Range,
         [parameter(mandatory = $false, ParameterSetName = "default")]
-        [ValidateSet("_image-base64", "allow-routing", "associated-interface", "cache-ttl", "clearpass-spt", "color", "comment", "country", "dirty", "end-ip", "epg-name", "fabric-object", "filter", "fqdn", "fsso-group", "interface", "macaddr", "name", "node-ip-only", "obj-id", "obj-tag", "obj-type", "organization", "policy-group", "sdn", "sdn-addr-type", "sdn-tag", "start-ip", "sub-type", "subnet", "subnet-name", "tag-detection-level", "tag-type", "tenant", "type", "uuid","wildcard","wildcard-fqdn")]
+        [ValidateSet("_image-base64", "allow-routing", "associated-interface", "cache-ttl", "clearpass-spt", "color", "comment", "country", "dirty", "end-ip", "epg-name", "fabric-object", "filter", "fqdn", "fsso-group", "interface", "macaddr", "name", "node-ip-only", "obj-id", "obj-tag", "obj-type", "organization", "policy-group", "sdn", "sdn-addr-type", "sdn-tag", "start-ip", "sub-type", "subnet", "subnet-name", "tag-detection-level", "tag-type", "tenant", "type", "uuid", "wildcard", "wildcard-fqdn")]
         [System.Object[]]$Fields,
         [ValidateSet("Keep", "RemoveAttribute", "ClearContent")]
         [parameter(mandatory = $false, ValueFromPipeline = $false, ParameterSetName = "default")]
         $NullHandler = "RemoveAttribute"
     )
     $Parameter = @{
-        'url'      = "$Url"
         'attr'     = "$Attr"
         'sortings' = @($Sortings)
         'loadsub'  = $Loadsub
@@ -96,10 +95,13 @@
     } | Remove-FMNullValuesFromHashtable -NullHandler $NullHandler
     $explicitADOM = Resolve-FMAdom -Connection $Connection -Adom $ADOM -EnableException $EnableException
     $apiCallParameter = @{
-        Connection    = $Connection
-        method        = "get"
-        Parameter = $Parameter
-        Path          = "/pm/config/adom/$explicitADOM/obj/firewall/address"
+        EnableException     = $EnableException
+        Connection          = $Connection
+        LoggingAction       = "Get-FMAddress"
+        LoggingActionValues = ($Parameter.Keys.Count)
+        method              = "get"
+        Parameter           = $Parameter
+        Path                = "/pm/config/adom/$explicitADOM/obj/firewall/address"
     }
 
     $result = Invoke-FMAPI @apiCallParameter

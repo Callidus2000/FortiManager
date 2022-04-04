@@ -61,36 +61,71 @@
         [parameter(Mandatory)]
         [ValidateSet("get", "set", "add", "update", "delete", "clone", "exec")]
         $Method,
-        [bool]$EnableException=$true,
+        [bool]$EnableException = $true,
+        [string]$LoggingAction = "Invoke-FMAPI",
+        [string[]]$LoggingActionValues="",
         [switch]$EnablePaging
     )
+    # $callingFunctionName=(Get-Variable MyInvocation -Scope 1).Value.MyCommand.Name
+    # Write-PSFMessage "API Wrapper called from $($pscmdlet |convertto-json)" -Level Host
+    # $callingFunctionName = (Get-PSCallStack | Select-Object FunctionName -Skip 1 -First 1).FunctionName
+    # $callingFunctionName = (Get-PSCallStack | Where-Object { $_.FunctionName -notlike '<*' } | Select-Object -ExpandProperty FunctionName -first 1 -skip 1) -replace '<.*>'
+    # Write-PSFMessage "API Wrapper called from $LoggingAction"
+    # $pscmdlet | convertto-json | set-clipboard
     $existingSession = $connection.forti.session
     $requestId = $connection.forti.requestId
     $connection.forti.requestId = $connection.forti.requestId + 1
 
     $apiCallParameter = @{
-        Connection = $Connection
-        method     = "Post"
-        Path       = "/jsonrpc"
-        Body       =  @{
+        EnableException = $true
+        Connection      = $Connection
+        method          = "Post"
+        Path            = "/jsonrpc"
+        Body            = @{
             "id"      = $requestId
             "method"  = "$Method"
             "params"  = @(
                 @{
                     # "data" = @($Parameter                    )
-                    "url"  = "$Path"
+                    "url" = "$Path"
                 }
             )
             "session" = $existingSession
             "verbose" = 1
         }
     }
-    if ($Parameter){
-        $global:hubba=$apiCallParameter
-        $Parameter | ForEach-Object { $apiCallParameter.body.params[0] += $_}
+    if ($Parameter) {
+        # $global:hubba = $apiCallParameter
+        $Parameter | ForEach-Object { $apiCallParameter.body.params[0] += $_ }
         # $apiCallParameter.body.params[0]+=$Parameter
     }
 
     # $apiCallParameter.Body.params[0].url=$Path
-    return Invoke-ARAHRequest @apiCallParameter #-PagingHandler 'FM.PagingHandler'
+    # Invoke-PSFProtectedCommand -ActionString "APICall.$LoggingAction" -ActionStringValues $Url -Target $Url -ScriptBlock {
+    Invoke-PSFProtectedCommand -ActionString "APICall.$LoggingAction" -ActionStringValues $LoggingActionValues -ScriptBlock {
+        $result = Invoke-ARAHRequest @apiCallParameter #-PagingHandler 'FM.PagingHandler'
+        # if ($null -eq $result) {
+        #     Stop-PSFFunction -Message "ADOM could not be locked" -EnableException $EnableException -AlwaysWarning
+        #     return $false
+        # }
+        # elseif (-not $EnableException) { return $true }
+
+        if ($null -eq $result) {
+            Stop-PSFFunction -Message "No Result delivered" -EnableException $true
+            return $false
+        }
+        $statusCode = $result.result.status.code
+        if ($statusCode -ne 0) {
+            # Write-PSFMessage -Level Warning "Could not get Lockstatus of ADOM $explicitADOM"
+            Stop-PSFFunction -Message "API-Error, statusCode: $statusCode, Message $($result.result.status.Message)" -EnableException $true -StepsUpward 3 #-AlwaysWarning
+            # Throw "API-Error, statusCode: $statusCode, Message $($result.result.status.Message)" #-EnableException $true -StepsUpward 3 #-AlwaysWarning
+            return
+        }
+        return $result
+
+    # } -PSCmdlet $PSCmdlet  -EnableException $EnableException -Level (Get-PSFConfigValue -FullName "FortigateManager.Logging.Api" -Fallback "Verbose")
+    } -PSCmdlet $PSCmdlet  -EnableException $false -Level (Get-PSFConfigValue -FullName "FortigateManager.Logging.Api" -Fallback "Verbose")
+    if((Test-PSFFunctionInterrupt) -and $EnableException){
+        Throw "API-Error, statusCode: $statusCode, Message $($result.result.status.Message)" #-EnableException $true -StepsUpward 3 #-AlwaysWarning
+    }
 }

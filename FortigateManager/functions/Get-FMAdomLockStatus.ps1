@@ -30,20 +30,14 @@
     $explicitADOM = Resolve-FMAdom -Connection $Connection -Adom $ADOM -EnableException $EnableException
     Write-PSFMessage "`$explicitADOM=$explicitADOM"
     $apiCallParameter = @{
-        Connection = $Connection
-        method     = "get"
-        Path       = "/dvmdb/adom/$explicitADOM/workspace/lockinfo"
+        EnableException     = $EnableException
+        Connection          = $Connection
+        LoggingAction       = "Get-FMAdomLockStatus"
+        LoggingActionValues = $explicitADOM
+        method              = "get"
+        Path                = "/dvmdb/adom/$explicitADOM/workspace/lockinfo"
     }
 
     $result = Invoke-FMAPI @apiCallParameter
-    $statusCode = $result.result.status.code
-    if ($statusCode -ne 0) {
-        Write-PSFMessage -Level Warning "Could not get Lockstatus of ADOM $explicitADOM"
-        if ($EnableException) {
-            throw "ADOM $explicitADOM could not be locked, Error-Message: $($result.result.status.Message)"
-        }
-        # return $false
-    }
-
     return $result.result.data
 }

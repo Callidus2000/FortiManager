@@ -22,9 +22,12 @@
         $Connection
     )
     $apiCallParameter = @{
-        Connection   = $Connection
-        method       = "get"
-        Path         ="sys/status"
+        EnableException = $EnableException
+        Connection      = $Connection
+        LoggingAction       = "Get-FMSystemStatus"
+        LoggingActionValues = ""
+        method          = "get"
+        Path            = "sys/status"
     }
 
     Invoke-FMAPI @apiCallParameter

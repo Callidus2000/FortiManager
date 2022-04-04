@@ -32,24 +32,21 @@
     )
     $explicitADOM = Resolve-FMAdom -Connection $Connection -Adom $ADOM
     Write-PSFMessage "`$explicitADOM=$explicitADOM"
-    if ($Commit){
+    if ($Commit) {
         Publish-FMAdomChange -Connection $Connection -Adom $explicitADOM -EnableException $EnableException
     }
     $apiCallParameter = @{
-        Connection = $Connection
-        method     = "exec"
-        Path       = "/dvmdb/adom/$explicitADOM/workspace/unlock"
+        EnableException     = $EnableException
+        Connection          = $Connection
+        LoggingAction       = "Unlock-FMAdom"
+        LoggingActionValues = $explicitADOM
+        method              = "exec"
+        Path                = "/dvmdb/adom/$explicitADOM/workspace/unlock"
     }
 
     $result = Invoke-FMAPI @apiCallParameter
-    $statusCode = $result.result.status.code
-    if ($statusCode -ne 0) {
-        Write-PSFMessage -Level Warning "ADOM $explicitADOM could not be unlocked"
-        if ($EnableException) {
-            throw "ADOM $explicitADOM could not be unlocked, Error-Message: $($result.result.status.Message)"
-        }
-        return $false
+    # If EnableException an exception would have be thrown, otherwise the function returns true for success or false for failure
+    if (-not $EnableException) {
+        return ($null -ne $result)
     }
-    Write-PSFMessage "ADOM $explicitADOM successfully unlocked"
-   if (-not $EnableException){return $true}
 }

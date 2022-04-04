@@ -37,7 +37,7 @@
 		[string]$ADOM,
 		[parameter(mandatory = $true, ParameterSetName = "credential")]
 		[pscredential]$Credential,
-		[switch]$EnableException
+		[bool]$EnableException = $true
 	)
 	begin {
 	}
@@ -51,31 +51,40 @@
 		$connection.ContentType = "application/json;charset=UTF-8"
 
 		Write-PSFMessage "Stelle Verbindung her zu $Url" -Target $Url
-		Invoke-PSFProtectedCommand -ActionString "Connect-FM.Connecting" -ActionStringValues $Url -Target $Url -ScriptBlock {
 
-			$apiCallParameter = @{
-				Connection     = $Connection
-				method         = "exec"
-				Path           = "sys/login/user"
-				Parameter = @{
-					"data"=@{
+		$apiCallParameter = @{
+			Connection      = $Connection
+			EnableException = $EnableException
+			method          = "exec"
+			Path            = "sys/login/user"
+			LoggingAction   = "Connect-FM"
+			LoggingActionValues = @($Url, $Credential.UserName)
+			Parameter       = @{
+				"data" = @{
 					"passwd" = $Credential.GetNetworkCredential().Password
 					"user"   = $Credential.UserName
-					}
 				}
 			}
+		}
 
+		# Invoke-PSFProtectedCommand -ActionString "Connect-FM.Connecting" -ActionStringValues $Url -Target $Url -ScriptBlock {
 			$result = Invoke-FMAPI @apiCallParameter
-			$connection.authenticatedUser = $Credential.UserName
-			if ($result.session) {
-				$successFullConnected = $true
-				$connection.forti.session= $result.session
+			if ($null -eq $result) {
+				Stop-PSFFunction -Message "No API Results" -EnableException $EnableException
 			}
-			if($ADOM){
-				$connection.forti.defaultADOM= $ADOM
-			}
-		} -PSCmdlet $PSCmdlet  -EnableException $EnableException
-		if (Test-PSFFunctionInterrupt) { return }
+		# } -PSCmdlet $PSCmdlet  -EnableException $EnableException
+		if (Test-PSFFunctionInterrupt) {
+			Write-PSFMessage "Test-PSFFunctionInterrupt"
+			return
+		}
+		$connection.authenticatedUser = $Credential.UserName
+		if ($result.session) {
+			$successFullConnected = $true
+			$connection.forti.session = $result.session
+		}
+		if ($ADOM) {
+			$connection.forti.defaultADOM = $ADOM
+		}
 		if ($successFullConnected) {
 			Write-PSFMessage -string "Connect-FM.Connected"
 			return $connection
