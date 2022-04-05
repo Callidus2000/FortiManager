@@ -42,6 +42,7 @@
 	# Functions to export from this module
 	FunctionsToExport = @(
 		'Add-FMAddress'
+		'Add-FMAddressGroup'
 		'Connect-FM'
 		'Disconnect-FM'
 		'Get-FMAddress'
@@ -53,13 +54,15 @@
 		'Invoke-FMAPI'
 		'Lock-FMAdom'
 		'New-FMObjAddress'
-		'New-FMObjAddrGroup'
+		'New-FMObjAddressGroup'
 		'Publish-FMAdomChange'
 		'Remove-FMAddress'
+		'Remove-FMAddressGroup'
 		'Rename-FMAddress'
+		'Rename-FMAddressGroup'
 		'Unlock-FMAdom'
 		'Update-FMAddress'
-		'ConvertTo-FMFilterArray'
+		'Update-FMAddressGroup'
 	)
 
 	# Cmdlets to export from this module

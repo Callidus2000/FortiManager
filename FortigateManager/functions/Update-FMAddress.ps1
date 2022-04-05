@@ -77,7 +77,7 @@
             # if name is given 'data' does only accept one object but no array
             $apiCallParameter.Parameter.data=$addressList[0]
         }
-        $result = Invoke-FMAPI @apiCallParameter -verbose
+        $result = Invoke-FMAPI @apiCallParameter
         if (-not $EnableException) {
             return ($null -ne $result)
         }
