@@ -11,7 +11,7 @@
 	'APICall.Publish-FMAdomChange'   = 'Saving changes'
 	'APICall.Get-FMAdomLockStatus'   = 'Query current Lockstatus of ADOM {0}'
 	'APICall.Remove-FMAddress'   = 'Remove address {0}'
-	'APICall.Disconnect-FM'   = 'Disconnecting Sessioan'
+	'APICall.Disconnect-FM'   = 'Disconnecting Session'
 	'Connect-FM.Connected'    = 'Connection established' #
 	'Connect-FM.NotConnected' = 'Connection could not be established' #
 }

@@ -53,8 +53,8 @@
     #>
 
     param (
-        [parameter(Mandatory)]
-        $Connection,
+        [parameter(Mandatory = $false)]
+        $Connection = (Get-FMLastConnection),
         [parameter(Mandatory)]
         [string]$Path,
         [Hashtable[]]$Parameter,
@@ -66,6 +66,14 @@
         [string[]]$LoggingActionValues="",
         [switch]$EnablePaging
     )
+    if(-not $Connection){
+        Write-PSFMessage "Keine Connection als Parameter erhalten, frage die letzte ab"
+        $Connection = Get-FMLastConnection -EnableException $EnableException
+        if(-not $Connection){
+            Stop-PSFFunction "No last connection available" -EnableException $EnableException -AlwaysWarning
+            return
+        }
+    }
     # $callingFunctionName=(Get-Variable MyInvocation -Scope 1).Value.MyCommand.Name
     # Write-PSFMessage "API Wrapper called from $($pscmdlet |convertto-json)" -Level Host
     # $callingFunctionName = (Get-PSCallStack | Select-Object FunctionName -Skip 1 -First 1).FunctionName

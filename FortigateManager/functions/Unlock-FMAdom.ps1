@@ -24,8 +24,8 @@
     General notes
     #>
     param (
-        [parameter(Mandatory)]
-        $Connection,
+        [parameter(Mandatory=$false)]
+        $Connection = (Get-FMLastConnection),
         [string]$ADOM,
         [bool]$EnableException = $true,
         [switch]$Commit

@@ -15,6 +15,9 @@
     .PARAMETER Address
     The new address, generated e.g. by using New-FMObjAddress
 
+    .PARAMETER Overwrite
+    If used and an address with the given name already exists the data will be overwritten.
+
     .EXAMPLE
     # Read some input in the format [IP]/[Subnet-Mask]
     $missingAddresses=Get-Content "PATH TO SOME FILE"
@@ -35,11 +38,12 @@
     General notes
     #>
     param (
-        [parameter(Mandatory)]
-        $Connection,
+        [parameter(Mandatory=$false)]
+        $Connection = (Get-FMLastConnection),
         [string]$ADOM,
         [parameter(mandatory = $true, ValueFromPipeline = $true, ParameterSetName = "default")]
         [object[]]$Address,
+        [switch]$Overwrite,
         [bool]$EnableException = $true
     )
     begin {
@@ -62,7 +66,10 @@
                 "data" = $addressList
             }
         }
-
+        if ($Overwrite){
+            Write-PSFMessage "Existing data should be overwritten"
+            $apiCallParameter.method="set"
+        }
         $result = Invoke-FMAPI @apiCallParameter
         if (-not $EnableException) {
             return ($null -ne $result)

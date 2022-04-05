@@ -42,51 +42,56 @@
 	begin {
 	}
 	end {
-		$successFullConnected = $false
 		$connection = Get-ARAHConnection -Url $Url -APISubPath ""
 		Add-Member -InputObject $connection -MemberType NoteProperty -Name "forti" -Value @{
 			requestId = 1
 			session   = $null
+			EnableException=$EnableException
 		}
+		$connection.credential = $Credential
 		$connection.ContentType = "application/json;charset=UTF-8"
-
-		Write-PSFMessage "Stelle Verbindung her zu $Url" -Target $Url
-
-		$apiCallParameter = @{
-			Connection      = $Connection
-			EnableException = $EnableException
-			method          = "exec"
-			Path            = "sys/login/user"
-			LoggingAction   = "Connect-FM"
-			LoggingActionValues = @($Url, $Credential.UserName)
-			Parameter       = @{
-				"data" = @{
-					"passwd" = $Credential.GetNetworkCredential().Password
-					"user"   = $Credential.UserName
-				}
-			}
-		}
-
-		# Invoke-PSFProtectedCommand -ActionString "Connect-FM.Connecting" -ActionStringValues $Url -Target $Url -ScriptBlock {
-			$result = Invoke-FMAPI @apiCallParameter
-			if ($null -eq $result) {
-				Stop-PSFFunction -Message "No API Results" -EnableException $EnableException
-			}
-		# } -PSCmdlet $PSCmdlet  -EnableException $EnableException
-		if (Test-PSFFunctionInterrupt) {
-			Write-PSFMessage "Test-PSFFunctionInterrupt"
-			return
-		}
 		$connection.authenticatedUser = $Credential.UserName
-		if ($result.session) {
-			$successFullConnected = $true
-			$connection.forti.session = $result.session
-		}
 		if ($ADOM) {
 			$connection.forti.defaultADOM = $ADOM
 		}
-		if ($successFullConnected) {
+
+		Add-Member -InputObject $connection -MemberType ScriptMethod -Name "Refresh" -Value {
+			$functionName = "Connect-FM>Refresh"
+			Write-PSFMessage "Stelle Verbindung her zu $($this.ServerRoot)" -Target $this.ServerRoot -FunctionName $functionName
+
+			$apiCallParameter = @{
+				Connection          = $this
+				EnableException     = $this.forti.EnableException
+				method              = "exec"
+				Path                = "sys/login/user"
+				LoggingAction       = "Connect-FM"
+				LoggingActionValues = @($this.ServerRoot, $this.Credential.UserName)
+				Parameter           = @{
+					"data" = @{
+						"passwd" = $this.Credential.GetNetworkCredential().Password
+						"user"   = $this.Credential.UserName
+					}
+				}
+			}
+
+			# Invoke-PSFProtectedCommand -ActionString "Connect-FM.Connecting" -ActionStringValues $Url -Target $Url -ScriptBlock {
+			$result = Invoke-FMAPI @apiCallParameter
+			if ($null -eq $result) {
+				Stop-PSFFunction -Message "No API Results" -EnableException $EnableException -FunctionName $functionName
+			}
+			# } -PSCmdlet $PSCmdlet  -EnableException $EnableException
+			if (Test-PSFFunctionInterrupt) {
+				Write-PSFMessage "Test-PSFFunctionInterrupt" -FunctionName $functionName
+				return
+			}
+			if ($result.session) {
+				$this.forti.session = $result.session
+			}
+		}
+		$connection.Refresh()
+		if ($connection.forti.session) {
 			Write-PSFMessage -string "Connect-FM.Connected"
+			Set-PSFConfig -Module 'FortigateManager' -Name 'LastConnection' -Value $connection -Description "Last known Connection" -AllowDelete
 			return $connection
 		}
 		Write-PSFMessage -string "Connect-FM.NotConnected" -Level Warning
