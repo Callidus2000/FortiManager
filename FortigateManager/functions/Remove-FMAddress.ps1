@@ -33,6 +33,7 @@
     .NOTES
     General notes
     #>
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param (
         [parameter(Mandatory=$false)]
         $Connection = (Get-FMLastConnection),
@@ -57,14 +58,14 @@
         $addressList = @()
     }
     process {
-        $addressList += $Name -replace '/', '\/'
+        $addressList += $Name #-replace '/', '\/'
     }
     end {
         # Removing potential Null values
-        $addressList = $addressList | Where-Object { $_ }
-        foreach ($name in $addressList) {
-            $apiCallParameter.Path = "/pm/config/adom/$explicitADOM/obj/firewall/address/$name"
-            $apiCallParameter.LoggingActionValues = $name
+        $addressList = $addressList | Where-Object { $_ } | ConvertTo-FMUrlPart
+        foreach ($addrName in $addressList) {
+            $apiCallParameter.Path = "/pm/config/adom/$explicitADOM/obj/firewall/address/$addrName"
+            $apiCallParameter.LoggingActionValues = $addrName
             $result = Invoke-FMAPI @apiCallParameter
         }
         # # If EnableException an exception would have be thrown, otherwise the function returns true for success or false for failure

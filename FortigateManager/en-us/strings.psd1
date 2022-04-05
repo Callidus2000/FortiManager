@@ -6,6 +6,7 @@
 	'APICall.Lock-FMAdom'   = 'Locking ADOM {0}'
 	'APICall.Unlock-FMAdom'   = 'Unlocking ADOM {0}'
 	'APICall.Add-FMAddress'   = 'Adding {0} addresses to ADOM {1}'
+	'APICall.Update-FMAddress'   = 'Updating {0} addresses to ADOM {1}, additional -Name: {2}'
 	'APICall.Get-FMAddress'   = 'Query addresses, {0} parameters used'
 	'APICall.Get-FMSystemStatus'   = 'Query Systemstatus'
 	'APICall.Publish-FMAdomChange'   = 'Saving changes'

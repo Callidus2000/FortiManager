@@ -48,6 +48,7 @@
 		'Get-FMAddressGroup'
 		'Get-FMAdomLockStatus'
 		'Get-FMDataModel'
+		'Get-FMLastConnection'
 		'Get-FMSystemStatus'
 		'Invoke-FMAPI'
 		'Lock-FMAdom'
@@ -56,6 +57,7 @@
 		'Publish-FMAdomChange'
 		'Remove-FMAddress'
 		'Unlock-FMAdom'
+		'Update-FMAddress'
 		'ConvertTo-FMFilterArray'
 	)
 
