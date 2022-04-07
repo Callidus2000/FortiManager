@@ -134,5 +134,11 @@
         'wildcard'             = "$Wildcard"
         'wildcard-fqdn'        = "$WildcardFqdn"
     }
-    return $data | Remove-FMNullValuesFromHashtable -NullHandler $NullHandler
+    $data = $data | Remove-FMNullValuesFromHashtable -NullHandler $NullHandler
+    if ($data.subnet){
+        Write-PSFMessage "Converting ipMask $($data.subnet) to CIDR Notation if neccessary"
+        $data.subnet = Convert-FMSubnetMask -Target CIDR -IPMask $data.subnet
+        Write-PSFMessage " > ipMask= $($data.subnet)"
+    }
+    return $data
 }

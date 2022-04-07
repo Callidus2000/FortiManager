@@ -15,6 +15,9 @@
     .PARAMETER SubnetMask
     The current subnet mask which should be converted
 
+    .PARAMETER IPMask
+    The current ip/subnetmask which should be converted
+
     .PARAMETER EnableException
 	Should Exceptions been thrown? If the SubnetMask can't be converted and set
     to $true an exception will be thrown, otherwise the function returns $null
@@ -28,6 +31,10 @@
     Convert-FMSubnetMask -SubnetMask 24
 
     Returns 255.255.255.0
+    .EXAMPLE
+    Convert-FMSubnetMask -IPMask "192.16.0.0/255.255.255.0"
+
+    Returns 192.16.0.0/24
 
     .NOTES
     General notes
@@ -36,8 +43,10 @@
     param (
         # [parameter(mandatory = $true, ParameterSetName = "cidr")]
         # [string]$Cidr,
-        [parameter(mandatory = $true, ParameterSetName = "longmask")]
+        [parameter(mandatory = $true, ParameterSetName = "subnet")]
         [string]$SubnetMask,
+        [parameter(mandatory = $true, ParameterSetName = "ipMask")]
+        [string]$IPMask,
         [ValidateSet("Auto", "CIDR", "Octet")]
         [string]$Target="Auto",
         [bool]$EnableException = $true
@@ -113,6 +122,13 @@
     }
 
     end {
+        if($IPMask){
+            Write-PSFMessage "Splitting ipMask into ip and subnet: $IPMask"
+            $pair=$IPMask -split '/'
+            $ip = $pair[0]
+            $SubnetMask = $pair[1]
+            Write-PSFMessage "Splitting ipMask into ip ($($pair[0]))and subnet $($pair[1]): $IPMask"
+        }
         if($SubnetMask.length -gt 2){
             $currentFormat= "Octet"
         }else{
@@ -120,9 +136,19 @@
         }
         Write-PSFMessage "Converting $currentFormat>$Target"
         if($currentFormat -eq $Target){
-            return $SubnetMask
+            Write-PSFMessage "No Conversion of $SubnetMask needed"
+            $result="$SubnetMask"
+        }else{
+            $result = $conversionTable."$SubnetMask"
         }
-        $result = $conversionTable."$SubnetMask"
+        if($null -eq $result -and $EnableException){
+            throw "Could not convert subnet mask $SubnetMask"
+        }
+        Write-PSFMessage "`$result=$result"
+
+        if($IPMask){
+            return "$ip/$result"
+        }
         return $result
     }
 }
