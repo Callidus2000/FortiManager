@@ -44,7 +44,7 @@
 		'Add-FMAddress'
 		'Add-FMAddressGroup'
 		'Connect-FM'
-		'Convert-FMIpAddressToMaskLength'
+		'Convert-FMSubnetMask'
 		'Disconnect-FM'
 		'Get-FMAddress'
 		'Get-FMAddressGroup'
