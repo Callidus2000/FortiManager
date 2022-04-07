@@ -3,7 +3,7 @@
 	RootModule        = 'FortigateManager.psm1'
 
 	# Version number of this module.
-	ModuleVersion     = '0.0.1'
+	ModuleVersion     = '1.0.0'
 
 	# ID used to uniquely identify this module
 	GUID              = '6c74c0d7-80cf-4bef-8fe1-19ac4a89c438'
@@ -92,10 +92,10 @@
 			# Tags = @()
 
 			# A URL to the license for this module.
-			# LicenseUri = ''
+			LicenseUri = 'https://github.com/Callidus2000/FortiManager/blob/master/LICENSE'
 
 			# A URL to the main website for this project.
-			# ProjectUri = ''
+			ProjectUri = 'https://github.com/Callidus2000/FortiManager/'
 
 			# A URL to an icon representing this module.
 			# IconUri = ''
