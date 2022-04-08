@@ -10,7 +10,9 @@
         $filterInputArray = @()
         $operatorTranslation = @{
             "-eq"       = "=="
+            "-ne"       = "!=="
             "-like"     = "like"
+            "-notlike"  = "!like"
             "-contains" = "contain"
         }
     }
@@ -22,14 +24,20 @@
     end {
         foreach ($filterString in $filterInputArray) {
             Write-PSFMessage "Analysiere '$filterString'"
-            $regexResults = [regex]::Matches($filterString, "(?<attribute>.*) (?<operator>-eq|-like|-contains) (?<value>.*)")
+            $regexResults = [regex]::Matches($filterString, "(?<attribute>.*) (?<operator>-eq|-ne|-notlike|-like|-contains) (?<value>.*)")
             Write-PSFMessage "`$regexResults=$($regexResults)"
             if ($regexResults) {
-                $currentFilter = @(
-                    $regexResults[0].Groups["attribute"].value,
-                    $operatorTranslation."$($regexResults[0].Groups["operator"].value)",
-                    $regexResults[0].Groups["value"].value
-                )
+                $attribute = $regexResults[0].Groups["attribute"].value
+                $operator = $operatorTranslation."$($regexResults[0].Groups["operator"].value)"
+                $value = $regexResults[0].Groups["value"].value
+                if ($operator -like '!*') {
+                    $currentFilter = @("!")
+                    $operator = $operator.Trim("!")
+                }
+                else {
+                    $currentFilter = @()
+                }
+                $currentFilter += @($attribute, $operator, $value)
                 $resultArray += , ($currentFilter)
             }
             else {

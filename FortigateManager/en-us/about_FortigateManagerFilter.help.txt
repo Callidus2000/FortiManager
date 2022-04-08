@@ -12,8 +12,10 @@ LONG DESCRIPTION
 	- The attribute depends on the object model you are querying.
 	- the operator is one of the following:
 	  -eq
-	  -like   (use % as a wildcard)
+	  -like   (use % (multi) and _ (single char) as a wildcard)
 	  -contain
+	  -ne
+	  -notlike
 	- The value is the value used for filtering
 
 	Example:
