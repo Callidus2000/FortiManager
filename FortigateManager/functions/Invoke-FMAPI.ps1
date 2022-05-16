@@ -59,17 +59,17 @@
         [string]$Path,
         [Hashtable[]]$Parameter,
         [parameter(Mandatory)]
-        [ValidateSet("get", "set", "add", "update", "delete", "clone", "exec")]
+        [ValidateSet("get", "set", "add", "update", "delete", "clone", "exec", "move", "clone")]
         $Method,
         [bool]$EnableException = $true,
         [string]$LoggingAction = "Invoke-FMAPI",
-        [string[]]$LoggingActionValues="",
+        [string[]]$LoggingActionValues = "",
         [switch]$EnablePaging
     )
-    if(-not $Connection){
+    if (-not $Connection) {
         Write-PSFMessage "Keine Connection als Parameter erhalten, frage die letzte ab"
         $Connection = Get-FMLastConnection -EnableException $EnableException
-        if(-not $Connection){
+        if (-not $Connection) {
             Stop-PSFFunction "No last connection available" -EnableException $EnableException -AlwaysWarning
             return
         }
@@ -131,9 +131,9 @@
         }
         return $result
 
-    # } -PSCmdlet $PSCmdlet  -EnableException $EnableException -Level (Get-PSFConfigValue -FullName "FortigateManager.Logging.Api" -Fallback "Verbose")
+        # } -PSCmdlet $PSCmdlet  -EnableException $EnableException -Level (Get-PSFConfigValue -FullName "FortigateManager.Logging.Api" -Fallback "Verbose")
     } -PSCmdlet $PSCmdlet  -EnableException $false -Level (Get-PSFConfigValue -FullName "FortigateManager.Logging.Api" -Fallback "Verbose")
-    if((Test-PSFFunctionInterrupt) -and $EnableException){
+    if ((Test-PSFFunctionInterrupt) -and $EnableException) {
         Throw "API-Error, statusCode: $statusCode, Message $($result.result.status.Message)" #-EnableException $true -StepsUpward 3 #-AlwaysWarning
     }
 }

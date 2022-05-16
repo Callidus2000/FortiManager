@@ -43,6 +43,7 @@
 	FunctionsToExport = @(
 		'Add-FMAddress'
 		'Add-FMAddressGroup'
+		'Add-FMFirewallPolicy'
 		'Connect-FM'
 		'Convert-FMSubnetMask'
 		'Disconnect-FM'
@@ -50,13 +51,17 @@
 		'Get-FMAddressGroup'
 		'Get-FMAdomLockStatus'
 		'Get-FMDataModel'
+		'Get-FMFirewallPolicy'
 		'Get-FMLastConnection'
+		'Get-FMPolicyPackage'
 		'Get-FMSystemStatus'
 		'Invoke-FMAPI'
 		'Lock-FMAdom'
+		'Move-FMFirewallPolicy'
 		'New-FMObjAddress'
 		'New-FMObjAddressGroup'
 		'New-FMObjDynamicMapping'
+		'New-FMObjFirewallPolicy'
 		'Publish-FMAdomChange'
 		'Remove-FMAddress'
 		'Remove-FMAddressGroup'
@@ -65,6 +70,7 @@
 		'Unlock-FMAdom'
 		'Update-FMAddress'
 		'Update-FMAddressGroup'
+		'Update-FMFirewallPolicy'
 	)
 
 	# Cmdlets to export from this module
