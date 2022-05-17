@@ -60,7 +60,7 @@
 		'Move-FMFirewallPolicy'
 		'New-FMObjAddress'
 		'New-FMObjAddressGroup'
-		'New-FMObjDynamicMapping'
+		'New-FMObjDynamicAddressGroupMapping'
 		'New-FMObjFirewallPolicy'
 		'Publish-FMAdomChange'
 		'Remove-FMAddress'
