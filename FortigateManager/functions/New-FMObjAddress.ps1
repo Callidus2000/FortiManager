@@ -1,4 +1,148 @@
 ﻿function New-FMObjAddress {
+    <#
+    .SYNOPSIS
+    Helper for creating new Address-Objects.
+
+    .DESCRIPTION
+    Helper for creating new Address-Objects.
+    Each parameter corresponds to an address attribute with the exception of
+    IpRange. This will be split into the attributes StartIp and EndIp
+
+    .PARAMETER ImageBase64
+    Parameter description
+
+    .PARAMETER AllowRouting
+    Parameter description
+
+    .PARAMETER AssociatedInterface
+    Parameter description
+
+    .PARAMETER CacheTtl
+    Parameter description
+
+    .PARAMETER ClearpassSpt
+    Parameter description
+
+    .PARAMETER Color
+    Parameter description
+
+    .PARAMETER Comment
+    Parameter description
+
+    .PARAMETER Country
+    Parameter description
+
+    .PARAMETER Dirty
+    Parameter description
+
+    .PARAMETER Dynamic_mapping
+    Parameter description
+
+    .PARAMETER EndIp
+    Parameter description
+
+    .PARAMETER EpgName
+    Parameter description
+
+    .PARAMETER FabricObject
+    Parameter description
+
+    .PARAMETER Filter
+    Parameter description
+
+    .PARAMETER Fqdn
+    Parameter description
+
+    .PARAMETER FssoGroup
+    Parameter description
+
+    .PARAMETER Interface
+    Parameter description
+
+    .PARAMETER IpRange
+    Parameter description
+
+    .PARAMETER List
+    Parameter description
+
+    .PARAMETER Macaddr
+    Parameter description
+
+    .PARAMETER Name
+    Parameter description
+
+    .PARAMETER NodeIpOnly
+    Parameter description
+
+    .PARAMETER ObjId
+    Parameter description
+
+    .PARAMETER ObjTag
+    Parameter description
+
+    .PARAMETER ObjType
+    Parameter description
+
+    .PARAMETER Organization
+    Parameter description
+
+    .PARAMETER PolicyGroup
+    Parameter description
+
+    .PARAMETER Sdn
+    Parameter description
+
+    .PARAMETER SdnAddrType
+    Parameter description
+
+    .PARAMETER SdnTag
+    Parameter description
+
+    .PARAMETER StartIp
+    Parameter description
+
+    .PARAMETER SubType
+    Parameter description
+
+    .PARAMETER Subnet
+    Parameter description
+
+    .PARAMETER SubnetName
+    Parameter description
+
+    .PARAMETER TagDetectionLevel
+    Parameter description
+
+    .PARAMETER TagType
+    Parameter description
+
+    .PARAMETER Tagging
+    Parameter description
+
+    .PARAMETER Tenant
+    Parameter description
+
+    .PARAMETER Type
+    Parameter description
+
+    .PARAMETER Uuid
+    Parameter description
+
+    .PARAMETER Wildcard
+    Parameter description
+
+    .PARAMETER WildcardFqdn
+    Parameter description
+
+    .PARAMETER NullHandler
+    Parameter description
+
+    .EXAMPLE
+    An example
+
+    .NOTES
+    General notes
+    #>
     [CmdletBinding()]
     param (
         [parameter(mandatory = $false, ParameterSetName = "default")]
@@ -37,6 +181,8 @@
         [System.Object[]]$FssoGroup,
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$Interface,
+        [parameter(mandatory = $false, ParameterSetName = "default")]
+        [string]$IpRange,
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [System.Object[]]$List,
         [parameter(mandatory = $false, ParameterSetName = "default")]
@@ -91,6 +237,14 @@
         [parameter(mandatory = $false, ValueFromPipeline = $false, ParameterSetName = "default")]
         $NullHandler = "RemoveAttribute"
     )
+    if ($IpRange){
+        Write-PSFMessage "Extracting Start- and End-IP from Range $IpRange"
+        $regex = "(\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b)[ -]+(\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b)"
+        $rangeMatches=$IpRange|Select-String -Pattern $regex
+        $StartIp = $rangeMatches.Matches[0].Groups[1].Value
+        $EndIp = $rangeMatches.Matches[0].Groups[2].Value
+        Write-PSFMessage "StartIP=$StartIp  EndIp=$EndIp"
+    }
     $data = @{
         '_image-base64'        = "$ImageBase64"
         'allow-routing'        = "$AllowRouting"
