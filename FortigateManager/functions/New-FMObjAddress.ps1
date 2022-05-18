@@ -35,7 +35,7 @@
     .PARAMETER Dirty
     Parameter description
 
-    .PARAMETER Dynamic_mapping
+    .PARAMETER DynamicMapping
     Parameter description
 
     .PARAMETER EndIp
@@ -165,7 +165,7 @@
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$Dirty,
         [parameter(mandatory = $false, ParameterSetName = "default")]
-        [System.Object[]]$Dynamic_mapping,
+        [System.Object[]]$DynamicMapping,
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$EndIp,
         [parameter(mandatory = $false, ParameterSetName = "default")]
@@ -255,7 +255,7 @@
         'comment'              = "$Comment"
         'country'              = "$Country"
         'dirty'                = "$Dirty"
-        'dynamic_mapping'      = @($Dynamic_mapping)
+        'dynamic_mapping'      = @($DynamicMapping)
         'end-ip'               = "$EndIp"
         'epg-name'             = "$EpgName"
         'fabric-object'        = "$FabricObject"

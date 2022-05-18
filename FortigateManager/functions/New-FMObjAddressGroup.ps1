@@ -12,7 +12,7 @@
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$Comment,
         [parameter(mandatory = $false, ParameterSetName = "default")]
-        [System.Object[]]$Dynamic_mapping,
+        [System.Object[]]$DynamicMapping,
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$Exclude,
         [parameter(mandatory = $false, ParameterSetName = "default")]
@@ -39,7 +39,7 @@
         'category'        = "$Category"
         'color'           = $Color
         'comment'         = "$Comment"
-        'dynamic_mapping' = @($Dynamic_mapping)
+        'dynamic_mapping' = @($DynamicMapping)
         'exclude'         = "$Exclude"
         'exclude-member'  = @($ExcludeMember)
         'fabric-object'   = "$FabricObject"
