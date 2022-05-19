@@ -309,6 +309,9 @@
     .PARAMETER ScheduleTimeout
     Parameter description
 
+    .PARAMETER ScopeMember
+    The "Install on" property of a firewall policy; undocumented within the API.
+
     .PARAMETER SctpFilterProfile
     Parameter description
 
@@ -715,6 +718,8 @@
         [ValidateSet("disable", "enable")]
         [string]$ScheduleTimeout,
         [parameter(mandatory = $false, ParameterSetName = "default")]
+        [object[]]$ScopeMember,
+        [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$SctpFilterProfile,
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [ValidateSet("disable", "enable")]
@@ -932,6 +937,7 @@
         'rtp-nat'                           = "$RtpNat"
         'schedule'                          = "$Schedule"
         'schedule-timeout'                  = "$ScheduleTimeout"
+        'scope member'                      = @($ScopeMember)
         'sctp-filter-profile'               = "$SctpFilterProfile"
         'send-deny-packet'                  = "$SendDenyPacket"
         'service'                           = @($Service)
