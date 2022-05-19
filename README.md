@@ -76,7 +76,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-This Powershell Module is a wrapper for the API of Fortigate FortiManager. Fortigate FortiManager is a 
+This Powershell Module is a wrapper for the API of Fortnet FortiManager. Fortnet FortiManager is a 
 solution for managing multiple instances of Fortigate firewalls.
 
 The API is documented in the [Fortinet Developer Network](https://fndn.fortinet.net/).
@@ -104,12 +104,12 @@ The releases are published in the Powershell Gallery, therefor it is quite simpl
   ```powershell
   Install-Module FortiManager -Force -AllowClobber
   ```
-The `AllowClobber` option is currently neccessary because of an issue in the current PowerShellGet module. Hopefully it will not be needed in the future any more.
+The `AllowClobber` option is currently necessary because of an issue in the current PowerShellGet module. Hopefully it will not be needed in the future any more.
 
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-The module is a wrapper for the Fortigate FortiManager API. For getting started take a look at the integrated help of the included functions.
+The module is a wrapper for the Fortnet FortiManager API. For getting started take a look at the integrated help of the included functions.
 
 Main Entries:
 * Connect-FM - Connect to your installation
@@ -160,6 +160,8 @@ everything else is documented in the module itself.
 <!-- ROADMAP -->
 ## Roadmap
 New features will be added if any of my scripts need it ;-)
+
+Until V2.0.0 I cannot guarantee that no breaking change will occur as the development follows my internal DevOps need completely. Likewise I will not insert full documentation of all parameters as I don't have time for this copy&paste. Sorry.
 
 See the [open issues](https://github.com/Callidus2000/FortiManager/issues) for a list of proposed features (and known issues).
 
