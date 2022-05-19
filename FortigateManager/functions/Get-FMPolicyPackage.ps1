@@ -40,7 +40,7 @@
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$Name,
         [parameter(mandatory = $false, ParameterSetName = "default")]
-        [ValidateSet("_image-base64", "allow-routing", "associated-interface", "cache-ttl", "clearpass-spt", "color", "comment", "country", "dirty", "end-ip", "epg-name", "fabric-object", "filter", "fqdn", "fsso-group", "interface", "macaddr", "name", "node-ip-only", "obj-id", "obj-tag", "obj-type", "organization", "policy-group", "sdn", "sdn-addr-type", "sdn-tag", "start-ip", "sub-type", "subnet", "subnet-name", "tag-detection-level", "tag-type", "tenant", "type", "uuid", "wildcard", "wildcard-fqdn")]
+        [ValidateSet("name", "obj ver", "oid", "scope member", "type")]
         [System.Object[]]$Fields,
         [ValidateSet("Keep", "RemoveAttribute", "ClearContent")]
         [parameter(mandatory = $false, ValueFromPipeline = $false, ParameterSetName = "default")]
@@ -54,7 +54,7 @@
     $apiCallParameter = @{
         EnableException     = $EnableException
         Connection          = $Connection
-        LoggingAction       = "Get-FMPolicy"
+        LoggingAction       = "Get-FMPolicyPackage"
         LoggingActionValues = ($Parameter.Keys.Count)
         method              = "get"
         Parameter           = $Parameter
@@ -63,7 +63,7 @@
     if ($Name){
             $apiCallParameter.Path+="/$Name"
     }
-    $result = Invoke-FMAPI @apiCallParameter
+    $result = Invoke-FMAPI @apiCallParameter -verbose
     Write-PSFMessage "Result-Status: $($result.result.status)"
     return $result.result.data
 }

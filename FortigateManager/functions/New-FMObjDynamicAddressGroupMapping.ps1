@@ -5,7 +5,7 @@
 
     .DESCRIPTION
     Creates a new DynamicMapping object with the given attributes.
-    The result can be used for Dynamic_mapping parameters
+    The result can be used for DynamicMapping parameters
 
     .PARAMETER ImageBase64
     Parameter description

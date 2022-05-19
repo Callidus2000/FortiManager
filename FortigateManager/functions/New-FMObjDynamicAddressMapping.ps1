@@ -1,14 +1,18 @@
-﻿function New-FMObjAddress {
+﻿function New-FMObjDynamicAddressMapping {
     <#
     .SYNOPSIS
-    Helper for creating new Address-Objects.
+    Creates a new DynamicMapping object with the given attributes for Address-Objects.
 
     .DESCRIPTION
-    Helper for creating new Address-Objects.
+    Creates a new DynamicMapping object with the given attributes.
+    The result can be used for DynamicMapping parameters
     Each parameter corresponds to an address attribute with the exception of
     IpRange. This will be split into the attributes StartIp and EndIp
 
     .PARAMETER ImageBase64
+    Parameter description
+
+    .PARAMETER Scope
     Parameter description
 
     .PARAMETER AllowRouting
@@ -35,10 +39,10 @@
     .PARAMETER Dirty
     Parameter description
 
-    .PARAMETER DynamicMapping
+    .PARAMETER EndIp
     Parameter description
 
-    .PARAMETER EndIp
+    .PARAMETER EndMac
     Parameter description
 
     .PARAMETER EpgName
@@ -56,19 +60,16 @@
     .PARAMETER FssoGroup
     Parameter description
 
+    .PARAMETER GlobalObject
+    Parameter description
+
     .PARAMETER Interface
     Parameter description
 
     .PARAMETER IpRange
     Parameter description
 
-    .PARAMETER List
-    Parameter description
-
     .PARAMETER Macaddr
-    Parameter description
-
-    .PARAMETER Name
     Parameter description
 
     .PARAMETER NodeIpOnly
@@ -86,6 +87,12 @@
     .PARAMETER Organization
     Parameter description
 
+    .PARAMETER PatternEnd
+    Parameter description
+
+    .PARAMETER PatternStart
+    Parameter description
+
     .PARAMETER PolicyGroup
     Parameter description
 
@@ -99,6 +106,9 @@
     Parameter description
 
     .PARAMETER StartIp
+    Parameter description
+
+    .PARAMETER StartMac
     Parameter description
 
     .PARAMETER SubType
@@ -116,7 +126,7 @@
     .PARAMETER TagType
     Parameter description
 
-    .PARAMETER Tagging
+    .PARAMETER Tags
     Parameter description
 
     .PARAMETER Tenant
@@ -125,7 +135,13 @@
     .PARAMETER Type
     Parameter description
 
+    .PARAMETER Url
+    Parameter description
+
     .PARAMETER Uuid
+    Parameter description
+
+    .PARAMETER Visibility
     Parameter description
 
     .PARAMETER Wildcard
@@ -148,6 +164,8 @@
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$ImageBase64,
         [parameter(mandatory = $false, ParameterSetName = "default")]
+        [System.Object[]]$Scope,
+        [parameter(mandatory = $false, ParameterSetName = "default")]
         [ValidateSet("disable", "enable")]
         [string]$AllowRouting,
         [parameter(mandatory = $false, ParameterSetName = "default")]
@@ -165,9 +183,9 @@
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$Dirty,
         [parameter(mandatory = $false, ParameterSetName = "default")]
-        [System.Object[]]$DynamicMapping,
-        [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$EndIp,
+        [parameter(mandatory = $false, ParameterSetName = "default")]
+        [string]$EndMac,
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$EpgName,
         [parameter(mandatory = $false, ParameterSetName = "default")]
@@ -180,15 +198,13 @@
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [System.Object[]]$FssoGroup,
         [parameter(mandatory = $false, ParameterSetName = "default")]
+        [long]$GlobalObject = -1,
+        [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$Interface,
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$IpRange,
         [parameter(mandatory = $false, ParameterSetName = "default")]
-        [System.Object[]]$List,
-        [parameter(mandatory = $false, ParameterSetName = "default")]
         [System.Object[]]$Macaddr,
-        [parameter(mandatory = $true, ParameterSetName = "default")]
-        [string]$Name,
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [ValidateSet("disable", "enable")]
         [string]$NodeIpOnly,
@@ -201,6 +217,10 @@
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$Organization,
         [parameter(mandatory = $false, ParameterSetName = "default")]
+        [long]$PatternEnd = -1,
+        [parameter(mandatory = $false, ParameterSetName = "default")]
+        [long]$PatternStart = -1,
+        [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$PolicyGroup,
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$Sdn,
@@ -210,6 +230,8 @@
         [string]$SdnTag,
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$StartIp,
+        [parameter(mandatory = $false, ParameterSetName = "default")]
+        [string]$StartMac,
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$SubType,
         [parameter(mandatory = $false, ParameterSetName = "default")]
@@ -221,14 +243,18 @@
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$TagType,
         [parameter(mandatory = $false, ParameterSetName = "default")]
-        [System.Object[]]$Tagging,
+        [System.Object[]]$Tags,
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$Tenant,
         [parameter(mandatory = $true, ParameterSetName = "default")]
-        [ValidateSet("ipmask", "iprange", "dynamic", "fqdn")]
         [string]$Type,
         [parameter(mandatory = $false, ParameterSetName = "default")]
+        [string]$Url,
+        [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$Uuid,
+        [parameter(mandatory = $false, ParameterSetName = "default")]
+        [ValidateSet("disable", "enable")]
+        [string]$Visibility,
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$Wildcard,
         [parameter(mandatory = $false, ParameterSetName = "default")]
@@ -237,26 +263,15 @@
         [parameter(mandatory = $false, ValueFromPipeline = $false, ParameterSetName = "default")]
         $NullHandler = "RemoveAttribute"
     )
-    if ($IpRange){
-        $singleIps=ConvertTo-FMStartEndIp -IpRange $IpRange
+    if ($IpRange) {
+        $singleIps = ConvertTo-FMStartEndIp -IpRange $IpRange
         $StartIp = $singleIps[0]
         $EndIp = $singleIps[1]
-    }elseif ($Subnet) { $Subnet = Test-FMSubnetCidr -Subnet $Subnet}
-    # if ($Subnet -match '^\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b$'){
-    #     Write-PSFMessage "Subnet $Subnet is missing the subnet mask"
-    #     $cidr=""
-    #     switch -regex ($Subnet){
-    #         '^\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b$'{$cidr="/32"}
-    #         '^\b\d{1,3}\.\d{1,3}\.\d{1,3}\.0$'{$cidr="/24"}
-    #         default{
-    #             Write-PSFMessage "Cannot guess cidr for Subnet $Subnet"
-    #         }
-    #     }
-    #     $Subnet+=$cidr
-    #     Write-PSFMessage "New Subnet: $Subnet"
-    # }
+    }elseif ($Subnet) { $Subnet = Test-FMSubnetCidr -Subnet $Subnet }
+
     $data = @{
         '_image-base64'        = "$ImageBase64"
+        '_scope'               = @($Scope)
         'allow-routing'        = "$AllowRouting"
         'associated-interface' = "$AssociatedInterface"
         'cache-ttl'            = $CacheTtl
@@ -265,44 +280,43 @@
         'comment'              = "$Comment"
         'country'              = "$Country"
         'dirty'                = "$Dirty"
-        'dynamic_mapping'      = @($DynamicMapping)
         'end-ip'               = "$EndIp"
+        'end-mac'              = "$EndMac"
         'epg-name'             = "$EpgName"
         'fabric-object'        = "$FabricObject"
         'filter'               = "$Filter"
         'fqdn'                 = "$Fqdn"
         'fsso-group'           = @($FssoGroup)
+        'global-object'        = $GlobalObject
         'interface'            = "$Interface"
-        'list'                 = @($List)
         'macaddr'              = @($Macaddr)
-        'name'                 = "$Name"
         'node-ip-only'         = "$NodeIpOnly"
         'obj-id'               = "$ObjId"
         'obj-tag'              = "$ObjTag"
         'obj-type'             = "$ObjType"
         'organization'         = "$Organization"
+        'pattern-end'          = $PatternEnd
+        'pattern-start'        = $PatternStart
         'policy-group'         = "$PolicyGroup"
         'sdn'                  = "$Sdn"
         'sdn-addr-type'        = "$SdnAddrType"
         'sdn-tag'              = "$SdnTag"
         'start-ip'             = "$StartIp"
+        'start-mac'            = "$StartMac"
         'sub-type'             = "$SubType"
         'subnet'               = "$Subnet"
         'subnet-name'          = "$SubnetName"
         'tag-detection-level'  = "$TagDetectionLevel"
         'tag-type'             = "$TagType"
-        'tagging'              = @($Tagging)
+        'tags'                 = @($Tags)
         'tenant'               = "$Tenant"
         'type'                 = "$Type"
+        'url'                  = "$Url"
         'uuid'                 = "$Uuid"
+        'visibility'           = "$Visibility"
         'wildcard'             = "$Wildcard"
         'wildcard-fqdn'        = "$WildcardFqdn"
+
     }
-    $data = $data | Remove-FMNullValuesFromHashtable -NullHandler $NullHandler
-    if ($data.subnet){
-        Write-PSFMessage "Converting ipMask $($data.subnet) to CIDR Notation if neccessary"
-        $data.subnet = Convert-FMSubnetMask -Target CIDR -IPMask $data.subnet
-        Write-PSFMessage " > ipMask= $($data.subnet)"
-    }
-    return $data
+    return $data | Remove-FMNullValuesFromHashtable -NullHandler $NullHandler
 }

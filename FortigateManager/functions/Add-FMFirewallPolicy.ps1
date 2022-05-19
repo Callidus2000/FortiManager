@@ -150,6 +150,7 @@
                 "rtp-nat"
                 "schedule"
                 "schedule-timeout"
+                "scope member"
                 "sctp-filter-profile"
                 "send-deny-packet"
                 "service"
