@@ -18,7 +18,7 @@
 	Copyright         = 'Copyright (c) 2022 Sascha Spiekermann'
 
 	# Description of the functionality provided by this module
-	Description       = 'A module to interact with a fortigate manager appliance'
+	Description       = 'A module to interact with a Fortinet Manager appliance for Fortigate Firewalls'
 
 	# Minimum version of the Windows PowerShell engine required by this module
 	PowerShellVersion = '5.0'
@@ -98,7 +98,7 @@
 		PSData = @{
 
 			# Tags applied to this module. These help with module discovery in online galleries.
-			# Tags = @()
+			Tags = @('Fortinet','Fortigate','Forti Manager','Fortinet Manager')
 
 			# A URL to the license for this module.
 			LicenseUri = 'https://github.com/Callidus2000/FortiManager/blob/master/LICENSE'
