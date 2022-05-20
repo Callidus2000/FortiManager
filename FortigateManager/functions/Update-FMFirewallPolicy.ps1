@@ -148,6 +148,7 @@
                 "schedule"
                 "schedule-timeout"
                 "sctp-filter-profile"
+                "scope member"
                 "send-deny-packet"
                 "service"
                 "service-negate"
