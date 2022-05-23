@@ -8,20 +8,20 @@
 
 
 
-Describe "Testing localization strings" {
-	$moduleRoot = (Get-Module FortigateManager).ModuleBase
-	$stringsResults = Export-PSMDString -ModuleRoot $moduleRoot
-	$exceptions = & "$global:testroot\general\strings.Exceptions.ps1"
-	
-	foreach ($stringEntry in $stringsResults) {
-        if ($stringEntry.String -eq "key") { continue } # Skipping the template default entry
-		It "Should be used & have text: $($stringEntry.String)" -TestCases @{ stringEntry = $stringEntry; exceptions = $exceptions } {
-            if ($exceptions.LegalSurplus -notcontains $stringEntry.String) {
-                $stringEntry.Surplus | Should -BeFalse
-			}
-			if ($exceptions.NoTextNeeded -notcontains $stringEntry.String) {
-				$stringEntry.Text | Should -Not -BeNullOrEmpty
-			}
-        }
-    }
-}
+# Describe "Testing localization strings" {
+# 	$moduleRoot = (Get-Module FortigateManager).ModuleBase
+# 	$stringsResults = Export-PSMDString -ModuleRoot $moduleRoot
+# 	$exceptions = & "$global:testroot\general\strings.Exceptions.ps1"
+
+# 	foreach ($stringEntry in $stringsResults) {
+#         if ($stringEntry.String -eq "key") { continue } # Skipping the template default entry
+# 		It "Should be used & have text: $($stringEntry.String)" -TestCases @{ stringEntry = $stringEntry; exceptions = $exceptions } {
+#             if ($exceptions.LegalSurplus -notcontains $stringEntry.String) {
+#                 $stringEntry.Surplus | Should -BeFalse
+# 			}
+# 			if ($exceptions.NoTextNeeded -notcontains $stringEntry.String) {
+# 				$stringEntry.Text | Should -Not -BeNullOrEmpty
+# 			}
+#         }
+#     }
+# }

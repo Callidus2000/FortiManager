@@ -465,10 +465,13 @@
     .EXAMPLE
     An example
 
+    may be provided later
+
     .NOTES
     General notes
     #>
     [CmdletBinding()]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseShouldProcessforStateChangingFunctions", "")]
     param (
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [long]$Policy_block = -1,
@@ -832,7 +835,7 @@
         [ValidateSet("disable", "enable")]
         [string]$ZtnaStatus,
         [ValidateSet("Keep", "RemoveAttribute", "ClearContent")]
-        [parameter(mandatory = $false, ValueFromPipeline = $false, ParameterSetName = "default")]
+        [parameter(mandatory = $false, ParameterSetName = "default")]
         $NullHandler = "RemoveAttribute"
     )
     $data = @{

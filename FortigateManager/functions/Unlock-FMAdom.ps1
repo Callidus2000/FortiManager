@@ -15,6 +15,9 @@
     .PARAMETER Commit
     If used the changes will be commited before unlocking the ADOM.
 
+  	.PARAMETER EnableException
+	Should Exceptions been thrown?
+
     .EXAMPLE
     To be added
 

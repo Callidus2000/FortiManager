@@ -26,6 +26,9 @@
     .PARAMETER Target
     The Policy-ID the policies should be moved before/after
 
+  	.PARAMETER EnableException
+	Should Exceptions been thrown?
+
     .EXAMPLE
     Lock-FMAdom -Connection $connection
     try {
@@ -54,9 +57,9 @@
         [string]$Package,
         [parameter(mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
         [Object[]]$PolicyID,
-        [parameter(mandatory = $true, ValueFromPipeline = $false)]
+        [parameter(mandatory = $true)]
         $Target,
-        [parameter(mandatory = $true, ValueFromPipeline = $false)]
+        [parameter(mandatory = $true)]
         [ValidateSet("before", "after")]
         [string]$Position,
         [bool]$EnableException = $true
@@ -71,7 +74,7 @@
     }
     process {
         $PolicyID | ForEach-Object {
-            $id=$_
+            $id = $_
             if ($id -isnot [long]) {
                 $id = $id.policyid
             }
@@ -96,7 +99,7 @@
             write-psfmessage "Moving ID $id"
             $apiCallParameter.Path = "$basePath/$id"
             $apiCallParameter.LoggingActionValues[0] = $id
-            Write-PSFMessage "`$apiCallParameter.LoggingActionValues=$($apiCallParameter.LoggingActionValues | join ';')"
+            Write-PSFMessage "`$apiCallParameter.LoggingActionValues=$($apiCallParameter.LoggingActionValues | Join-String ';')"
             $result = Invoke-FMAPI @apiCallParameter
             if (-not $EnableException -and $null -ne $result) {
                 return $false

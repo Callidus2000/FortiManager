@@ -137,13 +137,19 @@
     .PARAMETER NullHandler
     Parameter description
 
+  	.PARAMETER EnableException
+	Should Exceptions been thrown?
+
     .EXAMPLE
     An example
+
+    may be provided later
 
     .NOTES
     General notes
     #>
     [CmdletBinding()]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessforStateChangingFunctions', '')]
     param (
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$ImageBase64,
@@ -234,14 +240,15 @@
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$WildcardFqdn,
         [ValidateSet("Keep", "RemoveAttribute", "ClearContent")]
-        [parameter(mandatory = $false, ValueFromPipeline = $false, ParameterSetName = "default")]
+        [parameter(mandatory = $false, ParameterSetName = "default")]
         $NullHandler = "RemoveAttribute"
     )
-    if ($IpRange){
-        $singleIps=ConvertTo-FMStartEndIp -IpRange $IpRange
+    if ($IpRange) {
+        $singleIps = ConvertTo-FMStartEndIp -IpRange $IpRange
         $StartIp = $singleIps[0]
         $EndIp = $singleIps[1]
-    }elseif ($Subnet) { $Subnet = Test-FMSubnetCidr -Subnet $Subnet}
+    }
+    elseif ($Subnet) { $Subnet = Test-FMSubnetCidr -Subnet $Subnet }
     # if ($Subnet -match '^\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b$'){
     #     Write-PSFMessage "Subnet $Subnet is missing the subnet mask"
     #     $cidr=""
@@ -299,7 +306,7 @@
         'wildcard-fqdn'        = "$WildcardFqdn"
     }
     $data = $data | Remove-FMNullValuesFromHashtable -NullHandler $NullHandler
-    if ($data.subnet){
+    if ($data.subnet) {
         Write-PSFMessage "Converting ipMask $($data.subnet) to CIDR Notation if neccessary"
         $data.subnet = Convert-FMSubnetMask -Target CIDR -IPMask $data.subnet
         Write-PSFMessage " > ipMask= $($data.subnet)"

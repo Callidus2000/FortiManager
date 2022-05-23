@@ -27,6 +27,8 @@
     .EXAMPLE
     An example
 
+    may be provided later
+
     .NOTES
     General notes
     #>
@@ -43,7 +45,7 @@
         [ValidateSet("name", "obj ver", "oid", "scope member", "type")]
         [System.Object[]]$Fields,
         [ValidateSet("Keep", "RemoveAttribute", "ClearContent")]
-        [parameter(mandatory = $false, ValueFromPipeline = $false, ParameterSetName = "default")]
+        [parameter(mandatory = $false, ParameterSetName = "default")]
         $NullHandler = "RemoveAttribute"
     )
     # 'pkg_path'     = "$PkgPath"

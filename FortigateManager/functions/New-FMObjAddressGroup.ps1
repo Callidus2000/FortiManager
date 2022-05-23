@@ -1,5 +1,71 @@
 ﻿function New-FMObjAddressGroup {
+    <#
+    .SYNOPSIS
+    Helper for creating new Addressgroup-Objects.
+
+    .DESCRIPTION
+    Helper for creating new Addressgroup-Objects.
+    Each parameter corresponds to an addressgroup attribute with the exception of
+    IpRange. This will be split into the attributes StartIp and EndIp
+
+    .PARAMETER ImageBase64
+    Parameter description
+
+    .PARAMETER AllowRouting
+    Parameter description
+
+    .PARAMETER Category
+    Parameter description
+
+    .PARAMETER Color
+    Parameter description
+
+    .PARAMETER Comment
+    Parameter description
+
+    .PARAMETER DynamicMapping
+    Parameter description
+
+    .PARAMETER Exclude
+    Parameter description
+
+    .PARAMETER ExcludeMember
+    Parameter description
+
+    .PARAMETER FabricObject
+    Parameter description
+
+    .PARAMETER Member
+    Parameter description
+
+    .PARAMETER Name
+    Parameter description
+
+    .PARAMETER Tagging
+    Parameter description
+
+    .PARAMETER Type
+    Parameter description
+
+    .PARAMETER Uuid
+    Parameter description
+
+    .PARAMETER NullHandler
+    Parameter description
+
+  	.PARAMETER EnableException
+	Should Exceptions been thrown?
+
+    .EXAMPLE
+    An example
+
+    may be provided later
+
+    .NOTES
+    General notes
+    #>
     [CmdletBinding()]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseShouldProcessforStateChangingFunctions", "")]
     param (
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$ImageBase64,
@@ -30,7 +96,7 @@
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$Uuid,
         [ValidateSet("Keep", "RemoveAttribute", "ClearContent")]
-        [parameter(mandatory = $false, ValueFromPipeline = $false, ParameterSetName = "default")]
+        [parameter(mandatory = $false, ParameterSetName = "default")]
         $NullHandler = "RemoveAttribute"
     )
     $data = @{

@@ -15,6 +15,9 @@
     .PARAMETER Name
     Name of the address group to be removed.
 
+  	.PARAMETER EnableException
+	Should Exceptions been thrown?
+
     .EXAMPLE
     $testGroup = Get-FMAddressGroup -Connection $Connection -Filter "name -eq Dummy-Group"
     Lock-FMAdom -Connection $connection
@@ -69,10 +72,10 @@
             $apiCallParameter.LoggingActionValues = $groupName
             $result = Invoke-FMAPI @apiCallParameter
         }
-        # # If EnableException an exception would have be thrown, otherwise the function returns true for success or false for failure
-        # if (-not $EnableException) {
-        #     return ($null -ne $result)
-        # }
+        # If EnableException an exception would have be thrown, otherwise the function returns true for success or false for failure
+        if (-not $EnableException) {
+            return ($null -ne $result)
+        }
     }
 
 }

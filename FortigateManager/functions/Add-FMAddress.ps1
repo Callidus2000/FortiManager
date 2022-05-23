@@ -18,6 +18,9 @@
     .PARAMETER Overwrite
     If used and an address with the given name already exists the data will be overwritten.
 
+  	.PARAMETER EnableException
+	Should Exceptions been thrown?
+
     .EXAMPLE
     # Read some input in the format [IP]/[Subnet-Mask]
     $missingAddresses=Get-Content "PATH TO SOME FILE"

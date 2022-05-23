@@ -9,6 +9,9 @@
     .PARAMETER Connection
     The API connection object.
 
+  	.PARAMETER EnableException
+	Should Exceptions been thrown?
+
     .PARAMETER ADOM
     The (non-default) ADOM for the requests.
 
@@ -20,6 +23,7 @@
     .NOTES
     General notes
     #>
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'High')]
     param (
         [parameter(Mandatory=$false)]
         $Connection = (Get-FMLastConnection),

@@ -15,10 +15,16 @@
     .PARAMETER AddressGroup
     The new address group, generated e.g. by using New-FMObjAddressGroup
 
+  	.PARAMETER EnableException
+	Should Exceptions been thrown?
+
     .PARAMETER Overwrite
     If used and an address with the given name already exists the data will be overwritten.
 
     .EXAMPLE
+    An example
+
+    may be provided later
 
     .NOTES
     General notes

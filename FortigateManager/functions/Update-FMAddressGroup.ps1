@@ -18,8 +18,8 @@
     .PARAMETER AddressGroup
     The new address group, generated e.g. by using New-FMObjAddress or Get-FMAddress
 
-    .PARAMETER Overwrite
-    If used and an address group with the given name already exists the data will be overwritten.
+  	.PARAMETER EnableException
+	Should Exceptions been thrown?
 
     .EXAMPLE
     $testGroup = Get-FMAddressGroup -Connection $Connection -Filter "name -eq Dummy-Group"| ConvertTo-PSFHashtable
@@ -31,6 +31,7 @@
     .NOTES
     General notes
     #>
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param (
         [parameter(Mandatory=$false)]
         $Connection = (Get-FMLastConnection),
@@ -38,7 +39,6 @@
         [parameter(mandatory = $true, ValueFromPipeline = $true, ParameterSetName = "default")]
         [object[]]$AddressGroup,
         [string]$Name,
-        [switch]$Overwrite,
         [bool]$EnableException = $true
     )
     begin {

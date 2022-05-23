@@ -40,6 +40,7 @@
     General notes
     #>
     [CmdletBinding()]
+    [OutputType([string])]
     param (
         # [parameter(mandatory = $true, ParameterSetName = "cidr")]
         # [string]$Cidr,

@@ -18,10 +18,13 @@
     .EXAMPLE
     An example
 
+    may be provided later
+
     .NOTES
     General notes
     #>
     [CmdletBinding()]
+    [OutputType([string])]
     param (
         [parameter(Mandatory)]
         $Connection,

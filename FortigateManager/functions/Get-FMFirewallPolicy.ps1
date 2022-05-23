@@ -60,6 +60,8 @@
     .EXAMPLE
     An example
 
+    may be provided later
+
     .NOTES
     See
     https://fndn.fortinet.net/index.php?/fortiapi/5-fortimanager/1636/5/pm/config/firewall/
@@ -91,7 +93,7 @@
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [System.Object[]]$Sortings,
         [ValidateSet("Keep", "RemoveAttribute", "ClearContent")]
-        [parameter(mandatory = $false, ValueFromPipeline = $false, ParameterSetName = "default")]
+        [parameter(mandatory = $false, ParameterSetName = "default")]
         $NullHandler = "RemoveAttribute"
     )
     # 'pkg_path'     = "$PkgPath"

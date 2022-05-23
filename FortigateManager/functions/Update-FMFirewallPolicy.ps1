@@ -21,6 +21,9 @@
     .PARAMETER Overwrite
     If used and an policy with the given name already exists the data will be overwritten.
 
+  	.PARAMETER EnableException
+	Should Exceptions been thrown?
+
     .EXAMPLE
     #To Be Provided
 
@@ -28,6 +31,7 @@
     .NOTES
     General notes
     #>
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param (
         [parameter(Mandatory=$false)]
         $Connection = (Get-FMLastConnection),

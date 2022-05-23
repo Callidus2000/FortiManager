@@ -18,8 +18,8 @@
     .PARAMETER Address
     The new address, generated e.g. by using New-FMObjAddress or Get-FMAddress
 
-    .PARAMETER Overwrite
-    If used and an address with the given name already exists the data will be overwritten.
+  	.PARAMETER EnableException
+	Should Exceptions been thrown?
 
     .EXAMPLE
     $testAddress=Get-FMAddress -filter "name -eq MyDUMMY" -verbose
@@ -38,6 +38,7 @@
     .NOTES
     General notes
     #>
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param (
         [parameter(Mandatory=$false)]
         $Connection = (Get-FMLastConnection),
@@ -45,7 +46,6 @@
         [parameter(mandatory = $true, ValueFromPipeline = $true, ParameterSetName = "default")]
         [object[]]$Address,
         [string]$Name,
-        [switch]$Overwrite,
         [bool]$EnableException = $true
     )
     begin {

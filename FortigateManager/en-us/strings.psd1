@@ -23,6 +23,5 @@
 	'APICall.Update-FMAddress'        = 'Updating {0} addresses to ADOM {1}, additional -Name: {2}'
 	'APICall.Update-FMFirewallPolicy' = 'Updating {0} policies in ADOM {1}, Policy Package {2}'
 	'Connect-FM.Connected'            = 'Connection established' #
-	'Connect-FM.Connecting'           = 'Connecting to instance {0}'
 	'Connect-FM.NotConnected'         = 'Connection could not be established'
 }
