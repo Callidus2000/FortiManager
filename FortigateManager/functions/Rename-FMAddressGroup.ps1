@@ -33,9 +33,9 @@
         [parameter(Mandatory=$false)]
         $Connection = (Get-FMLastConnection),
         [string]$ADOM,
-        [parameter(mandatory = $true, ValueFromPipeline = $false, ParameterSetName = "default")]
+        [parameter(mandatory = $true, ParameterSetName = "default")]
         [string]$Name,
-        [parameter(mandatory = $true, ValueFromPipeline = $false, ParameterSetName = "default")]
+        [parameter(mandatory = $true, ParameterSetName = "default")]
         [string]$NewName,
         [bool]$EnableException = $true
     )

@@ -58,10 +58,13 @@
     .EXAMPLE
     An example
 
+    may be provided later
+
     .NOTES
     General notes
     #>
     [CmdletBinding()]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseShouldProcessforStateChangingFunctions", "")]
     param (
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$ImageBase64,
@@ -96,7 +99,7 @@
         [ValidateSet("disable", "enable")]
         [string]$Visibility,
         [ValidateSet("Keep", "RemoveAttribute", "ClearContent")]
-        [parameter(mandatory = $false, ValueFromPipeline = $false, ParameterSetName = "default")]
+        [parameter(mandatory = $false, ParameterSetName = "default")]
         $NullHandler = "RemoveAttribute"
     )
     $data = @{

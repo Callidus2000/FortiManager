@@ -8,6 +8,9 @@
 
     .PARAMETER Connection
     The API connection object.
+  	.PARAMETER EnableException
+	Should Exceptions been thrown?
+
 
     .EXAMPLE
     To be added

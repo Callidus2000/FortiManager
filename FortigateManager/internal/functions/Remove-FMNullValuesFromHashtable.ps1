@@ -1,14 +1,42 @@
 ﻿function Remove-FMNullValuesFromHashtable {
+    <#
+    .SYNOPSIS
+    Helper function to remove empty attributes from a provided HashTable.
+
+    .DESCRIPTION
+    Helper function to remove empty attributes from a provided HashTable.
+
+    .PARAMETER InputObject
+    The original Hastable
+
+    .PARAMETER NullHandler
+    How should empty values be handled?
+    -Keep: Keep the Attribute
+    -RemoveAttribute: Remove the Attribute (default)
+    -ClearContent: Clear the value
+
+    .PARAMETER LongNullValue
+    Which long value should be interpretated as "empty"
+
+    .EXAMPLE
+    An example
+
+    has to be provided later
+    .NOTES
+    General notes
+    #>
     [CmdletBinding()]
+    [OutputType([Hashtable])]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessforStateChangingFunctions', '')]
     param (
         [parameter(mandatory = $true, ValueFromPipeline = $true, ParameterSetName = "default")]
         # [parameter(mandatory = $true, ValueFromPipeline = $true, ParameterSetName = "clearEmpty")]
         # [parameter(mandatory = $true, ValueFromPipeline = $true, ParameterSetName = "removeEmpty")]
         [HashTable]$InputObject,
         [ValidateSet("Keep", "RemoveAttribute", "ClearContent")]
-        [parameter(mandatory = $false, ValueFromPipeline = $false, ParameterSetName = "default")]
+        [parameter(mandatory = $false, ParameterSetName = "default")]
         $NullHandler = "RemoveAttribute",
-        [parameter(mandatory = $false, ValueFromPipeline = $false, ParameterSetName = "default")]
+        [parameter(mandatory = $false, ParameterSetName = "default")]
         [long]$LongNullValue = -1
         # ,
         # [parameter(mandatory = $false, ParameterSetName = "clearEmpty")]

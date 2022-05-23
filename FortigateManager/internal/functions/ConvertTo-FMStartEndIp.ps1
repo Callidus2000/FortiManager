@@ -7,16 +7,19 @@
     Helper for extracting start- and end-ip from a iprange in a string.
     Returns an array, $result[0] is the start and $result[1] the end ip
 
-    .PARAMETER IPpRange
+    .PARAMETER IPRange
     The ipRange
 
     .EXAMPLE
-    An example
+    ConvertTo-FMStartEndIp -IPRange "1.1.1.1-1.1.2.3"
+
+    Returns @("1.1.1.1","1.1.2.3")
 
     .NOTES
     General notes
     #>
     [CmdletBinding()]
+    [OutputType([object[]])]
     param (
         [string]$IpRange
     )

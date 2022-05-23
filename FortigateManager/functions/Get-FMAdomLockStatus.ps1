@@ -6,6 +6,9 @@
     .DESCRIPTION
     Query the lockstatus of the given ADOM.
     Returns null if not locked, otherwise detailed information is returned.
+  	.PARAMETER EnableException
+	Should Exceptions been thrown?
+
 
     .PARAMETER Connection
     The API connection object.

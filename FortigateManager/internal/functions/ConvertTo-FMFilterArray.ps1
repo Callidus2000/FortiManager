@@ -1,4 +1,35 @@
 ﻿function ConvertTo-FMFilterArray {
+    <#
+    .SYNOPSIS
+    Converts filter strings into the array type the API aspects.
+
+    .DESCRIPTION
+    Converts filter strings into the array type the API aspects.
+    See about_FortigateManagerFilter
+
+    .PARAMETER Filter
+    The filter String in the following format:
+	"{attribute} {operator} {value}"
+
+	- The attribute depends on the object model you are querying.
+	- the operator is one of the following:
+	  -eq
+	  -like   (use % (multi) and _ (single char) as a wildcard)
+	  -contain (NO LIKE COMPARISON, checks if something is contained within an array)
+	  -ne
+	  -notlike
+	- The value is the value used for filtering
+
+	Example:
+
+
+    .EXAMPLE
+	Get-FMAddress -Filter "name -eq srv123"
+
+    Returns the array @('name','==','srv123')
+    .NOTES
+    General notes
+    #>
     [CmdletBinding()]
     param (
         [parameter(mandatory = $false, ValueFromPipeline = $true, ParameterSetName = "default")]

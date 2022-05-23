@@ -52,6 +52,8 @@
     .EXAMPLE
     An example
 
+    may be provided later
+
     .NOTES
     General notes
     #>
@@ -79,7 +81,7 @@
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [System.Object[]]$Sortings,
         [ValidateSet("Keep", "RemoveAttribute", "ClearContent")]
-        [parameter(mandatory = $false, ValueFromPipeline = $false, ParameterSetName = "default")]
+        [parameter(mandatory = $false, ParameterSetName = "default")]
         $NullHandler = "RemoveAttribute",
 
         [bool]$EnableException = $true

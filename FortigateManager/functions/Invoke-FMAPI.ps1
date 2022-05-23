@@ -37,8 +37,16 @@
     .PARAMETER ContentType
     HTTP-ContentType, defaults to "application/json;charset=UTF-8"
 
-    .PARAMETER EnablePaging
-    If the API makes use of paging (therefor of limit/offset URLParameter) setting EnablePaging to $true will not return the raw data but a combination of all data sets.
+    .PARAMETER Parameter
+    The values for the parameter body part of the API request.
+
+    .PARAMETER LoggingAction
+    compare ~\FortigateManager\en-us\strings.psd1
+    The given string with the prefix "APICall." will be used for logging purposes.
+
+    .PARAMETER LoggingActionValues
+    compare ~\FortigateManager\en-us\strings.psd1
+    Array of placeholder values.
 
     .PARAMETER EnableException
     If set to true, inner exceptions will be rethrown. Otherwise the an empty result will be returned.
@@ -51,6 +59,7 @@
     .NOTES
     General notes
     #>
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
 
     param (
         [parameter(Mandatory = $false)]
@@ -63,8 +72,7 @@
         $Method,
         [bool]$EnableException = $true,
         [string]$LoggingAction = "Invoke-FMAPI",
-        [string[]]$LoggingActionValues = "",
-        [switch]$EnablePaging
+        [string[]]$LoggingActionValues = ""
     )
     if (-not $Connection) {
         Write-PSFMessage "Keine Connection als Parameter erhalten, frage die letzte ab"

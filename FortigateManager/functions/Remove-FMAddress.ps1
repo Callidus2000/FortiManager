@@ -15,6 +15,9 @@
     .PARAMETER Name
     Name of the address to be removed.
 
+  	.PARAMETER EnableException
+	Should Exceptions been thrown?
+
     .EXAMPLE
     $testAddresses = Get-FMAddress -Connection $Connection -Filter "comment -like %API Test%" |select -first 3
     Lock-FMAdom -Connection $connection
@@ -68,10 +71,10 @@
             $apiCallParameter.LoggingActionValues = $addrName
             $result = Invoke-FMAPI @apiCallParameter
         }
-        # # If EnableException an exception would have be thrown, otherwise the function returns true for success or false for failure
-        # if (-not $EnableException) {
-        #     return ($null -ne $result)
-        # }
+        # If EnableException an exception would have be thrown, otherwise the function returns true for success or false for failure
+        if (-not $EnableException) {
+            return ($null -ne $result)
+        }
     }
 
 }

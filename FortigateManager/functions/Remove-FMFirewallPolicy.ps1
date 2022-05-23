@@ -18,6 +18,9 @@
     .PARAMETER PolicyId
     Id of the Policy to be removed.
 
+  	.PARAMETER EnableException
+	Should Exceptions been thrown?
+
     .EXAMPLE
     $testAddresses = Get-FMAddress -Connection $Connection -Filter "comment -like %API Test%" |select -first 3
     Lock-FMAdom -Connection $connection
@@ -69,6 +72,7 @@
             $apiCallParameter.Path = "/pm/config/adom/$explicitADOM/pkg/$Package/firewall/policy/$id"
             $apiCallParameter.LoggingActionValues = $id
             $result = Invoke-FMAPI @apiCallParameter
+            $result|Out-Null
         }
     }
 }
