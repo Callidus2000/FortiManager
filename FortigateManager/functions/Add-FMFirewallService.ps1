@@ -1,10 +1,10 @@
-﻿function Add-FMAddress {
+﻿function Add-FMFirewallService {
     <#
     .SYNOPSIS
-    Adds new addresses to the given ADOM.
+    Adds new firewall services to the given ADOM.
 
     .DESCRIPTION
-    Adds new addresses to the given ADOM.
+    Adds new firewall services to the given ADOM.
 
     .PARAMETER Connection
     The API connection object.
@@ -12,8 +12,8 @@
     .PARAMETER ADOM
     The (non-default) ADOM for the requests.
 
-    .PARAMETER Address
-    The new address, generated e.g. by using New-FMObjAddress
+    .PARAMETER Service
+    The new service, generated e.g. by using New-FMObjFirewallService
 
     .PARAMETER Overwrite
     If used and an address with the given name already exists the data will be overwritten.
@@ -45,29 +45,29 @@
         $Connection = (Get-FMLastConnection),
         [string]$ADOM,
         [parameter(mandatory = $true, ValueFromPipeline = $true, ParameterSetName = "default")]
-        [object[]]$Address,
+        [object[]]$Service,
         [switch]$Overwrite,
         [bool]$EnableException = $true
     )
     begin {
-        $addressList = @()
+        $serviceList = @()
         $explicitADOM = Resolve-FMAdom -Connection $Connection -Adom $ADOM
         Write-PSFMessage "`$explicitADOM=$explicitADOM"
-        $validAttributes = Get-PSFConfigValue -FullName 'FortigateManager.ValidAttr.FirewallAddress'
+        $validAttributes = Get-PSFConfigValue -FullName 'FortigateManager.ValidAttr.FirewallService'
     }
     process {
-        $Address | ForEach-Object { $addressList += $_ | ConvertTo-PSFHashtable -Include $validAttributes }
+        $Service | ForEach-Object { $serviceList += $_ | ConvertTo-PSFHashtable -Include $validAttributes }
     }
     end {
         $apiCallParameter = @{
             EnableException     = $EnableException
             Connection          = $Connection
-            LoggingAction       = "Add-FMAddress"
-            LoggingActionValues = @($addressList.count, $explicitADOM)
+            LoggingAction       = "Add-FMFirewallService"
+            LoggingActionValues = @($serviceList.count, $explicitADOM)
             method              = "add"
-            Path                = "/pm/config/adom/$explicitADOM/obj/firewall/address"
+            Path                = "/pm/config/adom/$explicitADOM/obj/firewall/service/custom"
             Parameter           = @{
-                "data" = $addressList
+                "data" = $serviceList
             }
         }
         if ($Overwrite){

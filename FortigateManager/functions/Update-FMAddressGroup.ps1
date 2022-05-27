@@ -45,9 +45,10 @@
         $groupList = @()
         $explicitADOM = Resolve-FMAdom -Connection $Connection -Adom $ADOM
         Write-PSFMessage "`$explicitADOM=$explicitADOM"
+        $validAttributes = Get-PSFConfigValue -FullName 'FortigateManager.ValidAttr.FirewallAddressGroups'
     }
     process {
-        $AddressGroup | ForEach-Object { $groupList += $_ }
+        $AddressGroup | ForEach-Object { $groupList +=  $_ | ConvertTo-PSFHashtable -Include $validAttributes }
     }
     end {
         if ($groupList.count -gt 1 -and $Name){

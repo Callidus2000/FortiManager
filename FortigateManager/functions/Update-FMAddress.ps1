@@ -14,6 +14,7 @@
 
     .PARAMETER Name
     The name of the address to be changed (neccessary if the 'name' property itself changes)
+    This is the *old* Name of the existing object! The new name has to be set in the object itself.
 
     .PARAMETER Address
     The new address, generated e.g. by using New-FMObjAddress or Get-FMAddress
@@ -52,9 +53,10 @@
         $addressList = @()
         $explicitADOM = Resolve-FMAdom -Connection $Connection -Adom $ADOM
         Write-PSFMessage "`$explicitADOM=$explicitADOM"
+        $validAttributes = Get-PSFConfigValue -FullName 'FortigateManager.ValidAttr.FirewallAddress'
     }
     process {
-        $Address | ForEach-Object { $addressList += $_ }
+        $Address | ForEach-Object { $addressList += $_ | ConvertTo-PSFHashtable -Include $validAttributes }
     }
     end {
         if ($addressList.count -gt 1 -and $Name){

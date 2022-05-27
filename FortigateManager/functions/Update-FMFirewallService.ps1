@@ -1,10 +1,10 @@
-﻿function Add-FMAddress {
+﻿function Update-FMFirewallService {
     <#
     .SYNOPSIS
-    Adds new addresses to the given ADOM.
+    Adds new firewall services to the given ADOM.
 
     .DESCRIPTION
-    Adds new addresses to the given ADOM.
+    Adds new firewall services to the given ADOM.
 
     .PARAMETER Connection
     The API connection object.
@@ -12,11 +12,12 @@
     .PARAMETER ADOM
     The (non-default) ADOM for the requests.
 
-    .PARAMETER Address
-    The new address, generated e.g. by using New-FMObjAddress
+    .PARAMETER Name
+    The name of the service to be changed (neccessary if the 'name' property itself changes)
+    This is the *old* Name of the existing object! The new name has to be set in the object itself.
 
-    .PARAMETER Overwrite
-    If used and an address with the given name already exists the data will be overwritten.
+    .PARAMETER Service
+    The new service, generated e.g. by using New-FMObjFirewallService
 
   	.PARAMETER EnableException
 	Should Exceptions been thrown?
@@ -40,39 +41,45 @@
     .NOTES
     General notes
     #>
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param (
         [parameter(Mandatory=$false)]
         $Connection = (Get-FMLastConnection),
         [string]$ADOM,
         [parameter(mandatory = $true, ValueFromPipeline = $true, ParameterSetName = "default")]
-        [object[]]$Address,
-        [switch]$Overwrite,
+        [object[]]$Service,
+        [string]$Name,
         [bool]$EnableException = $true
     )
     begin {
-        $addressList = @()
+        $serviceList = @()
         $explicitADOM = Resolve-FMAdom -Connection $Connection -Adom $ADOM
         Write-PSFMessage "`$explicitADOM=$explicitADOM"
-        $validAttributes = Get-PSFConfigValue -FullName 'FortigateManager.ValidAttr.FirewallAddress'
+        $validAttributes = Get-PSFConfigValue -FullName 'FortigateManager.ValidAttr.FirewallService'
     }
     process {
-        $Address | ForEach-Object { $addressList += $_ | ConvertTo-PSFHashtable -Include $validAttributes }
+        $Service | ForEach-Object { $serviceList += $_|ConvertTo-PSFHashtable -Include $validAttributes }
     }
     end {
+        if ($serviceList.count -gt 1 -and $Name) {
+            Stop-PSFFunction -AlwaysWarning -EnableException $EnableException -Message "Usage of -Name and more than one -Service is not permitted"
+            return
+        }
         $apiCallParameter = @{
             EnableException     = $EnableException
             Connection          = $Connection
-            LoggingAction       = "Add-FMAddress"
-            LoggingActionValues = @($addressList.count, $explicitADOM)
-            method              = "add"
-            Path                = "/pm/config/adom/$explicitADOM/obj/firewall/address"
+            LoggingAction       = "Update-FMFirewallService"
+            LoggingActionValues = @($serviceList.count, $explicitADOM,$Name)
+            method              = "update"
+            Path                = "/pm/config/adom/$explicitADOM/obj/firewall/service/custom"
             Parameter           = @{
-                "data" = $addressList
+                "data" = $serviceList
             }
         }
-        if ($Overwrite){
-            Write-PSFMessage "Existing data should be overwritten"
-            $apiCallParameter.method="set"
+        if ($Name) {
+            $apiCallParameter.Path = "/pm/config/adom/$explicitADOM/obj/firewall/service/custom/$($Name|ConvertTo-FMUrlPart)"
+            # if name is given 'data' does only accept one object but no array
+            $apiCallParameter.Parameter.data = $serviceList[0]
         }
         $result = Invoke-FMAPI @apiCallParameter
         if (-not $EnableException) {

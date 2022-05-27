@@ -68,10 +68,10 @@
                 continue
             }
             $paramaterType = $InputObject.$key.gettype()
-            switch ($paramaterType) {
-                "System.Object[]" {
+            switch -regex ($paramaterType) {
+                ".*\[\]" {
                     write-psfmessage "Prüfe Null-Arrays" -Level $logLevel
-                    if ($InputObject.$key.Count -gt 0 -and ($null -eq $InputObject.$key[0])) {
+                    if ($InputObject.$key.Count -gt 0 -and ([string]::IsNullOrEmpty($InputObject.$key[0]))) {
                         if ($NullHandler -eq "ClearContent") {
                             write-psfmessage "Replacing Array Attribute $key with empty Array" -Level $logLevel
                             $InputObject.$key = @()

@@ -20,6 +20,12 @@
     .PARAMETER Policy
     The new policy, generated e.g. by using New-FMObjAddress
 
+    .PARAMETER After
+    If used the policy will be added after the policy with the given ID
+
+    .PARAMETER Before
+    If used the policy will be added before the policy with the given ID
+
     .PARAMETER Overwrite
     If used and an policy with the given name already exists the data will be
     overwritten.
@@ -35,175 +41,41 @@
     General notes
     #>
     param (
-        [parameter(Mandatory = $false)]
+        [parameter(Mandatory = $false, ParameterSetName = "default")]
+        [parameter(mandatory = $false, ParameterSetName = "undocumentedAfter")]
+        [parameter(mandatory = $false, ParameterSetName = "undocumentedBefore")]
         $Connection = (Get-FMLastConnection),
         [string]$ADOM,
         [parameter(mandatory = $true, ParameterSetName = "default")]
+        [parameter(mandatory = $false, ParameterSetName = "undocumentedAfter")]
+        [parameter(mandatory = $false, ParameterSetName = "undocumentedBefore")]
         [string]$Package,
+        [parameter(mandatory = $false, ParameterSetName = "undocumentedAfter")]
+        [string]$After,
+        [parameter(mandatory = $false, ParameterSetName = "undocumentedBefore")]
+        [string]$Before,
         [parameter(mandatory = $true, ValueFromPipeline = $true, ParameterSetName = "default")]
+        [parameter(mandatory = $true, ValueFromPipeline = $true, ParameterSetName = "undocumentedAfter")]
+        [parameter(mandatory = $true, ValueFromPipeline = $true, ParameterSetName = "undocumentedBefore")]
         [object[]]$Policy,
+        [parameter(mandatory = $false, ParameterSetName = "default")]
+        [parameter(mandatory = $false, ParameterSetName = "undocumentedAfter")]
+        [parameter(mandatory = $false, ParameterSetName = "undocumentedBefore")]
         [switch]$Overwrite,
+        [parameter(mandatory = $false, ParameterSetName = "default")]
+        [parameter(mandatory = $false, ParameterSetName = "undocumentedAfter")]
+        [parameter(mandatory = $false, ParameterSetName = "undocumentedBefore")]
         [bool]$EnableException = $true
     )
     begin {
         $policyList = @()
         $explicitADOM = Resolve-FMAdom -Connection $Connection -Adom $ADOM
         Write-PSFMessage "`$explicitADOM=$explicitADOM"
+        $validAttributes = Get-PSFConfigValue -FullName 'FortigateManager.ValidAttr.FirewallPolicy'
     }
     process {
         $Policy | ForEach-Object {
-            $policyList += $_ | ConvertTo-PSFHashtable -Include @(
-                "action"
-                "anti-replay"
-                "application-list"
-                "auth-cert"
-                "auth-path"
-                "auth-redirect-addr"
-                "auto-asic-offload"
-                "av-profile"
-                "block-notification"
-                "captive-portal-exempt"
-                "capture-packet"
-                "cifs-profile"
-                "comments"
-                "custom-log-fields"
-                "decrypted-traffic-mirror"
-                "delay-tcp-npu-session"
-                "diffserv-forward"
-                "diffserv-reverse"
-                "diffservcode-forward"
-                "diffservcode-rev"
-                "disclaimer"
-                "dlp-profile"
-                "dnsfilter-profile"
-                "dsri"
-                "dstaddr"
-                "dstaddr-negate"
-                "dstaddr6"
-                "dstintf"
-                "dynamic-shaping"
-                "email-collect"
-                "emailfilter-profile"
-                "fec"
-                "file-filter-profile"
-                "firewall-session-dirty"
-                "fixedport"
-                "fsso-agent-for-ntlm"
-                "fsso-groups"
-                "geoip-anycast"
-                "geoip-match"
-                "global-label"
-                "groups"
-                "gtp-profile"
-                "http-policy-redirect"
-                "icap-profile"
-                "identity-based-route"
-                "inbound"
-                "inspection-mode"
-                "internet-service"
-                "internet-service-custom"
-                "internet-service-custom-group"
-                "internet-service-group"
-                "internet-service-name"
-                "internet-service-negate"
-                "internet-service-src"
-                "internet-service-src-custom"
-                "internet-service-src-custom-group"
-                "internet-service-src-group"
-                "internet-service-src-name"
-                "internet-service-src-negate"
-                "ippool"
-                "ips-sensor"
-                "label"
-                "logtraffic"
-                "logtraffic-start"
-                "match-vip"
-                "match-vip-only"
-                "name"
-                "nat"
-                "nat46"
-                "nat64"
-                "natinbound"
-                "natip"
-                "natoutbound"
-                "np-acceleration"
-                "ntlm"
-                "ntlm-enabled-browsers"
-                "ntlm-guest"
-                "outbound"
-                "passive-wan-health-measurement"
-                "per-ip-shaper"
-                "permit-any-host"
-                "permit-stun-host"
-                "pfcp-profile"
-                "policy-expiry"
-                "policy-expiry-date"
-                # "policyid"
-                "poolname"
-                "poolname6"
-                "profile-group"
-                "profile-protocol-options"
-                "profile-type"
-                "radius-mac-auth-bypass"
-                "redirect-url"
-                "replacemsg-override-group"
-                "reputation-direction"
-                "reputation-minimum"
-                "rtp-addr"
-                "rtp-nat"
-                "schedule"
-                "schedule-timeout"
-                "scope member"
-                "sctp-filter-profile"
-                "send-deny-packet"
-                "service"
-                "service-negate"
-                "session-ttl"
-                "sgt"
-                "sgt-check"
-                "src-vendor-mac"
-                "srcaddr"
-                "srcaddr-negate"
-                "srcaddr6"
-                "srcintf"
-                "ssh-filter-profile"
-                "ssh-policy-redirect"
-                "ssl-ssh-profile"
-                "status"
-                "tcp-mss-receiver"
-                "tcp-mss-sender"
-                "tcp-session-without-syn"
-                "timeout-send-rst"
-                "tos"
-                "tos-mask"
-                "tos-negate"
-                "traffic-shaper"
-                "traffic-shaper-reverse"
-                "users"
-                "utm-status"
-                # "uuid"
-                "videofilter-profile"
-                "vlan-cos-fwd"
-                "vlan-cos-rev"
-                "vlan-filter"
-                "voip-profile"
-                "vpntunnel"
-                "waf-profile"
-                "wanopt"
-                "wanopt-detection"
-                "wanopt-passive-opt"
-                "wanopt-peer"
-                "wanopt-profile"
-                "wccp"
-                "webcache"
-                "webcache-https"
-                "webfilter-profile"
-                "webproxy-forward-server"
-                "webproxy-profile"
-                "ztna-ems-tag"
-                "ztna-geo-tag"
-                "ztna-status"
-            )
+            $policyList += $_ | ConvertTo-PSFHashtable -Include $validAttributes
         }
     }
     end {
@@ -221,6 +93,14 @@
         if ($Overwrite) {
             Write-PSFMessage "Existing data should be overwritten"
             $apiCallParameter.method = "set"
+        }
+        if (-not [string]::IsNullOrEmpty($After)) {
+            Write-PSFMessage "Using undocumented after parameter"
+            $apiCallParameter.Parameter.after = "$after"
+        }
+        if (-not [string]::IsNullOrEmpty($Before)) {
+            Write-PSFMessage "Using undocumented before parameter"
+            $apiCallParameter.Parameter.before = "$Before"
         }
         $result = Invoke-FMAPI @apiCallParameter
         if (-not $EnableException) {

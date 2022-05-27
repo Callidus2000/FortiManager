@@ -3,7 +3,7 @@
 	RootModule        = 'FortigateManager.psm1'
 
 	# Version number of this module.
-	ModuleVersion     = '1.1.2'
+	ModuleVersion     = '1.2.0'
 
 	# ID used to uniquely identify this module
 	GUID              = '6c74c0d7-80cf-4bef-8fe1-19ac4a89c438'
@@ -44,6 +44,7 @@
 		'Add-FMAddress'
 		'Add-FMAddressGroup'
 		'Add-FMFirewallPolicy'
+		'Add-FMFirewallService'
 		'Connect-FM'
 		'Convert-FMIpAddressToMaskLength'
 		'Convert-FMSubnetMask',
@@ -53,6 +54,7 @@
 		'Get-FMAdomLockStatus'
 		'Get-FMDeviceInfo'
 		'Get-FMFirewallPolicy'
+		'Get-FMFirewallService'
 		'Get-FMLastConnection'
 		'Get-FMPolicyPackage'
 		'Get-FMSystemStatus'
@@ -64,6 +66,7 @@
 		'New-FMObjDynamicAddressGroupMapping'
 		'New-FMObjDynamicAddressMapping'
 		'New-FMObjFirewallPolicy'
+		'New-FMObjFirewallService'
 		'Publish-FMAdomChange'
 		'Remove-FMAddress'
 		'Remove-FMAddressGroup'
@@ -74,6 +77,7 @@
 		'Update-FMAddress'
 		'Update-FMAddressGroup'
 		'Update-FMFirewallPolicy'
+		'Update-FMFirewallService'
 	)
 
 	# Cmdlets to export from this module

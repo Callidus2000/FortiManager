@@ -39,23 +39,24 @@
         [bool]$EnableException = $true
     )
     begin {
-        $addressList = @()
+        $groupList = @()
         $explicitADOM = Resolve-FMAdom -Connection $Connection -Adom $ADOM
         Write-PSFMessage "`$explicitADOM=$explicitADOM"
+        $validAttributes = Get-PSFConfigValue -FullName 'FortigateManager.ValidAttr.FirewallAddressGroups'
     }
     process {
-        $AddressGroup | ForEach-Object { $addressList += $_ }
+        $AddressGroup | ForEach-Object { $groupList += $_ | ConvertTo-PSFHashtable -Include $validAttributes }
     }
     end {
         $apiCallParameter = @{
             EnableException     = $EnableException
             Connection          = $Connection
             LoggingAction       = "Add-FMAddressGroup"
-            LoggingActionValues = @($addressList.count, $explicitADOM)
+            LoggingActionValues = @($groupList.count, $explicitADOM)
             method              = "add"
             Path                = "/pm/config/adom/$explicitADOM/obj/firewall/addrgrp"
             Parameter           = @{
-                "data" = $addressList
+                "data" = $groupList
             }
         }
         if ($Overwrite) {
