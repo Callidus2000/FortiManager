@@ -44,6 +44,7 @@
 		'Add-FMAddress'
 		'Add-FMAddressGroup'
 		'Add-FMFirewallPolicy'
+		'Add-FMFirewallService'
 		'Connect-FM'
 		'Convert-FMIpAddressToMaskLength'
 		'Convert-FMSubnetMask',
@@ -53,6 +54,7 @@
 		'Get-FMAdomLockStatus'
 		'Get-FMDeviceInfo'
 		'Get-FMFirewallPolicy'
+		'Get-FMFirewallService'
 		'Get-FMLastConnection'
 		'Get-FMPolicyPackage'
 		'Get-FMSystemStatus'
@@ -64,6 +66,7 @@
 		'New-FMObjDynamicAddressGroupMapping'
 		'New-FMObjDynamicAddressMapping'
 		'New-FMObjFirewallPolicy'
+		'New-FMObjFirewallService'
 		'Publish-FMAdomChange'
 		'Remove-FMAddress'
 		'Remove-FMAddressGroup'
@@ -74,6 +77,7 @@
 		'Update-FMAddress'
 		'Update-FMAddressGroup'
 		'Update-FMFirewallPolicy'
+		'Update-FMFirewallService'
 	)
 
 	# Cmdlets to export from this module
