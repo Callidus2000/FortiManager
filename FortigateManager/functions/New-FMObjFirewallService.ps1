@@ -94,6 +94,9 @@
     .PARAMETER Visibility
     Parameter description
 
+    .PARAMETER NullHandler
+    Parameter description
+
     .EXAMPLE
     An example
 
@@ -103,6 +106,7 @@
     General notes
     #>
     [CmdletBinding()]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseShouldProcessforStateChangingFunctions", "")]
     param (
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [System.Object[]]$AppCategory,
@@ -166,7 +170,7 @@
         [ValidateSet("disable", "enable")]
         [string]$Visibility,
         [ValidateSet("Keep", "RemoveAttribute", "ClearContent")]
-        [parameter(mandatory = $false, ValueFromPipeline = $false, ParameterSetName = "default")]
+        [parameter(mandatory = $false, ParameterSetName = "default")]
         $NullHandler = "RemoveAttribute"
     )
     if ($Protocol -in @("IP", "TCP/UDP/SCTP") -and [string]::IsNullOrEmpty($Iprange)) {

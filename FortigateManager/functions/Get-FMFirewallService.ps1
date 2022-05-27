@@ -52,6 +52,8 @@
     .EXAMPLE
     An example
 
+    may be provided later
+
     .NOTES
     https://fndn.fortinet.net/index.php?/fortiapi/5-fortimanager/1637/5/pm/config/firewall/
 
