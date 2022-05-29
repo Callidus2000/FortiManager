@@ -112,8 +112,7 @@ The `AllowClobber` option is currently necessary because of an issue in the curr
 
 The module is a wrapper for the Fortinet FortiManager API. For getting started take a look at the integrated help of the included functions. As inspiration you can take a look at the use-cases which led to the development of this module.
 
-## Use-Cases
-**Why was the module developed?**
+## Use-Cases - Why was the module developed?
 ### Background
 Our company uses the Fortinet Manager for administration of 8 production firewalls. The policies were separated into 8 policy packages and no policy package was the same. In a refactoring project we created a new firewall design based on 
 * categorizing the vlans into security levels
