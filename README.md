@@ -63,7 +63,7 @@
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
-    <li><a href="#Use-Cases">Use-Cases - Why was this module created?</a></li>
+    <li><a href="#use-cases-why-was-the-module-developed">Use-Cases - Why was this module created?</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
