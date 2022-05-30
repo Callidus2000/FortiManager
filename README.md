@@ -63,7 +63,7 @@
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
-    <li><a href="#use-cases-why-was-the-module-developed">Use-Cases - Why was this module created?</a></li>
+    <li><a href="#use-cases-or-why-was-the-module-developed">Use-Cases - Why was this module created?</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
@@ -112,7 +112,7 @@ The `AllowClobber` option is currently necessary because of an issue in the curr
 
 The module is a wrapper for the Fortinet FortiManager API. For getting started take a look at the integrated help of the included functions. As inspiration you can take a look at the use-cases which led to the development of this module.
 
-## Use-Cases - Why was the module developed?
+## Use-Cases or Why was the module developed?
 ### Background
 Our company uses the Fortinet Manager for administration of 8 production firewalls. The policies were separated into 8 policy packages and no policy package was the same. In a refactoring project we created a new firewall design based on 
 * categorizing the vlans into security levels
@@ -120,7 +120,7 @@ Our company uses the Fortinet Manager for administration of 8 production firewal
 * building new default policies based on those new objects
 
 ### Part One
-First task was done within excel, but no one wanted to add about 400 new address objects in the web gui by hand. This resulted in the idea for this module. After getting an account for the [fortinet developer network](https://fndn.fortinet.net/) I needed some time for understanding the API and to create the first functions. The business requirements were simple:
+First task was to import 400 new address objects from Excel. The business requirements were simple:
 * Login to the manager (**Connect-FM**)
 * Query existing addresses (**Get-FMAddress**) and address groups (**Get-FMADdressGroup**)
 * Create new objects for the API (**New-FMObjAddressGroup** and **New-FMObjAddress**) out of the excel file (Thanks to ImportExcel)
@@ -139,12 +139,12 @@ New plan:
 * Create a new policy package, add all firewall devices/vdoms to the new package
 * Create the new global policy rules
 * Foreach existing policy package
-  * read the existing rules (**Get-FMFirewallPolicy**)
-  * modify them (rename, add the previous "Installation Targets" as "Install On" attribute (scope member))
-  * add the modified rule to the new policy package (**Add-FMFirewallPolicy**)
+  * Read the existing rules (**Get-FMFirewallPolicy**)
+  * Modify them (rename, add the previous "Installation Targets" as "Install On" attribute (scope member))
+  * Add the modified rule to the new policy package (**Add-FMFirewallPolicy**)
 * Apply the new Package to each VDOM
-  * the global rules would target all devices
-  * the prior copied rules would target specific VDOMs
+  * The global rules would target all devices
+  * The prior copied rules would target specific VDOMs
 
 ### Part three
 As the module has the ability to read/create/add Firewall policy rules, why not import the new global rules directly from excel? No problem, just had to implement the functions around Firewall Services (**Get/Add/Update-FMFirewallService**). Voila, every necessary task can be automated.
