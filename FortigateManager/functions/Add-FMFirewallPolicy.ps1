@@ -42,32 +42,32 @@
     #>
     param (
         [parameter( ParameterSetName = "default")]
-        [parameter( ParameterSetName = "undocumentedAfter")]
-        [parameter( ParameterSetName = "undocumentedBefore")]
+        #[parameter( ParameterSetName = "undocumentedAfter")]
+        #[parameter( ParameterSetName = "undocumentedBefore")]
         $Connection = (Get-FMLastConnection),
         [parameter( ParameterSetName = "default")]
-        [parameter( ParameterSetName = "undocumentedAfter")]
-        [parameter( ParameterSetName = "undocumentedBefore")]
+        #[parameter( ParameterSetName = "undocumentedAfter")]
+        #[parameter( ParameterSetName = "undocumentedBefore")]
         [string]$ADOM,
         [parameter(mandatory = $true, ParameterSetName = "default")]
         [parameter(mandatory = $true, ParameterSetName = "undocumentedAfter")]
         [parameter( mandatory = $true, ParameterSetName = "undocumentedBefore")]
         [string]$Package,
-        [parameter( ParameterSetName = "undocumentedAfter")]
+        #[parameter( ParameterSetName = "undocumentedAfter")]
         [string]$After,
-        [parameter( ParameterSetName = "undocumentedBefore")]
+        #[parameter( ParameterSetName = "undocumentedBefore")]
         [string]$Before,
         [parameter(mandatory = $true, ValueFromPipeline = $true, ParameterSetName = "default")]
-        [parameter(mandatory = $true, ValueFromPipeline = $true, ParameterSetName = "undocumentedAfter")]
-        [parameter(mandatory = $true, ValueFromPipeline = $true, ParameterSetName = "undocumentedBefore")]
+        # [parameter(mandatory = $true, ValueFromPipeline = $true, ParameterSetName = "undocumentedAfter")]
+        # [parameter(mandatory = $true, ValueFromPipeline = $true, ParameterSetName = "undocumentedBefore")]
         [object[]]$Policy,
         [parameter( ParameterSetName = "default")]
-        [parameter( ParameterSetName = "undocumentedAfter")]
-        [parameter( ParameterSetName = "undocumentedBefore")]
+        #[parameter( ParameterSetName = "undocumentedAfter")]
+        #[parameter( ParameterSetName = "undocumentedBefore")]
         [switch]$Overwrite,
         [parameter( ParameterSetName = "default")]
-        [parameter( ParameterSetName = "undocumentedAfter")]
-        [parameter( ParameterSetName = "undocumentedBefore")]
+        #[parameter( ParameterSetName = "undocumentedAfter")]
+        #[parameter( ParameterSetName = "undocumentedBefore")]
         [bool]$EnableException = $true
     )
     begin {
