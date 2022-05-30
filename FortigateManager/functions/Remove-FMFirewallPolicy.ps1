@@ -41,7 +41,7 @@
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param (
-        [parameter(Mandatory=$false)]
+        [parameter(Mandatory = $false)]
         $Connection = (Get-FMLastConnection),
         [string]$ADOM,
         [bool]$EnableException = $true,
@@ -56,9 +56,10 @@
         $apiCallParameter = @{
             EnableException     = $EnableException
             Connection          = $Connection
-            LoggingAction       = "Remove-FMFirewallPolicy"
+            LoggingAction       = "Remove-FMFirewallPolicy.Multi"
             LoggingActionValues = $explicitADOM
             method              = "delete"
+            Path                = "/pm/config/adom/$explicitADOM/pkg/$Package/firewall/policy"
         }
         $policyIdList = @()
     }
@@ -68,11 +69,24 @@
     end {
         # Removing potential Null values
         $policyIdList = $policyIdList | Where-Object { $_ }
-        foreach ($id in $policyIdList) {
-            $apiCallParameter.Path = "/pm/config/adom/$explicitADOM/pkg/$Package/firewall/policy/$id"
-            $apiCallParameter.LoggingActionValues = $id
-            $result = Invoke-FMAPI @apiCallParameter
-            $result|Out-Null
+        $apiCallParameter.Parameter = @{
+            confirm = 1
+            filter  = @("policyid", "in") + $policyIdList
         }
+        if ($policyIdList.count -eq 0) {
+            $apiCallParameter.LoggingAction = "Remove-FMFirewallPolicy"
+            $apiCallParameter.LoggingActionValues = $policyIdList[0]
+        }
+        else {
+            $apiCallParameter.LoggingActionValues = $policyIdList.count
+        }
+        # foreach ($id in $policyIdList) {
+        #     $apiCallParameter.Path = "/pm/config/adom/$explicitADOM/pkg/$Package/firewall/policy/$id"
+        #     $apiCallParameter.LoggingActionValues = $id
+        #     $result = Invoke-FMAPI @apiCallParameter
+        #     $result|Out-Null
+        # }
+        $result = Invoke-FMAPI @apiCallParameter
+        $result | Out-Null
     }
 }

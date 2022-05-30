@@ -63,6 +63,7 @@
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
+    <li><a href="#use-cases-or-why-was-the-module-developed">Use-Cases - Why was this module created?</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
@@ -109,19 +110,46 @@ The `AllowClobber` option is currently necessary because of an issue in the curr
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-The module is a wrapper for the Fortnet FortiManager API. For getting started take a look at the integrated help of the included functions.
+The module is a wrapper for the Fortinet FortiManager API. For getting started take a look at the integrated help of the included functions. As inspiration you can take a look at the use-cases which led to the development of this module.
 
-Main Entries:
-* Connect-FM - Connect to your installation
-* Get-FMAddress - Queries existing addresses of the given ADOM.
-* New-FMObjAddress - Creates a new address object
-* Add-FMAddress - Add the object to the configuration
-* Remove-FMAddress/Rename-FMAddress/Update-FMAddress - Does what it says
-* Lock-FMAdom - Locks the ADOM for modification
-* Publish-FMAdomChange - Same as clicking on "Save" in the Web-GUI
-* Unlock-FMAdom - Unlocks the ADOM
+## Use-Cases or Why was the module developed?
+### Background
+Our company uses the Fortinet Manager for administration of 8 production firewalls. The policies were separated into 8 policy packages and no policy package was the same. In a refactoring project we created a new firewall design based on 
+* categorizing the vlans into security levels
+* creating hierarchical address groups based on the security levels and locations
+* building new default policies based on those new objects
 
-Corresponding functions for address groups are also provided.
+### Part One
+First task was to import 400 new address objects from Excel. The business requirements were simple:
+* Login to the manager (**Connect-FM**)
+* Query existing addresses (**Get-FMAddress**) and address groups (**Get-FMADdressGroup**)
+* Create new objects for the API (**New-FMObjAddressGroup** and **New-FMObjAddress**) out of the excel file (Thanks to ImportExcel)
+* Lock the ADOM for writing (**Lock-FMAdom**)
+* Add the new address objects to the ADOM (**Add-FMAddress** and **Add-FMAddressGroup**)
+* Save the changes (**Publish-FMAdomChange**)
+* Unlock the ADOM after work (**UnlockFMAdom**)
+
+For testing purposes the antagonists of Add where needed (**Remove-FMAddress**, **Remove-FMAddressGroup**), and updating the objects would have been nice, too (you get it, **Update-***).
+### Part Two
+The new default address objects could be imported, the new default policy rules could be implemented... But where? We had 8 policy packages....
+
+One solution would have been to add the policies to the Global Header config... But beside the firewalls within the project scope the Manager appliance was also in charge of the main location firewalls which would receive the new policies, too. That's not desirable.
+
+New plan: 
+* Create a new policy package, add all firewall devices/vdoms to the new package
+* Create the new global policy rules
+* Foreach existing policy package
+  * Read the existing rules (**Get-FMFirewallPolicy**)
+  * Modify them (rename, add the previous "Installation Targets" as "Install On" attribute (scope member))
+  * Add the modified rule to the new policy package (**Add-FMFirewallPolicy**)
+* Apply the new Package to each VDOM
+  * The global rules would target all devices
+  * The prior copied rules would target specific VDOMs
+
+### Part three
+As the module has the ability to read/create/add Firewall policy rules, why not import the new global rules directly from excel? No problem, just had to implement the functions around Firewall Services (**Get/Add/Update-FMFirewallService**). Voila, every necessary task can be automated.
+
+# Example code
 ```Powershell
 # Connect
 $connection = Connect-FM -Credential $fortiCred -Url MyServer.MyCompany.com -verbose -Adom TEST
