@@ -7,13 +7,14 @@ A big welcome and thank you for considering contributing to this repository! Bes
 ## Missing a functionality?
 
 If you are missing a function in this module:
-* Identify the corresponding API from the [Swagger documentation](#Swagger-documentation)
+* Identify the corresponding API from the [Fortinet Developer Network](https://fndn.fortinet.net/index.php?/fortiapi/5-fortimanager/)
 * Take a look at [Working with the layout](#working-with-the-layout)
 * Add a new public function under `\FortiManager\functions`
   * One function per file
   * Filename relates to the function name
   * Add the function to `\FortiManager\FortiManager.psd1` under `FunctionsToExport`
 * Make use of [API Proxy Invoke-FMAPI](#api-proxy-Invoke-FMAPI) to access the API - it takes the stress out of coping with default problem
+  * With a little bit of trickery you can create time consuming functions/parts by script, see [Easy code creation](#easy-code-creation)
 * Add new [Pester tests](#pester-tests) for the new function (completely missing at the moment)
 * The module has currently some [limitations](#limitations) - either live with them or fix them by contributing.
 
@@ -57,6 +58,121 @@ That's the quick and easy way for getting started. But for robust code there is 
 
 Just take a look at existing functions, it's hopefully self explaining. Otherwise raise an issue for asking about details.
 
+## Easy code creation
+After you've got access to the [API from Fortinet](https://fndn.fortinet.net/index.php?/fortiapi/5-fortimanager/) you can find (roughly guessed) 98% of the available functionality from it. For the remaining 2% you would need to use your browsers developer tools and inspect the network traffic...
+
+Where can the needed information be found and how can it be used for easy code creation?
+
+Let's take the firewall address table as an example. You can find the corresponding API documentation under the mentioned link, following the left menu ["FortiManager 7.2.0 > Configuration Database v7.2 > ADOM Level Objects > pm/config/firewall"](https://fndn.fortinet.net/index.php?/fortiapi/5-fortimanager/1637/5/pm/config/firewall/). From there unfold the swagger documentation for "/pm/config/firewall/address". For creating a new address we are looking for "/pm/config/adom/{adom}/obj/firewall/address (**add**)". 
+
+#### Special note!
+You need the module `PSUtil` for the following helper functions.
+### Creating the function Add-FMAddress
+Take a look at the existing function:
+
+![Add-FMAddress](_img/Add-FMAddress-code.png)
+
+And now the deep look at the parts to be exchanged/modified if using it as an template:
+* Main parameter is an array of addresses which should be added (line 7)
+* Those input objects get sanitized to only include valid attributes (line 15, 18)
+  * If you query an existing address not every returned attribute can be set for new objects!
+  * Attributes can be configured, see `FortigateManager\internal\configurations\configuration.ps1`
+* For default logging add the corresponding Key from `FortigateManager\en-us\strings.psd1` as LoggingAction (line 24)
+* Method (line 26) and Path (line 27) can be obtained from the swagger API.
+* The API tells you to add the new address array to the Parameter "data" (Line 28/29)
+
+For this to work we need to construct a valid address object. As an address object consists of 41 top level attributes (which might themselves consist of complex types) creating one in the correct format is quite time consuming. Or it would be if I didn't include some helper functions.
+
+### Create a new object
+Back in the API click on example data and you will get the JSON request for creating a new address:
+```json Hubba
+{
+  "method": "add",
+  "params": [
+    {
+      "data": [
+        {
+          "_image-base64": "string",
+          "allow-routing": "disable",
+          "associated-interface": "string",
+          "cache-ttl": 0,
+          "clearpass-spt": "unknown",
+          "color": 0,
+          "comment": "string",
+........
+           "type": "ipmask",
+          "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+          "wildcard": "string",
+          "wildcard-fqdn": "string"
+        }
+      ],
+      "url": "/pm/config/adom/{adom}/obj/firewall/address"
+    }
+  ],
+  "session": "string",
+  "id": 1
+}
+```
+The "data" key contains the attribute structure needed for the address. Copy the content from "data" starting with
+```json Hubba
+{
+  "_image-base64": "string",
+  "allow-routing": "disable",
+```
+and ending with
+```json
+  "wildcard": "string",
+  "wildcard-fqdn": "string"
+}
+```
+to the clipboard. Now execute the following command:
+```Powershell
+InModuleScope fortigatemanager {Convert-FMApi2HashTable}
+```
+
+and past the new clipboard content into an empty powershell file. After formatting it (I like VSCode) it should look like this:
+![New-FMObj-code](_img/New-FMObj-code.png)
+
+Now all you have to do is
+* Name the new function correctly (*New-FMObjAddress* for example, line 1)
+* Add some inline help (add ## as a newline before line 2 in VSCode)
+* mark the mandatory attributes
+* fine tune the detected parameter types
+
+As a result you can create new objects by invoking a regular powershell function with nice CamelCase parameter names.
+
+### Further use of `Convert-FMApi2HashTable`
+You can although use the helper function for creating parameters of `Get-/Add-/...` functions. Take the `/pm/config/adom/{adom}/obj/firewall/address (get)` as an example, especially the params-block from the example value:
+![Address-Parameter](_img/Get-FMAddress-json.png)
+
+Copy it to the clipboard and run again
+```Powershell
+InModuleScope fortigatemanager {Convert-FMApi2HashTable}
+```
+The resulting dummy code
+![Dummy Code](_img/Dummy-Get-Address-code.png)
+contains main parts for the real getter function:
+![Real Code](_img/Get-FMAddress-code.png)
+
+Dummy-Lines -> Real-Function-Lines
+* 4-19 -> 9-26 (function parameters)
+* 26-37 -> 32-41 (parameter mapping to API parameter hashmap)
+
+The `ValidateSet` for the `Fields` paramter was created by copying the enum ("Model" View, not "Example Value" in the API)
+
+``
+_image-base64, allow-routing, associated-interface, cache-ttl, clearpass-spt, color, comment, country, dirty, end-ip, epg-name, fabric-object, filter, fqdn, fsso-group, interface, macaddr, name, node-ip-only, obj-id, obj-tag, obj-type, organization, policy-group, sdn, sdn-addr-type, sdn-tag, start-ip, sub-type, subnet, subnet-name, tag-detection-level, tag-type, tenant, type, uuid, wildcard, wildcard-fqdn
+``
+
+to the clipboard and then use the Powershell command
+```Powershell
+Get-Clipboard|split ', '|wrap '"' '"' |join ', '|wrap '[ValidateSet(' ')]'|Set-Clipboard -PassThru
+```
+to get
+```Powershell
+[ValidateSet("_image-base64", "allow-routing", "associated-interface", "cache-ttl", "clearpass-spt", "color", "comment", "country", "dirty", "end-ip", "epg-name", "fabric-object", "filter", "fqdn", "fsso-group", "interface", "macaddr", "name", "node-ip-only", "obj-id", "obj-tag", "obj-type", "organization", "policy-group", "sdn", "sdn-addr-type", "sdn-tag", "start-ip", "sub-type", "subnet", "subnet-name", "tag-detection-level", "tag-type", "tenant", "type", "uuid", "wildcard", "wildcard-fqdn")]
+```
+as new Clipboard Content.
 
 <!-- ## Pester tests
 The module does use pester for general and functional tests. The general tests are provided by [PSModuleDevelopment](https://github.com/PowershellFrameworkCollective/PSModuleDevelopment) and perform checks like *"is the help well written and complete"*. This results in more than 3500 automatic tests over all.
