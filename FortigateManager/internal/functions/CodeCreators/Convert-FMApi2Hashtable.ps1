@@ -23,7 +23,6 @@
         [String]
         $objectName = ""
     )
-    Write-Host "ParameterSetName=$ParameterSetName"
     $json = Get-Clipboard
 
     $newLineDelim = @"
@@ -45,7 +44,7 @@ function New-FMObj$objectName {
             $parameterName = [regex]::Replace($sourceKey.Trim('_'), '(?i)(?:^|-| )(\p{L})', { $args[0].Groups[1].Value.ToUpper() })
             $parameterType = $sourceHashTable.$sourceKey.gettype()
             $parameterValue = $sourceHashTable.$sourceKey
-            Write-Host "`$parameterName=$parameterName; Type=$parameterType;value=$parameterValue"
+            Write-PSFMessage "`$parameterName=$parameterName; Type=$parameterType;value=$parameterValue"
             #     $defParameter+=@"
             #         [parameter(mandatory = `$false, ParameterSetName = "default")]
             #         [$parameterType]`$$parameterName
@@ -96,11 +95,10 @@ function New-FMObj$objectName {
         $copy2ClipBoardData += "}"
         $copy2ClipBoardData += "return `$data | Remove-FMNullValuesFromHashtable -NullHandler `$NullHandler"
         $copy2ClipBoardData += "}"
-        write-host ($copy2ClipBoardData  | out-string)
+        Write-PSFMessage -Level Host ($copy2ClipBoardData  | out-string)
         $copy2ClipBoardData  | out-string | Set-Clipboard
-        # write-host ($defParameter | Join-String $newLineDelim | out-string)
     }
     catch {
-        Write-Host "Clipboard did not contain a JSON String, $_"
+        Write-PSFMessage -Level Warning "Clipboard did not contain a JSON String, $_"
     }
 }
