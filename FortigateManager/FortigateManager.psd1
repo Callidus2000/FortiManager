@@ -3,7 +3,7 @@
 	RootModule        = 'FortigateManager.psm1'
 
 	# Version number of this module.
-	ModuleVersion     = '1.2.2'
+	ModuleVersion     = '1.3.0'
 
 	# ID used to uniquely identify this module
 	GUID              = '6c74c0d7-80cf-4bef-8fe1-19ac4a89c438'
@@ -53,11 +53,14 @@
 		'Get-FMAddressGroup'
 		'Get-FMAdomLockStatus'
 		'Get-FMDeviceInfo'
+		'Get-FMFirewallHitCount'
 		'Get-FMFirewallPolicy'
 		'Get-FMFirewallService'
 		'Get-FMLastConnection'
 		'Get-FMPolicyPackage'
 		'Get-FMSystemStatus'
+		'Get-FMTaskResult'
+		'Get-FMTaskStatus'
 		'Invoke-FMAPI'
 		'Lock-FMAdom'
 		'Move-FMFirewallPolicy'
