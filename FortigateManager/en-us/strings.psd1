@@ -13,8 +13,11 @@
 	'APICall.Get-FMDeviceInfo'              = 'Query device Info of ADOM {0}'
 	'APICall.Get-FMFirewallPolicy'          = 'Query Firewall-Policy from ADOM {0}/Policy Package {1}'
 	'APICall.Get-FMFirewallService'         = 'Query Firewall-Services from ADOM {0}'
+	'APICall.Get-FMFirewallHitCount'        = 'Query Hitcount for ADOM {0} & Package {1}'
 	'APICall.Get-FMPolicyPackage'           = 'Query Policy Packages'
 	'APICall.Get-FMSystemStatus'            = 'Query Systemstatus'
+	'APICall.Get-FMTaskResult'              = 'Query results of task {0}'
+	'APICall.Get-FMTaskStatus'              = 'Query Status of task {0}'
 	'APICall.Lock-FMAdom'                   = 'Locking ADOM {0}'
 	'APICall.Move-FMFirewallPolicy'         = "Moving Policy {0} {1} {2}, ADOM {3}/Policy Package {4}"
 	'APICall.Publish-FMAdomChange'          = 'Saving changes'
