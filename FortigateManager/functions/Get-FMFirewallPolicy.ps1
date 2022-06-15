@@ -54,6 +54,21 @@
     .PARAMETER Sortings
     Specify the sorting of the returned result.
 
+    .PARAMETER IncludeHitCount
+    Additional Switch; Query the current hitcount statistik and add the
+    attributes to the result data as the following attributes:
+    _byte
+    _first_hit
+    _first_session
+    _hitcount
+    _pkts
+    _sesscount
+    _first_hit
+    _first_session
+    _last_hit
+    _last_session
+    The _hitcount will be set to -1 if no statistics could be found.
+
     .PARAMETER NullHandler
     Parameter description
 
@@ -73,6 +88,7 @@
         [string]$ADOM,
         [bool]$EnableException = $true,
         [parameter(mandatory = $true, ParameterSetName = "default")]
+        [PSFramework.TabExpansion.PsfArgumentCompleterAttribute("FortigateManager.FirewallPackage")]
         [string]$Package,
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$Attr,
@@ -92,6 +108,8 @@
         [System.Object[]]$Range,
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [System.Object[]]$Sortings,
+        [parameter(mandatory = $false, ParameterSetName = "default")]
+        [switch]$IncludeHitCount,
         [ValidateSet("Keep", "RemoveAttribute", "ClearContent")]
         [parameter(mandatory = $false, ParameterSetName = "default")]
         $NullHandler = "RemoveAttribute"
@@ -119,5 +137,36 @@
     }
     $result = Invoke-FMAPI @apiCallParameter
     Write-PSFMessage "Result-Status: $($result.result.status)"
-    return $result.result.data
+    $policyData = $result.result.data
+    if ($IncludeHitCount) {
+        $addAttributes = @('byte', 'first_hit', 'first_session', 'hitcount', 'pkts', 'sesscount')
+        $addAttributesAsDate = @('first_hit', 'first_session', 'last_hit', 'last_session')
+        Write-PSFMessage "Query hitcount statistics, statistics will be added as attributes: _byte, _first_hit, _first_session, _hitcount, _pkts, _sesscount, _first_hit, _first_session, _last_hit, _last_session"
+        $hitCountData = Get-FMFirewallHitCount -Package $packageName
+        $hitCountDataHash = @{}
+        $hitCountData.'firewall policy' | ForEach-Object { $hitCountDataHash.add("$($_.policyid)", $_) }
+        $emptyCounter = @{
+            byte          = -1
+            hitcount      = -1
+            pkts          = -1
+            sesscount     = -1
+            first_hit     = 0
+            first_session = 0
+            last_hit      = 0
+            last_session  = 0
+        }
+        foreach ($policy in $policyData) {
+            $counter = $hitCountDataHash."$($policy.policyid)"
+            if ($null -eq $counter) {
+                $counter = $emptyCounter
+            }
+            foreach ($attr in $addAttributes) {
+                Add-Member -inputobject $policy -MemberType NoteProperty -Name "_$attr" -Value $counter.$attr -Force
+            }
+            foreach ($attr in $addAttributesAsDate) {
+                Add-Member -inputobject $policy -MemberType NoteProperty -Name "_$attr" -Value ([DateTime]::FromFileTimeutc($counter.$attr)).toString() -Force
+            }
+        }
+    }
+    return $policyData
 }

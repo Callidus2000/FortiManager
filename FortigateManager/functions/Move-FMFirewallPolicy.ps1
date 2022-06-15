@@ -54,6 +54,7 @@
         $Connection = (Get-FMLastConnection),
         [string]$ADOM,
         [parameter(mandatory = $true)]
+        [PSFramework.TabExpansion.PsfArgumentCompleterAttribute("FortigateManager.FirewallPackage")]
         [string]$Package,
         [parameter(mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
         [Object[]]$PolicyID,
