@@ -158,7 +158,6 @@
             $counter = $hitCountDataHash."$($policy.policyid)"
             if ($null -eq $counter) {
                 $counter = $emptyCounter
-                Write-PSFMessage -Level Host "Empty Counter Policy $($policy.policyid)"
             }
             foreach ($attr in $addAttributes) {
                 Add-Member -inputobject $policy -MemberType NoteProperty -Name "_$attr" -Value $counter.$attr -Force
