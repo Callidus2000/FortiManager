@@ -52,6 +52,7 @@
         [parameter(mandatory = $true, ParameterSetName = "default")]
         [parameter(mandatory = $true, ParameterSetName = "undocumentedAfter")]
         [parameter( mandatory = $true, ParameterSetName = "undocumentedBefore")]
+        [PSFramework.TabExpansion.PsfArgumentCompleterAttribute("FortigateManager.FirewallPackage")]
         [string]$Package,
         #[parameter( ParameterSetName = "undocumentedAfter")]
         [string]$After,

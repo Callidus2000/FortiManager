@@ -48,6 +48,10 @@
     compare ~\FortigateManager\en-us\strings.psd1
     Array of placeholder values.
 
+    .PARAMETER LoggingLevel
+    On which level should die diagnostic Messages be logged?
+    Defaults to PSFConfig "FortigateManager.Logging.Api"
+
     .PARAMETER EnableException
     If set to true, inner exceptions will be rethrown. Otherwise the an empty result will be returned.
 
@@ -72,6 +76,8 @@
         $Method,
         [bool]$EnableException = $true,
         [string]$LoggingAction = "Invoke-FMAPI",
+        [ValidateSet("Critical", "Important", "Output", "Host", "Significant", "VeryVerbose", "Verbose", "SomewhatVerbose", "System", "Debug", "InternalComment", "Warning")]
+        [string]$LoggingLevel = (Get-PSFConfigValue -FullName "FortigateManager.Logging.Api" -Fallback "Verbose"),
         [string[]]$LoggingActionValues = ""
     )
     if (-not $Connection) {
@@ -140,7 +146,7 @@
         return $result
 
         # } -PSCmdlet $PSCmdlet  -EnableException $EnableException -Level (Get-PSFConfigValue -FullName "FortigateManager.Logging.Api" -Fallback "Verbose")
-    } -PSCmdlet $PSCmdlet  -EnableException $false -Level (Get-PSFConfigValue -FullName "FortigateManager.Logging.Api" -Fallback "Verbose")
+    } -PSCmdlet $PSCmdlet  -EnableException $false -Level $LoggingLevel
     if ((Test-PSFFunctionInterrupt) -and $EnableException) {
         Throw "API-Error, statusCode: $statusCode, Message $($result.result.status.Message)" #-EnableException $true -StepsUpward 3 #-AlwaysWarning
     }

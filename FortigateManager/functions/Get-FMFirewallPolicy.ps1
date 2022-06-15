@@ -88,6 +88,7 @@
         [string]$ADOM,
         [bool]$EnableException = $true,
         [parameter(mandatory = $true, ParameterSetName = "default")]
+        [PSFramework.TabExpansion.PsfArgumentCompleterAttribute("FortigateManager.FirewallPackage")]
         [string]$Package,
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$Attr,

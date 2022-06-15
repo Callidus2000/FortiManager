@@ -21,6 +21,10 @@
     .PARAMETER Fields
     Limit the output by returning only the attributes specified in the string array. If none specified, all attributes will be returned.
 
+    .PARAMETER LoggingLevel
+    On which level should die diagnostic Messages be logged?
+    Defaults to PSFConfig "FortigateManager.Logging.Api"
+
     .PARAMETER NullHandler
     Parameter description
 
@@ -44,6 +48,8 @@
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [ValidateSet("name", "obj ver", "oid", "scope member", "type")]
         [System.Object[]]$Fields,
+        [ValidateSet("Critical", "Important", "Output", "Host", "Significant", "VeryVerbose", "Verbose", "SomewhatVerbose", "System", "Debug", "InternalComment", "Warning")]
+        [string]$LoggingLevel = (Get-PSFConfigValue -FullName "FortigateManager.Logging.Api" -Fallback "Verbose"),
         [ValidateSet("Keep", "RemoveAttribute", "ClearContent")]
         [parameter(mandatory = $false, ParameterSetName = "default")]
         $NullHandler = "RemoveAttribute"
@@ -61,6 +67,7 @@
         method              = "get"
         Parameter           = $Parameter
         Path                = "/pm/pkg/adom/$explicitADOM"
+        LoggingLevel        = $LoggingLevel
     }
     if ($Name){
             $apiCallParameter.Path+="/$Name"
