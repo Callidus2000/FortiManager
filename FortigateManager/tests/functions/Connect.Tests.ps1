@@ -2,6 +2,9 @@ Describe  "Connection tests" {
     BeforeAll {
         . $PSScriptRoot\Connect4Testing.ps1
     }
+    AfterAll {
+        Disconnect-FM -EnableException $false
+    }
     Context "NotConnected" {
         It "Connection should not be established" {
             $wrongCreds = new-object -typename System.Management.Automation.PSCredential -argumentlist "anonymous", (ConvertTo-SecureString "password" -AsPlainText -Force)
