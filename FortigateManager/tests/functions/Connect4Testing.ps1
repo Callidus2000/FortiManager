@@ -3,7 +3,7 @@ if ([string]::IsNullOrEmpty($global:testroot)) {
     $global:testroot = (Resolve-Path "$PSScriptRoot\..").Path
 }
 $moduleRoot = (Resolve-Path "$global:testroot\..").Path
-Import-Module "$moduleRoot\FortigateManager.psd1" -Force
+# Import-Module "$moduleRoot\FortigateManager.psd1" -Force
 Write-PSFMessage "`$moduleRoot=$moduleRoot"
 $adom = Get-PSFConfigValue "FortigateManager.pester.adom" -ErrorAction Stop
 $packageName = Get-PSFConfigValue "FortigateManager.pester.packagename" -ErrorAction Stop
