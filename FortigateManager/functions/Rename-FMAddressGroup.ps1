@@ -30,7 +30,7 @@
     General notes
     #>
     param (
-        [parameter(Mandatory=$false)]
+        [parameter(Mandatory = $false)]
         $Connection = (Get-FMLastConnection),
         [string]$ADOM,
         [parameter(mandatory = $true, ParameterSetName = "default")]
@@ -39,18 +39,5 @@
         [string]$NewName,
         [bool]$EnableException = $true
     )
-    begin {
-    }
-    process {
-    }
-    end {
-        $existingGroup=Get-FMAddressGroup -Connection $Connection -filter "name -eq $Name"
-
-        if (-not $existingGroup) {
-            Stop-PSFFunction -AlwaysWarning -EnableException $EnableException -Message "No address group with the name '$Name' could be found"
-            # return
-        }
-        $existingGroup.name=$NewName
-        return Update-FMAddressGroup -Address $existingGroup -Connection $Connection -ADOM $ADOM -Name $Name
-    }
+    return Update-FMAddressGroup -Address @{name = $NewName } -Connection $Connection -ADOM $ADOM -Name $Name
 }
