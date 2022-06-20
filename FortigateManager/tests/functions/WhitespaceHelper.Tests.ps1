@@ -1,11 +1,10 @@
-Describe  "Connection tests" {
+Describe  "Remove-FMWhitespacesFromAttributes tests" {
     BeforeAll {
         $whiteSpaceDemo = @{
             name     = "Foo "
             type     = "Bar"
             TypeName = " Foo Bar"
         }
-        # . "C:\DEV\odin.git\GitHub\FortigateManager\FortigateManager\internal\functions\Remove-FMWhitespacesFromAttributes.ps1"
     }
     It "Remove Whitespace from Hashtable by parameter" {
         $cleanVersion = Remove-FMWhitespacesFromAttributes -InputObject $whiteSpaceDemo.Clone()

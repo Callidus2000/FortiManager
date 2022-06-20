@@ -1,4 +1,4 @@
-Describe  "Connection tests" {
+Describe  "List all available firewall packages tests" {
     BeforeAll {
         . $PSScriptRoot\Connect4Testing.ps1
     }

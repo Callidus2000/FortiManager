@@ -1,4 +1,4 @@
-Describe  "Connection tests" {
+Describe  "Lock and Unlock tests" {
     BeforeAll {
         . $PSScriptRoot\Connect4Testing.ps1
         $firstConnection=$connection
