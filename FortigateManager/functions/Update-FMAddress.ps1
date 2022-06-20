@@ -34,10 +34,16 @@
     $testAddress.name="MyDUMMY 2"
     Update-fmaddress -Address $testAddress -Name "MyDUMMY"
 
-    Renames the address
+    Renames the address "MyDUMMY" to "MyDUMMY 2"
+
+    .EXAMPLE
+    Update-fmaddress -Address @{name="MyDUMMY 2"} -Name "MyDUMMY"
+
+    Renames the address "MyDUMMY" to "MyDUMMY 2", everything else will be kept unchanged.
 
     .NOTES
-    General notes
+    If an address object does not contain every attribute which is already set,
+    then the existing values will be kept.
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param (
