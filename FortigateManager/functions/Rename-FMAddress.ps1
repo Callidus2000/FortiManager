@@ -30,7 +30,7 @@
     General notes
     #>
     param (
-        [parameter(Mandatory=$false)]
+        [parameter(Mandatory = $false)]
         $Connection = (Get-FMLastConnection),
         [string]$ADOM,
         [parameter(mandatory = $true, ParameterSetName = "default")]
@@ -39,18 +39,7 @@
         [string]$NewName,
         [bool]$EnableException = $true
     )
-    begin {
-    }
-    process {
-    }
-    end {
-        $existingAddress=Get-FMAddress -Connection $Connection -filter "name -eq $Name"
 
-        if (-not $existingAddress) {
-            Stop-PSFFunction -AlwaysWarning -EnableException $EnableException -Message "No address with the name '$Name' could be found"
-            # return
-        }
-        $existingAddress.name=$NewName
-        return Update-FMAddress -Address $existingAddress -Connection $Connection -ADOM $ADOM -Name $Name
-    }
+    $newNameData = @{name = $NewName }
+    return Update-FMAddress -Address $newNameData -Connection $Connection -ADOM $ADOM -Name $Name -EnableException $EnableException
 }
