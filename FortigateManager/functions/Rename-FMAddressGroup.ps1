@@ -39,5 +39,5 @@
         [string]$NewName,
         [bool]$EnableException = $true
     )
-    return Update-FMAddressGroup -Address @{name = $NewName } -Connection $Connection -ADOM $ADOM -Name $Name
+    return Update-FMAddressGroup -Address @{name = $NewName } -Connection $Connection -ADOM $ADOM -Name $Name -EnableException $EnableException
 }
