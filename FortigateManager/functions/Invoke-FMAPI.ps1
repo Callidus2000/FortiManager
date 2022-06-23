@@ -66,12 +66,17 @@
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
 
     param (
-        [parameter(Mandatory = $false)]
+        [parameter(ParameterSetName = "pathOnly")]
+        [parameter(ParameterSetName = "parameterOnly")]
+        [parameter(ParameterSetName = "pathAndParameter")]
         $Connection = (Get-FMLastConnection),
-        [parameter(Mandatory)]
+        [parameter(mandatory = $true, ParameterSetName = "pathOnly")]
+        [parameter(mandatory = $true, ParameterSetName = "pathAndParameter")]
         [string]$Path,
+        [parameter(mandatory = $true, ParameterSetName = "pathAndParameter")]
+        [parameter(mandatory = $true, ParameterSetName = "parameterOnly")]
         [Hashtable[]]$Parameter,
-        [parameter(Mandatory)]
+        [parameter(mandatory = $true)]
         [ValidateSet("get", "set", "add", "update", "delete", "clone", "exec", "move", "clone")]
         $Method,
         [bool]$EnableException = $true,
@@ -88,12 +93,6 @@
             return
         }
     }
-    # $callingFunctionName=(Get-Variable MyInvocation -Scope 1).Value.MyCommand.Name
-    # Write-PSFMessage "API Wrapper called from $($pscmdlet |convertto-json)" -Level Host
-    # $callingFunctionName = (Get-PSCallStack | Select-Object FunctionName -Skip 1 -First 1).FunctionName
-    # $callingFunctionName = (Get-PSCallStack | Where-Object { $_.FunctionName -notlike '<*' } | Select-Object -ExpandProperty FunctionName -first 1 -skip 1) -replace '<.*>'
-    # Write-PSFMessage "API Wrapper called from $LoggingAction"
-    # $pscmdlet | convertto-json | set-clipboard
     $existingSession = $connection.forti.session
     $requestId = $connection.forti.requestId
     $connection.forti.requestId = $connection.forti.requestId + 1
@@ -107,10 +106,10 @@
             "id"      = $requestId
             "method"  = "$Method"
             "params"  = @(
-                @{
-                    # "data" = @($Parameter                    )
-                    "url" = "$Path"
-                }
+                # @{
+                #     # "data" = @($Parameter                    )
+                #     "url" = "$Path"
+                # }
             )
             "session" = $existingSession
             "verbose" = 1
@@ -118,8 +117,19 @@
     }
     if ($Parameter) {
         # $global:hubba = $apiCallParameter
-        $Parameter | ForEach-Object { $apiCallParameter.body.params[0] += $_ }
+        $Parameter | ForEach-Object {
+            if ([string]::IsNullOrEmpty($_.url)){$_.url=$Path}
+            $apiCallParameter.body.params+= $_
+        }
         # $apiCallParameter.body.params[0]+=$Parameter
+    }else{
+        # No parameter given, use only the $Path url
+        $apiCallParameter.body.params += @{}
+    }
+    if (-not [string]::IsNullOrEmpty($Path)){
+        $apiCallParameter.body.params | ForEach-Object {
+            if ([string]::IsNullOrEmpty($_.url)) { $_.url = $Path }
+        }
     }
 
     # $apiCallParameter.Body.params[0].url=$Path
