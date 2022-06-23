@@ -148,10 +148,7 @@
         }
         $statusCode = $result.result.status.code
         if ($statusCode -ne 0) {
-            # Write-PSFMessage -Level Warning "Could not get Lockstatus of ADOM $explicitADOM"
-            Stop-PSFFunction -Message "API-Error, statusCode: $statusCode, Message $($result.result.status.Message)" -EnableException $true -StepsUpward 3 #-AlwaysWarning
-            # Throw "API-Error, statusCode: $statusCode, Message $($result.result.status.Message)" #-EnableException $true -StepsUpward 3 #-AlwaysWarning
-            return
+            Stop-PSFFunction -Message "API-Error, statusCode: $statusCode, Message $($result.result.status.Message)" -EnableException $EnableException -StepsUpward 3 #-AlwaysWarning
         }
         return $result
 
