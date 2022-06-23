@@ -58,7 +58,7 @@
         $apiCallParameter = @{
             EnableException     = $EnableException
             Connection          = $Connection
-            LoggingAction       = "Update-FMAddress"
+            LoggingAction       = "Update-FMAddressGroup"
             LoggingActionValues = @($groupList.count, $explicitADOM,$Name)
             method              = "update"
             Path                = "/pm/config/adom/$explicitADOM/obj/firewall/addrgrp"

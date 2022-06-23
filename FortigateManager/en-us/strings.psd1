@@ -26,8 +26,10 @@
 	'APICall.Remove-FMFirewallPolicy'       = 'Remove firewall policy {0}'
 	'APICall.Remove-FMFirewallPolicy.Multi' = 'Removing {0} firewall policy rules'
 	'APICall.Rename-FMAddress'              = 'Renaming {0} addresses to ADOM {1}'
+	'APICall.Rename-FMAddressGroup'         = 'Renaming {0} addressgroups to ADOM {1}'
 	'APICall.Unlock-FMAdom'                 = 'Unlocking ADOM {0}'
 	'APICall.Update-FMAddress'              = 'Updating {0} addresses to ADOM {1}, additional -Name: {2}'
+	'APICall.Update-FMAddressGroup'         = 'Updating {0} addressgroups to ADOM {1}, additional -Name: {2}'
 	'APICall.Update-FMFirewallPolicy'       = 'Updating {0} policies in ADOM {1}, Policy Package {2}'
 	'APICall.Update-FMFirewallService'      = 'Updating {0} firewall services to ADOM {1}, additional -Name: {2}'
 	'Connect-FM.Connected'                  = 'Connection established' #

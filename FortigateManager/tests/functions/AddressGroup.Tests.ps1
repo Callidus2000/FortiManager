@@ -53,5 +53,22 @@ Describe  "Tests around address group objects" {
             Get-FMAddressGroup -Connection $Connection -Filter "name -eq PESTER noMemberBuggy $pesterGUID" | Should -not -BeNullOrEmpty
             (Get-FMAddressGroup -Connection $Connection -Filter "name -eq PESTER noMemberBuggy $pesterGUID").comment | Should -BeLike 'Modified at*'
         }
+        It "Rename Multiple Addressgroups" {
+                { New-FMobjAddressGroup -Name "PESTER Group Tick $pesterGUID" -member "none" | Add-FMAddressGroup } | should -Not -Throw
+                { New-FMobjAddressGroup -Name "PESTER Group Trick $pesterGUID" -member "none" | Add-FMAddressGroup } | should -Not -Throw
+                { New-FMobjAddressGroup -Name "PESTER Group Track $pesterGUID" -member "none" | Add-FMAddressGroup } | should -Not -Throw
+                $renameMatrix = @{
+                    "PESTER Group Tick $pesterGUID"  = "PESTER Group Huey $pesterGUID"
+                    "PESTER Group Trick $pesterGUID" = "PESTER Group Dewey $pesterGUID"
+                    "PESTER Group Track $pesterGUID" = "PESTER Group Louie $pesterGUID"
+                }
+                { Rename-FMAddressGroup -Mapping $renameMatrix } | Should -Not -Throw
+                Get-FMAddressGroup -Filter "name -eq PESTER Group Huey $pesterGUID" | Should -Not -BeNullOrEmpty
+                Get-FMAddressGroup -Filter "name -eq PESTER Group Dewey $pesterGUID" | Should -Not -BeNullOrEmpty
+                Get-FMAddressGroup -Filter "name -eq PESTER Group Dewey $pesterGUID" | Should -Not -BeNullOrEmpty
+                Get-FMAddressGroup -Filter "name -eq PESTER Group Tick $pesterGUID" | Should -BeNullOrEmpty
+                Get-FMAddressGroup -Filter "name -eq PESTER Group Trick $pesterGUID" | Should -BeNullOrEmpty
+                Get-FMAddressGroup -Filter "name -eq PESTER Group Track $pesterGUID" | Should -BeNullOrEmpty
+            }
     }
 }

@@ -99,6 +99,18 @@ Describe  "Tests around address objects" {
                 Get-FMAddress -Filter "name -eq PESTER Trick $pesterGUID" | Should -BeNullOrEmpty
                 Get-FMAddress -Filter "name -eq PESTER Track $pesterGUID" | Should -BeNullOrEmpty
             }
+            It "Rename Multiple Addresses a second time" {
+                $renameMatrix = @{
+                    "PESTER Pinky $pesterGUID" = "PESTER Brain $pesterGUID"
+                    "PESTER Brain $pesterGUID" = "PESTER Pinky $pesterGUID"
+                }
+                {
+                    $result = Rename-FMAddress -Mapping $renameMatrix -Verbose
+                    $result= Rename-FMAddress -Mapping $renameMatrix -EnableException $false
+                 } | Should -Throw
+
+                Write-PSFMessage -Level Host "Bogey=$result"
+            }
             It "Add Address, Overwrite" {
                 $newAddress = New-FMObjAddress -Name "PESTER Scroodge $pesterGUID" -Type iprange -IpRange "192.168.1.10-192.168.1.50"
                 { $newAddress | Add-FMAddress } | should -Not -Throw

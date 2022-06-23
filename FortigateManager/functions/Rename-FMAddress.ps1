@@ -72,9 +72,10 @@
             data = @{name = $Mapping.$oldName }
         }
     }
-    Write-PSFMessage -Level Host "`$apiCallParameter=$($apiCallParameter|ConvertTo-PSFHashtable -Exclude connection |ConvertTo-Json -Depth 4)"
+    # Write-PSFMessage -Level Host "`$apiCallParameter=$($apiCallParameter|ConvertTo-PSFHashtable -Exclude connection |ConvertTo-Json -Depth 4)"
     $result = Invoke-FMAPI @apiCallParameter
     if (-not $EnableException) {
+        return $result
         return ($null -ne $result)
     }
 }
