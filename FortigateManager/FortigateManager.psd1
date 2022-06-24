@@ -3,7 +3,7 @@
 	RootModule        = 'FortigateManager.psm1'
 
 	# Version number of this module.
-	ModuleVersion     = '1.3.1'
+	ModuleVersion     = '1.3.3'
 
 	# ID used to uniquely identify this module
 	GUID              = '6c74c0d7-80cf-4bef-8fe1-19ac4a89c438'
@@ -27,7 +27,7 @@
 	# this module
 	RequiredModules   = @(
 		@{ ModuleName = 'PSFramework'; ModuleVersion = '1.6.214' }
-		@{ ModuleName = 'ARAH'; ModuleVersion = '1.3.2' }
+		@{ ModuleName = 'ARAH'; ModuleVersion = '1.3.3' }
 	)
 
 	# Assemblies that must be loaded prior to importing this module

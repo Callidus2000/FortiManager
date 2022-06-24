@@ -16,7 +16,9 @@
     The new address, generated e.g. by using New-FMObjAddress
 
     .PARAMETER Overwrite
-    If used and an address with the given name already exists the data will be overwritten.
+    If used and an address with the given name already exists the data will be
+    overwritten. Attention! If used and the new address lacks attributes which
+    are already present in the table, this will result in a delta update.
 
   	.PARAMETER EnableException
 	Should Exceptions been thrown?

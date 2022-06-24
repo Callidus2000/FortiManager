@@ -716,7 +716,7 @@
         [ValidateSet("disable", "enable")]
         [string]$RtpNat,
         [parameter(mandatory = $false, ParameterSetName = "default")]
-        [string]$Schedule,
+        [string]$Schedule="always",
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [ValidateSet("disable", "enable")]
         [string]$ScheduleTimeout,

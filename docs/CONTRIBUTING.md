@@ -174,16 +174,22 @@ to get
 ```
 as new Clipboard Content.
 
-<!-- ## Pester tests
-The module does use pester for general and functional tests. The general tests are provided by [PSModuleDevelopment](https://github.com/PowershellFrameworkCollective/PSModuleDevelopment) and perform checks like *"is the help well written and complete"*. This results in more than 3500 automatic tests over all.
+## Pester tests
+The module does use pester for general and functional tests. The general tests are provided by [PSModuleDevelopment](https://github.com/PowershellFrameworkCollective/PSModuleDevelopment) and perform checks like *"is the help well written and complete"*. This results in more than 6300 automatic tests over all.
 
 If you create a new function please provide a corresponding pester test within the `\FortiManager\tests\functions` directory. A pester tests should
-* Setup the test environment in a clean state, e.g.
-  * Create a new pester data room
-* Teardown/remove the test environment as a last step, e.g.
-  * Delete created datarooms
+* Setup the test environment in a clean state
+* Teardown/remove the test environment as a last step
 
-If you have only created a Getter function without the corresponding Create/Remove counterparts you will not be able to perform this clean testing. If this happens please either provide the additional functions or [create an issue](https://github.com/Callidus2000/FortiManager/issues) at the GitHub project page. An example is currently [Issue 4 - Implement pester tests for Get-FortiManagerAuthConfigAD](https://github.com/Callidus2000/FortiManager/issues/4) -->
+If you have only created a Getter function without the corresponding Create/Remove counterparts you will not be able to perform this clean testing. If this happens please either provide the additional functions or [create an issue](https://github.com/Callidus2000/FortiManager/issues) at the GitHub project page. 
+
+Running the tests depends on a a few configuration settings which has to be set as a PSFConfigValue. If you want to set those and store them use the following:
+```Powershell
+Set-PSFConfig -Module 'FortigateManager' -Name 'pester.adom' -Value "ThisIsAnID" -Description "The Test ADOM" -AllowDelete -PassThru | Register-PSFConfig
+Set-PSFConfig -Module 'FortigateManager' -Name 'pester.packagename' -Value "ThisShoudBeSecret" -Description "The Test Firewall Policy Package" -AllowDelete -PassThru | Register-PSFConfig
+Set-PSFConfig -Module 'FortigateManager' -Name 'pester.credentials' -Value $credentials -AllowDelete -PassThru | Register-PSFConfig
+Set-PSFConfig -Module 'FortigateManager' -Name 'pester.fqdn' -Value "myFortigateManager.com" -Description "The FQDN of the Fortinet Manager" -AllowDelete -PassThru | Register-PSFConfig
+```
 
 
 ## Limitations

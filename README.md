@@ -211,8 +211,7 @@ Short stop:
 
 ## Limitations
 * The module works on the ADOM level as this is the only permission set I've been granted
-* Currently there exists no viable pester tests
-* Maybe there are some inconsitencies in the docs, which may result in a mere copy/paste marathon from my other projects
+* Maybe there are some inconsistencies in the docs, which may result in a mere copy/paste marathon from my other projects
 
 <!-- LICENSE -->
 ## License
