@@ -1,4 +1,4 @@
-﻿function Remove-FMWhitespacesFromAttributes {
+﻿function Remove-FMWhitespacesFromAttribute {
     <#
     .SYNOPSIS
     Helper function to trim all string attributes.
