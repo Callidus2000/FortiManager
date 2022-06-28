@@ -37,10 +37,15 @@
                 }
     Rename-FMAddressGroup -Mapping $renameMatrix
 
-    Performs the renaming of all three addresses.
+    Performs the renaming of all three addresses. See notes for restrictions.
 
     .NOTES
-    General notes
+    If you want to rename multiple groups in one call, take a look at the
+    membership of the groups. If e.g.
+    Group A contains Group B
+    you cannot rename both in one call. Or at least be
+    aware that this might happen ;-)
+
     #>
     param (
         [parameter(Mandatory = $false)]

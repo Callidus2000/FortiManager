@@ -18,6 +18,9 @@
     .PARAMETER Package
     The name of the policy package
 
+    .PARAMETER Force
+    If set, the hitcounts will be refreshed before query.
+
     .EXAMPLE
     $hitCountData=Get-FMFirewallHitCount -Package $packageName
     Write-Host "`$hitCountData.count=$($hitCountData."firewall policy".count)"
@@ -32,28 +35,39 @@
         [string]$ADOM,
         [bool]$EnableException = $true,
         [parameter(mandatory = $true, ParameterSetName = "default")]
-        [string]$Package
+        [string]$Package,
+        [switch]$Force
     )
     $explicitADOM = Resolve-FMAdom -Connection $Connection -Adom $ADOM -EnableException $EnableException
-    $apiCallParameter = @{
-        EnableException     = $EnableException
-        Connection          = $Connection
-        LoggingAction       = "Get-FMFirewallHitCount"
-        LoggingActionValues = @($explicitADOM, $Package)
-        method              = "exec"
-        Parameter           = @{
-            data=@{
-                adom = "$explicitADOM"
-                pkg="$Package"
+    $packageInfo = Get-FMPolicyPackage -Adom $explicitADOM -Name $Package
+    if ($Force -or $packageInfo."package settings"."hitc-taskid" -eq 0) {
+        Write-PSFMessage -Level Host "Refresh hitcounts"
+        $apiCallParameter = @{
+            EnableException     = $EnableException
+            Connection          = $Connection
+            LoggingAction       = "Get-FMFirewallHitCount"
+            LoggingActionValues = @($explicitADOM, $Package)
+            method              = "exec"
+            Parameter           = @{
+                data = @{
+                    adom = "$explicitADOM"
+                    pkg  = "$Package"
+                }
             }
+            Path                = "/sys/hitcount"
         }
-        Path                = "/sys/hitcount"
+        $initTaskResult = Invoke-FMAPI @apiCallParameter
+        $taskID = $initTaskResult.result[0].taskid
+        Write-PSFMessage "taskID=$taskID"
+        $taskStatus = Get-FMTaskStatus -Id $taskID -Wait -Verbose
+        Write-PSFMessage "Status of Task $($taskID): $($taskStatus|ConvertTo-Json -Depth 3)"
     }
-    $initTaskResult = Invoke-FMAPI @apiCallParameter
-    $taskID = $initTaskResult.result[0].taskid
-    Write-PSFMessage "taskID=$taskID"
-    $taskStatus=Get-FMTaskStatus -Id $taskID -Wait -Verbose
-    Write-PSFMessage "Status of Task $($taskID): $($taskStatus|ConvertTo-Json -Depth 3)"
-    $result=Get-FMTaskResult -Id $taskID -verbose
+    else {
+        $taskID = $packageInfo."package settings"."hitc-taskid"
+        (Get-Date 01.01.1970) + ([System.TimeSpan]::fromseconds(1655983275))
+        $timestamp = $packageInfo."package settings"."hitc-timestamp" | Convert-FMTimestampToDate
+        Write-PSFMessage -Level Host "Query existing hitcounts from $timestamp"
+    }
+    $result = Get-FMTaskResult -Id $taskID -verbose
     return $result
 }

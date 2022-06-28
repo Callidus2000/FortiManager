@@ -69,6 +69,9 @@
     _last_session
     The _hitcount will be set to -1 if no statistics could be found.
 
+    .PARAMETER IncludeHitCountForce
+    Same as IncludeHitCount but the Data will be refreshed before.
+
     .PARAMETER NullHandler
     Parameter description
 
@@ -110,6 +113,8 @@
         [System.Object[]]$Sortings,
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [switch]$IncludeHitCount,
+        [parameter(mandatory = $false, ParameterSetName = "default")]
+        [switch]$IncludeHitCountForce,
         [ValidateSet("Keep", "RemoveAttribute", "ClearContent")]
         [parameter(mandatory = $false, ParameterSetName = "default")]
         $NullHandler = "RemoveAttribute"
@@ -138,11 +143,16 @@
     $result = Invoke-FMAPI @apiCallParameter
     Write-PSFMessage "Result-Status: $($result.result.status)"
     $policyData = $result.result.data
-    if ($IncludeHitCount) {
+    if ($IncludeHitCount -or $IncludeHitCountForce) {
         $addAttributes = @('byte', 'first_hit', 'first_session', 'hitcount', 'pkts', 'sesscount')
         $addAttributesAsDate = @('first_hit', 'first_session', 'last_hit', 'last_session')
         Write-PSFMessage "Query hitcount statistics, statistics will be added as attributes: _byte, _first_hit, _first_session, _hitcount, _pkts, _sesscount, _first_hit, _first_session, _last_hit, _last_session"
-        $hitCountData = Get-FMFirewallHitCount -Package $packageName
+        if($IncludeHitCountForce){
+            $hitCountData = Get-FMFirewallHitCount -Package $packageName -Force
+        }else{
+            $hitCountData = Get-FMFirewallHitCount -Package $packageName
+        }
+        Write-PSFMessage "Associating hitcount data to policy rules"
         $hitCountDataHash = @{}
         $hitCountData.'firewall policy' | ForEach-Object { $hitCountDataHash.add("$($_.policyid)", $_) }
         $emptyCounter = @{
@@ -164,9 +174,10 @@
                 Add-Member -inputobject $policy -MemberType NoteProperty -Name "_$attr" -Value $counter.$attr -Force
             }
             foreach ($attr in $addAttributesAsDate) {
-                Add-Member -inputobject $policy -MemberType NoteProperty -Name "_$attr" -Value ([DateTime]::FromFileTimeutc($counter.$attr)).toString() -Force
+                Add-Member -inputobject $policy -MemberType NoteProperty -Name "_$attr" -Value (Convert-FMTimestampToDate $counter.$attr).toString() -Force
             }
         }
     }
+    Write-PSFMessage "Associating hitcount data to policy rules - done"
     return $policyData
 }
