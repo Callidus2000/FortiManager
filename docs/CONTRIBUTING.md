@@ -70,7 +70,7 @@ You need the module `PSUtil` for the following helper functions.
 ### Creating the function Add-FMAddress
 Take a look at the existing function:
 
-![Add-FMAddress](_img/Add-FMAddress-code.png)
+![Add-FMAddress](_img/Add-FMAddress-code.png?raw=true)
 
 And now the deep look at the parts to be exchanged/modified if using it as an template:
 * Main parameter is an array of addresses which should be added (line 7)
@@ -131,7 +131,7 @@ InModuleScope fortigatemanager {Convert-FMApi2HashTable}
 ```
 
 and past the new clipboard content into an empty powershell file. After formatting it (I like VSCode) it should look like this:
-![New-FMObj-code](_img/New-FMObj-code.png)
+![New-FMObj-code](_img/New-FMObj-code.png?raw=true)
 
 Now all you have to do is
 * Name the new function correctly (*New-FMObjAddress* for example, line 1)
@@ -143,16 +143,16 @@ As a result you can create new objects by invoking a regular powershell function
 
 ### Further use of `Convert-FMApi2HashTable`
 You can although use the helper function for creating parameters of `Get-/Add-/...` functions. Take the `/pm/config/adom/{adom}/obj/firewall/address (get)` as an example, especially the params-block from the example value:
-![Address-Parameter](_img/Get-FMAddress-json.png)
+![Address-Parameter](_img/Get-FMAddress-json.png?raw=true)
 
 Copy it to the clipboard and run again
 ```Powershell
 InModuleScope fortigatemanager {Convert-FMApi2HashTable}
 ```
 The resulting dummy code
-![Dummy Code](_img/Dummy-Get-Address-code.png)
+![Dummy Code](_img/Dummy-Get-Address-code.png?raw=true)
 contains main parts for the real getter function:
-![Real Code](_img/Get-FMAddress-code.png)
+![Real Code](_img/Get-FMAddress-code.png?raw=true)
 
 Dummy-Lines -> Real-Function-Lines
 * 4-19 -> 9-26 (function parameters)
