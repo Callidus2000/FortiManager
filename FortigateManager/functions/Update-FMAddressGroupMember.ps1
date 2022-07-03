@@ -18,6 +18,10 @@
     .PARAMETER Member
     The members to be removed or added.
 
+    .PARAMETER NoneMember
+    If after a removal no member is left the address with this name
+    (default="none") will be added to the empty member list
+
     .PARAMETER Action
     remove or add.
 
@@ -77,6 +81,7 @@
         [string]$Action,
         [parameter(mandatory = $true, ParameterSetName = "table")]
         [object[]]$ActionMap,
+        [string]$NoneMember = "none",
         [bool]$EnableException = $true
     )
     begin {
@@ -113,7 +118,7 @@
         foreach ($actionGroup in $groupedActions) {
             # Write-PSFMessage "`$actionGroup=$($actionGroup|ConvertTo-Json -Depth 4)"
             Write-PSFMessage "Modify AddressGroup $($actionGroup.name)"
-            $group = Get-FMAddressGroup -ADOM $explicitADOM -Filter "name -eq $($actionGroup.name)" -Option 'scope member' -Fields name,member
+            $group = Get-FMAddressGroup -ADOM $explicitADOM -Filter "name -eq $($actionGroup.name)" -Option 'scope member' -Fields name, member
             # Write-PSFMessage "`$group= $($group.member.gettype())"
             $members = [System.Collections.ArrayList]($group.member)
             foreach ($memberAction in $actionGroup.Group) {
@@ -127,11 +132,18 @@
                 }
             }
             $oldMembers = $group.member
+            if ($members.Count -eq 0){
+                Write-PSFMessage "Add member $NoneMember to empty member collection"
+                $members.Add($NoneMember)
+            }elseif($members.Contains($NoneMember)){
+                Write-PSFMessage "Remove member $NoneMember from now not empty member collection"
+                $members.Remove($NoneMember)
+            }
             $group.member = $members.ToArray()
             Write-PSFMessage "OldMembers= $($oldMembers -join ',')"
             Write-PSFMessage "NewMembers= $($group.member -join ',')"
-            $modifiedAddrGroups+=$group
+            $modifiedAddrGroups += $group
         }
-        $modifiedAddrGroups|Update-FMAddressGroup -ADOM $explicitADOM
+        $modifiedAddrGroups | Update-FMAddressGroup -ADOM $explicitADOM
     }
 }

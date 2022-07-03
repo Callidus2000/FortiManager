@@ -120,6 +120,25 @@ Describe  "Tests around address group objects" {
                     $addGrp.member | Should  -Contain "PESTER $(5+$index) $pesterGUID"
                 }
             }
+            It "Check None-Membership functionality" {
+                # $pesterGUID = (New-Guid).guid -replace '.*-.*-.*-.*-'
+                # Create 5 Addresses
+                $addrGrp = Get-FMAddressGroup -Filter "name -eq PESTER Twin1 $pesterGUID" -Fields name, member
+                $addrGrp | Should -Not -BeNullOrEmpty
+                $addrGrp.member | Should -HaveCount 4
+                # remove all addresses from the group
+                { Update-FMAddressGroupMember -Action remove -Name $addrGrp.name -Member $addrGrp.member  -Verbose } | Should -Not -Throw
+                $addrGrp = Get-FMAddressGroup -Filter "name -like PESTER Twin1 $pesterGUID" -Fields name, member
+                Write-PSFMessage "`$addrGrp.member=$($addrGrp.member -join ',')"
+                $addrGrp.member | Should -HaveCount 1
+                $addrGrp.member | Should -Contain "none"
+                { Update-FMAddressGroupMember -Action add -Name $addrGrp.name -Member "PESTER 3 $pesterGUID"  -Verbose } | Should -Not -Throw
+                $addrGrp = Get-FMAddressGroup -Filter "name -like PESTER Twin1 $pesterGUID" -Fields name, member
+                Write-PSFMessage "`$addrGrp2.member=$($addrGrp.member -join ',')"
+                $addrGrp.member | Should -HaveCount 1
+                $addrGrp.member | Should -Contain "PESTER 3 $pesterGUID"
+                $addrGrp.member | Should -Not -Contain "none"
+            }
         }
         # It "Adding invalid data as address group does not work" {
         #     { "FooBar" | Add-FMAddressGroup } | Should -Throw "*invalid value*"
