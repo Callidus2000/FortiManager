@@ -79,6 +79,8 @@
         [parameter(mandatory = $true, ValueFromPipelineByPropertyName = $true, ParameterSetName = "default")]
         [ValidateSet("remove", "add")]
         [string]$Action,
+        [parameter(ValueFromPipelineByPropertyName = $true, ParameterSetName = "default")]
+        $Scope,
         [parameter(mandatory = $true, ParameterSetName = "table")]
         [object[]]$ActionMap,
         [string]$NoneMember = "none",
@@ -88,17 +90,23 @@
         $explicitADOM = Resolve-FMAdom -Connection $Connection -Adom $ADOM
         Write-PSFMessage "`$explicitADOM=$explicitADOM"
         $internalActionMap = @()
-        $modifiedAddrGroups = @()
+        $modifiedAddrGroups = @{}
     }
     process {
         if ($PSCmdlet.ParameterSetName -eq 'default') {
+            Write-PSFMessage "`$Scope=$($Scope|ConvertTo-Json -Compress)"
             foreach ($group in $Name) {
                 foreach ($memberName in $Member) {
                     $internalActionMap += @{
                         addrGrpName = $group
                         addrName    = $memberName
                         action      = $Action
+                        scope       = $Scope
                     }
+                    # if ($Scope.name -and $Scope.vdom) {
+                    #     Write-PSFMessage     "Füge Scope hinzu"
+                    #     $internalActionMap[-1].scope = $Scope
+                #}
                 }
             }
         }
@@ -108,19 +116,43 @@
         Write-PSFMessage "`$internalActionMap=$($internalActionMap|ConvertTo-Json -Depth 4)"
         if ($ActionMap) {
             Write-PSFMessage "Using ActionMap from parameter"
-            $groupedActions = $ActionMap | Group-Object -Property "addrGrpName"
+            $groupedActions = $ActionMap | Group-Object -Property addrGrpName, scope
         }
         else {
-            $groupedActions = $internalActionMap | Group-Object -Property "addrGrpName"
+            $groupedActions = $internalActionMap | Group-Object -Property addrGrpName, scope
             Write-PSFMessage "Using internalActionMap from manual mapping"
         }
         # Write-PSFMessage "`$groupedActions=$($groupedActions|ConvertTo-Json -Depth 4)"
         foreach ($actionGroup in $groupedActions) {
+            $addressGroupName = $actionGroup.Values[0]
+            $dynaScope = $actionGroup.Values[1]
             # Write-PSFMessage "`$actionGroup=$($actionGroup|ConvertTo-Json -Depth 4)"
-            Write-PSFMessage "Modify AddressGroup $($actionGroup.name)"
-            $group = Get-FMAddressGroup -ADOM $explicitADOM -Filter "name -eq $($actionGroup.name)" -Option 'scope member' -Fields name, member
+            Write-PSFMessage "Modify AddressGroup $addressGroupName"
+            Write-PSFMessage "`$dynaScope=$dynaScope"
+            Write-PSFMessage "`$dynaScope=null=$($null -eq $dynaScope)"
+
+            if ($modifiedAddrGroups.ContainsKey($addressGroupName)) {
+                $group = $modifiedAddrGroups.$addressGroupName
+            }
+            else {
+                $group = Get-FMAddressGroup -ADOM $explicitADOM -Filter "name -eq $addressGroupName" -Option 'scope member' -Fields name, member
+            }
             # Write-PSFMessage "`$group= $($group.member.gettype())"
-            $members = [System.Collections.ArrayList]($group.member)
+            if ($null -eq $dynaScope) {
+                $members = [System.Collections.ArrayList]($group.member)
+            }
+            else {
+                Write-PSFMessage "Verwende Scope $($dynaScope.name) VDOM $($dynaScope.vdom)"
+                Write-PSFMessage "`$group= $($group |ConvertTo-Json -Depth 5)"
+                $dynamapping = $group.dynamic_mapping | Where-Object { $_._scope.name -eq $dynaScope.name -and $_._scope.vdom -eq $dynaScope.vdom }
+                if ($null -eq $dynamapping) {
+                    Write-PSFMessage "dynamic_mapping does not exist, create it"
+                    $dynamapping = New-FMObjDynamicAddressGroupMapping -Scope $dynaScope -Member "none"
+                    $group.dynamic_mapping =@($dynamapping)
+                    # $group | Add-Member -name dynamic_mapping -Value @($dynamapping) -MemberType NoteProperty
+                }
+                $members = [System.Collections.ArrayList]($dynamapping.member)
+            }
             foreach ($memberAction in $actionGroup.Group) {
                 # Write-PSFMessage "`$memberAction=$($memberAction|ConvertTo-Json -Depth 4)"
                 Write-PSFMessage "$($memberAction.action) $($memberAction.addrName)"
@@ -132,18 +164,26 @@
                 }
             }
             $oldMembers = $group.member
-            if ($members.Count -eq 0){
+            if ($members.Count -eq 0) {
                 Write-PSFMessage "Add member $NoneMember to empty member collection"
                 $members.Add($NoneMember)
-            }elseif($members.Contains($NoneMember)){
+            }
+            elseif ($members.Contains($NoneMember)) {
                 Write-PSFMessage "Remove member $NoneMember from now not empty member collection"
                 $members.Remove($NoneMember)
             }
-            $group.member = $members.ToArray()
             Write-PSFMessage "OldMembers= $($oldMembers -join ',')"
             Write-PSFMessage "NewMembers= $($group.member -join ',')"
-            $modifiedAddrGroups += $group
+            if ($dynaScope) {
+                Write-PSFMessage "Speichere Scope"
+                $dynamapping.member = $members.ToArray()
+            }
+            else {
+                $group.member = $members.ToArray()
+            }
+
+            $modifiedAddrGroups.$addressGroupName = $group
         }
-        $modifiedAddrGroups | Update-FMAddressGroup -ADOM $explicitADOM
+        $modifiedAddrGroups.values | Update-FMAddressGroup -ADOM $explicitADOM
     }
 }
