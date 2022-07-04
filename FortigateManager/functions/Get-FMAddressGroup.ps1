@@ -22,6 +22,9 @@
     Filter the result according to a set of criteria. For detailed help
     see about_FortigateManagerFilter
 
+    .PARAMETER Name
+    Shortcut for -Filter "name -eq $Name"
+
     .PARAMETER GetUsed
     Parameter description
 
@@ -80,12 +83,23 @@
         [System.Object[]]$Range,
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [System.Object[]]$Sortings,
+        [parameter(mandatory = $false, ParameterSetName = "default", Position = 0)]
+        [String]$Name,
         [ValidateSet("Keep", "RemoveAttribute", "ClearContent")]
         [parameter(mandatory = $false, ParameterSetName = "default")]
         $NullHandler = "RemoveAttribute",
 
         [bool]$EnableException = $true
     )
+    if ($Name) {
+        If ($Filter) {
+            $Filter += , "name -eq $Name"
+        }
+        else {
+            $Filter = "name -eq $Name"
+        }
+    }
+
     $Parameter = @{
         'attr'     = "$Attr"
         'fields'   = @($Fields)

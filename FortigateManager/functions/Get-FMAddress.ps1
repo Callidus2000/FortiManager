@@ -36,6 +36,9 @@
     Filter the result according to a set of criteria. For detailed help
     see about_FortigateManagerFilter
 
+    .PARAMETER Name
+    Shortcut for -Filter "name -eq $Name"
+
     .PARAMETER GetUsed
     Parameter description
 
@@ -58,7 +61,7 @@
     #>
     [CmdletBinding()]
     param (
-        [parameter(Mandatory=$false)]
+        [parameter(Mandatory = $false)]
         $Connection = (Get-FMLastConnection),
         [string]$ADOM,
         [bool]$EnableException = $true,
@@ -81,10 +84,20 @@
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [ValidateSet("_image-base64", "allow-routing", "associated-interface", "cache-ttl", "clearpass-spt", "color", "comment", "country", "dirty", "end-ip", "epg-name", "fabric-object", "filter", "fqdn", "fsso-group", "interface", "macaddr", "name", "node-ip-only", "obj-id", "obj-tag", "obj-type", "organization", "policy-group", "sdn", "sdn-addr-type", "sdn-tag", "start-ip", "sub-type", "subnet", "subnet-name", "tag-detection-level", "tag-type", "tenant", "type", "uuid", "wildcard", "wildcard-fqdn")]
         [System.Object[]]$Fields,
+        [parameter(mandatory = $false, ParameterSetName = "default", Position = 0)]
+        [String]$Name,
         [ValidateSet("Keep", "RemoveAttribute", "ClearContent")]
         [parameter(mandatory = $false, ParameterSetName = "default")]
         $NullHandler = "RemoveAttribute"
     )
+    if ($Name) {
+        If ($Filter) {
+            $Filter += , "name -eq $Name"
+        }
+        else {
+            $Filter = "name -eq $Name"
+        }
+    }
     $Parameter = @{
         'attr'     = "$Attr"
         'sortings' = @($Sortings)
