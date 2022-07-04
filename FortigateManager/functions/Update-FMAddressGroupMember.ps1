@@ -25,6 +25,20 @@
     .PARAMETER Action
     remove or add.
 
+    .PARAMETER Scope
+    Can be used if the members of a specific dynamic_mapping should be changed.
+    Format: Array of Hashtables, @{name="MyFirewall";vdom="MyVDOM"}
+    or '*' if all available scopes should be changed
+
+
+    .PARAMETER ActionMap
+    Array of hashtable/PSCustomObjects with the attributes
+    -addrGrpName
+    -addrName
+    -action
+    -scope
+    for performing multiple changes in one API call.
+
   	.PARAMETER EnableException
 	Should Exceptions been thrown?
 
@@ -205,6 +219,6 @@
 
             $modifiedAddrGroups.$addressGroupName = $group
         }
-        $modifiedAddrGroups.values | Update-FMAddressGroup -ADOM $explicitADOM
+        $modifiedAddrGroups.values | Update-FMAddressGroup -Connection $Connection -ADOM $explicitADOM -EnableException $EnableException
     }
 }

@@ -1,6 +1,6 @@
 Describe  "Tests around address group objects" {
     BeforeAll {
-        Import-Module C:\DEV\odin.git\GitHub\FortigateManager\FortigateManager\FortigateManager.psd1 -Force
+        # Import-Module C:\DEV\odin.git\GitHub\FortigateManager\FortigateManager\FortigateManager.psd1 -Force
         . $PSScriptRoot\Connect4Testing.ps1
         Lock-FMAdom
     }
