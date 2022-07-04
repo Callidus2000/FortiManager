@@ -46,6 +46,22 @@ Describe  "Tests around address objects" {
                 $existingAddresses | Should -Not -BeNullOrEmpty
                 $existingAddresses | Should -HaveCount 3
             }
+            It "Query pester addresses by -Name shortcut" {
+                # Write-PSFMessage "################" -Level Host
+                Get-FMAddress -Name "PESTER ipmask $pesterGUID" | should -Not -BeNullOrEmpty -Because "Name is just a quick filter"
+                Get-FMAddress -Name "PESTER ipmask $pesterGUID" -Filter 'type -eq ipmask' | should -Not -BeNullOrEmpty -Because "Name is just a quick filter which cooperates"
+                Get-FMAddress -Name "PESTER ipmask%" | should -BeNullOrEmpty -Because "Name is just a quick filter for EQUAL, not LIKE"
+
+                # Write-PSFMessage "################" -Level Host
+            }
+            It "Query pester addresses by -Name shortcut, positional parameter" {
+                # Write-PSFMessage "################" -Level Host
+                Get-FMAddress "PESTER ipmask $pesterGUID" | should -Not -BeNullOrEmpty -Because "Name is just a quick filter"
+                Get-FMAddress "PESTER ipmask $pesterGUID" -Filter 'type -eq ipmask' | should -Not -BeNullOrEmpty -Because "Name is just a quick filter which cooperates"
+                Get-FMAddress "PESTER ipmask%" | should -BeNullOrEmpty -Because "Name is just a quick filter for EQUAL, not LIKE"
+
+                # Write-PSFMessage "################" -Level Host
+            }
             It "Update existing address - Full Update" {
                 $addr = Get-FMAddress -Filter "name -eq PESTER iprange $pesterGUID"
                 $addr | Should -Not -BeNullOrEmpty

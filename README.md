@@ -97,7 +97,13 @@ To get a local copy up and running follow these simple steps.
 
 ### Prerequisites
 
-All prerequisites will be installed automatically.
+- Powershell 7.x (Core) (If possible get the latest version)  
+  Maybe it's working under 5.1, just did not test it
+- A Fortinet FortiManager Manager and HTTPS enable with JSON API enable for the user
+  - Go on WebGUI of your FortiManager, on System Settings
+  - Go `Administrators`
+  - Click on `Create New`  
+  - and create a new user and don't forget to enable `JSON API Access` to `Read-Write`
 
 ### Installation
 
@@ -111,6 +117,33 @@ The `AllowClobber` option is currently necessary because of an issue in the curr
 ## Usage
 
 The module is a wrapper for the Fortinet FortiManager API. For getting started take a look at the integrated help of the included functions. As inspiration you can take a look at the use-cases which led to the development of this module.
+
+### Currently supported firewall object types (v1.5)
+The following types of objects can handled (the list is not exhaustive):
+
+| functionPrefix | `Get-FM*` | `New-FMObj*` | `Add-FM*` | `Update-FM*` | `Rename-FM*` | `Remove-FM*` |
+| ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |
+| Address | X | X | X | X | X | X |
+| AddressGroup | X | X | X | X | X | X | 
+| FirewallPolicy | X | X | X | X | * | X | 
+| FirewallService | X | X | X | X | * | | 
+| FirewallInterfaces | X | X | X | X | X | X | 
+| DeviceInfo | X |   |   |   |   |   | 
+
+An * in Rename means there is no specific function for it, you may use the `Update-FM*` to do it manually.
+
+### Additional Meta Functions
+- `Connect-FM` - Connects to an instance
+- `Disconnect-FM` - Disconnects
+- `Get-FMAdomLockStatus` - Check if the DOM is locked
+- `Lock-FMAdom` - Lock the ADOM for changes
+- `Publish-FMAdomChange` - Publish those changes (aka `save`)
+- `Unlock-FMAdom` - Unlock to make it available for change to other users
+- `Get-FMFirewallHitCount` - How many hits does which rule get?
+- `Move-FMFirewallPolicy` - Move a policy before/after another one
+- `Convert-FMIpAddressToMaskLength` - Converts a IP Subnet-Mask to a Mask Length
+- `Convert-FMSubnetMask` - Converts a subnet mask between long and short-version
+- `Invoke-FMAPI` - The magical black box which handles the API requests
 
 ## Use-Cases or Why was the module developed?
 ### Background
