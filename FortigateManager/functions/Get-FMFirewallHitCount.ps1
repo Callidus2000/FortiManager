@@ -39,7 +39,7 @@
         [switch]$Force
     )
     $explicitADOM = Resolve-FMAdom -Connection $Connection -Adom $ADOM -EnableException $EnableException
-    $packageInfo = Get-FMPolicyPackage -Adom $explicitADOM -Name $Package
+    $packageInfo = Get-FMPolicyPackage -Connection $Connection  -Adom $explicitADOM -Name $Package
     if ($Force -or $packageInfo."package settings"."hitc-taskid" -eq 0) {
         Write-PSFMessage -Level Host "Refresh hitcounts"
         $apiCallParameter = @{
