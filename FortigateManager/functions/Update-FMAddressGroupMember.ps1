@@ -39,6 +39,11 @@
     adds the address "PESTER 4" to the addressgroups "PESTER Single 1","PESTER Single 2"
 
     .EXAMPLE
+    Update-FMAddressGroupMember -Action add -Name "MyGroup" -Member "MyAddress" -Scope @{name="MyFirewall";vdom="MyVDOM"}
+
+    Adds the address to the addressgroup but not for the default member collection but to the dynamic_mapping with the given scope.
+
+    .EXAMPLE
      $actionMap = @(
         @{
             addrGrpName = "PESTER Twin1 $pesterGUID"
@@ -80,7 +85,7 @@
         [ValidateSet("remove", "add")]
         [string]$Action,
         [parameter(ValueFromPipelineByPropertyName = $true, ParameterSetName = "default")]
-        $Scope,
+        [object[]]$Scope,
         [parameter(mandatory = $true, ParameterSetName = "table")]
         [object[]]$ActionMap,
         [string]$NoneMember = "none",
@@ -91,22 +96,38 @@
         Write-PSFMessage "`$explicitADOM=$explicitADOM"
         $internalActionMap = @()
         $modifiedAddrGroups = @{}
+        $availableScopes = @()
     }
     process {
         if ($PSCmdlet.ParameterSetName -eq 'default') {
             Write-PSFMessage "`$Scope=$($Scope|ConvertTo-Json -Compress)"
             foreach ($group in $Name) {
                 foreach ($memberName in $Member) {
-                    $internalActionMap += @{
-                        addrGrpName = $group
-                        addrName    = $memberName
-                        action      = $Action
-                        scope       = $Scope
+                    if($Scope){
+                        if ($Scope -eq '*') {
+                            Write-PSFMessage "Scope should be all available scopes"
+                            if ($availableScopes.Count -eq 0) {
+                                Write-PSFMessage "Query existing scopes from device info"
+                                $devInfo = Get-FMDeviceInfo -Option 'object member'
+                                $availableScopes = $devInfo."object member" | Select-Object name, vdom | Where-Object { $_.vdom }
+                                $Scope = $availableScopes
+                            }
+                        }
+                        foreach ($singleScope in $Scope) {
+                            $internalActionMap += @{
+                                addrGrpName = $group
+                                addrName    = $memberName
+                                action      = $Action
+                                scope       = $singleScope
+                            }
+                        }
+                    }else{
+                        $internalActionMap += @{
+                            addrGrpName = $group
+                            addrName    = $memberName
+                            action      = $Action
+                        }
                     }
-                    # if ($Scope.name -and $Scope.vdom) {
-                    #     Write-PSFMessage     "Füge Scope hinzu"
-                    #     $internalActionMap[-1].scope = $Scope
-                #}
                 }
             }
         }
@@ -135,7 +156,7 @@
                 $group = $modifiedAddrGroups.$addressGroupName
             }
             else {
-                $group = Get-FMAddressGroup -ADOM $explicitADOM -Filter "name -eq $addressGroupName" -Option 'scope member' -Fields name, member
+                $group = Get-FMAddressGroup -Connection $Connection  -ADOM $explicitADOM -Filter "name -eq $addressGroupName" -Option 'scope member' -Fields name, member
             }
             # Write-PSFMessage "`$group= $($group.member.gettype())"
             if ($null -eq $dynaScope) {
@@ -148,7 +169,7 @@
                 if ($null -eq $dynamapping) {
                     Write-PSFMessage "dynamic_mapping does not exist, create it"
                     $dynamapping = New-FMObjDynamicAddressGroupMapping -Scope $dynaScope -Member "none"
-                    $group.dynamic_mapping =@($dynamapping)
+                    $group.dynamic_mapping = @($dynamapping)
                     # $group | Add-Member -name dynamic_mapping -Value @($dynamapping) -MemberType NoteProperty
                 }
                 $members = [System.Collections.ArrayList]($dynamapping.member)
