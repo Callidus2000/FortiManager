@@ -208,7 +208,7 @@
                 $members.Remove($NoneMember)
             }
             Write-PSFMessage "OldMembers= $($oldMembers -join ',')"
-            Write-PSFMessage "NewMembers= $($group.member -join ',')"
+            Write-PSFMessage "NewMembers= $($members -join ',')"
             if ($dynaScope) {
                 Write-PSFMessage "Speichere Scope"
                 $dynamapping.member = $members.ToArray()
