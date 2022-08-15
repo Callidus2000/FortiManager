@@ -58,5 +58,34 @@ Describe  "Tests around FirewallPolicy objects" {
             { $policy | Remove-FMFirewallPolicy -Package $packageName } | Should -Not -Throw
             Get-FMFirewallPolicy -Package $packageName -Filter "name -like %$pesterGUID" | Should -BeNullOrEmpty
         }
+        It "Update Multiple Policy Rules" {
+            { New-FMObjFirewallPolicy -Name "PESTER policy B-1 $pesterGUID" -Srcaddr $srcAddrName -Dstaddr $dstAddrName -Srcintf "any" -Dstintf "any" -Service "ALL" -Action accept | Add-FMFirewallPolicy -Package $packageName } | Should -Not -Throw
+            { New-FMObjFirewallPolicy -Name "PESTER policy B-2 $pesterGUID" -Srcaddr $srcAddrName -Dstaddr $dstAddrName -Srcintf "any" -Dstintf "any" -Service "ALL" -Action accept | Add-FMFirewallPolicy -Package $packageName } | Should -Not -Throw
+            $newPolicies = Get-FMFirewallPolicy -Package $packageName -Filter "name -like PESTER policy B-%$pesterGUID"
+            $newPolicies|Should -HaveCount 2
+            $idList = $newPolicies|Select-Object -ExpandProperty policyid
+            $idList | Should -HaveCount 2
+            $idList[0] | Should -BeGreaterThan 0
+            foreach($policy in $newPolicies){
+                $policy.status |Should -Be 'enable'
+            }
+            { Update-FMFirewallPolicy -Package $packageName -PolicyID $idList -Attribute @{status = 'disable' } } | Should -Not -Throw
+            $newPolicies = Get-FMFirewallPolicy -Package $packageName -Filter "name -like PESTER policy B-%$pesterGUID"
+            foreach($policy in $newPolicies){
+                $policy.status |Should -Be 'disable'
+            }
+            {Enable-FMFirewallPolicy -Package $packageName -PolicyID $idList } | Should -Not -Throw
+            $newPolicies = Get-FMFirewallPolicy -Package $packageName -Filter "name -like PESTER policy B-%$pesterGUID"
+            foreach($policy in $newPolicies){
+                $policy.status |Should -Be 'enable'
+            }
+            Write-PSFMessage -Level Host "Hubba"
+            {$newPolicies|Disable-FMFirewallPolicy -Package $packageName -verbose } | Should -Not -Throw
+
+            $newPolicies = Get-FMFirewallPolicy -Package $packageName -Filter "name -like PESTER policy B-%$pesterGUID"
+            foreach($policy in $newPolicies){
+                $policy.status |Should -Be 'disable'
+            }
+        }
     }
 }
