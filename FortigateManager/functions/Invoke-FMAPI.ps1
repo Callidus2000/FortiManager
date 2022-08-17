@@ -134,7 +134,7 @@
 
     # $apiCallParameter.Body.params[0].url=$Path
     # Invoke-PSFProtectedCommand -ActionString "APICall.$LoggingAction" -ActionStringValues $Url -Target $Url -ScriptBlock {
-    Invoke-PSFProtectedCommand -ActionString "APICall.$LoggingAction" -ActionStringValues $LoggingActionValues -ScriptBlock {
+    Invoke-PSFProtectedCommand -ActionString "APICall.$LoggingAction" -ActionStringValues (,$requestId+$LoggingActionValues) -ScriptBlock {
         $result = Invoke-ARAHRequest @apiCallParameter #-PagingHandler 'FM.PagingHandler'
         # if ($null -eq $result) {
         #     Stop-PSFFunction -Message "ADOM could not be locked" -EnableException $EnableException -AlwaysWarning
