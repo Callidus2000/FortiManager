@@ -61,6 +61,7 @@
 		'Get-FMFirewallService'
 		'Get-FMInterface'
 		'Get-FMLastConnection'
+		'Get-FMLog'
 		'Get-FMPolicyPackage'
 		'Get-FMSystemStatus'
 		'Get-FMTaskResult'
