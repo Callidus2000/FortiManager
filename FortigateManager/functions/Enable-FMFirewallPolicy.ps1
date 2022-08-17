@@ -15,16 +15,27 @@
     .PARAMETER Package
     The name of the policy package
 
-    .PARAMETER $PolicyID
+    .PARAMETER PolicyID
     The policyid attribut of the policy to modify.
 
   	.PARAMETER EnableException
 	Should Exceptions been thrown?
 
     .EXAMPLE
-    #To Be Provided
+    Enable-FMFirewallPolicy  -Package $packageName -PolicyID 4711,4712
 
-    Later
+    Enables the two policies.
+
+    .EXAMPLE
+    4711,4712 | Enable-FMFirewallPolicy  -Package $packageName
+
+    Enables the two policies.
+
+    .EXAMPLE
+    $newPolicies = Get-FMFirewallPolicy -Package $packageName -Filter "name -like PESTER policy B-%$pesterGUID"
+    $newPolicies | Enable-FMFirewallPolicy -Package $packageName
+
+    Enables the returned policies.
     .NOTES
     General notes
     #>
@@ -37,7 +48,7 @@
         [PSFramework.TabExpansion.PsfArgumentCompleterAttribute("FortigateManager.FirewallPackage")]
         [string]$Package,
         [parameter(mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, ParameterSetName = "multiUpdate")]
-        [object[]]$PolicyID,
+        [Int64[]]$PolicyID,
         [bool]$EnableException = $true
     )
     begin {
@@ -51,7 +62,7 @@
         }
     }
     end {
-        Write-PSFMessage "Disabling $($policyIdList.count) Policies with $($Attribute.count) new attributes"
-        return Update-FMFirewallPolicy -Connection $Connection -Adom $explicitADOM -Package $Package -PolicyId $policyIdList -Attribute $attributesToModify
+        Write-PSFMessage "Enabling Policies $($policyIdList|Join-String ',')"
+        return Update-FMFirewallPolicy -Connection $Connection -Adom $explicitADOM -Package $Package -PolicyId $policyIdList -Attribute $attributesToModify -EnableException $EnableException
     }
 }
