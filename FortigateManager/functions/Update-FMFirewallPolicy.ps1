@@ -18,6 +18,12 @@
     .PARAMETER Policy
     The new policy, generated e.g. by using New-FMObjAddress
 
+    .PARAMETER PolicyID
+    The ID of the policies to be modified with the Attribute values
+
+    .PARAMETER Attribute
+    The attributes to be modified for the policies with the IDs of the parameter PolicyID
+
     .PARAMETER Overwrite
     If used and an policy with the given name already exists the data will be overwritten.
 
@@ -25,7 +31,16 @@
 	Should Exceptions been thrown?
 
     .EXAMPLE
-    #To Be Provided
+    Update-FMFirewallPolicy -Connection $Connection -Adom $explicitADOM -Package $Package -PolicyId 4711 -Attribute @{status = 'disable'}
+
+    Sets the status attribute of the policy 4711 to disable
+
+    .EXAMPLE
+    $policy = Get-FMFirewallPolicy -Package $packageName -Filter "name -like %$pesterGUID"
+    $policy.service = "HTTP"
+    $policy | Update-FMFirewallPolicy -Package $packageName
+
+    Updates the service of the queried policy rule.
 
     Later
     .NOTES
@@ -43,7 +58,7 @@
         [parameter(mandatory = $true, ValueFromPipeline = $true, ParameterSetName = "default")]
         [object[]]$Policy,
         [parameter(mandatory = $true, ValueFromPipeline = $false, ParameterSetName = "multiUpdate")]
-        [object[]]$PolicyID,
+        [Int64[]]$PolicyID,
         [parameter(mandatory = $true, ValueFromPipeline = $false, ParameterSetName = "multiUpdate")]
         [hashtable]$Attribute,
         [bool]$EnableException = $true
