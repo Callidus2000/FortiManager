@@ -30,7 +30,7 @@
     process {
         foreach($string in $Input){
             $modifiedString=$string -replace '/', "\/"
-            Write-PSFMessage "Replacing String $string Result $modifiedString"
+            Write-PSFMessage -Level Debug "Replacing String $string Result $modifiedString"
             $resultList += $modifiedString
         }
     }

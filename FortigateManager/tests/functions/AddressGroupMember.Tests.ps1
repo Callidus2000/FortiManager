@@ -19,7 +19,7 @@ Describe  "Tests around address group objects" {
             $addrGrp | Should -Not -BeNullOrEmpty
             $addrGrp.member | Should -HaveCount 2
             # Add the third address to the group
-            Update-FMAddressGroupMember -Action add -Name "PESTER Single $pesterGUID" -Member "PESTER 3 $pesterGUID" -Verbose
+            Update-FMAddressGroupMember -Action add -Name "PESTER Single $pesterGUID" -Member "PESTER 3 $pesterGUID"
             Write-PSFMessage -Level Host "Update done"
             $addrGrp = Get-FMAddressGroup -Filter "name -eq PESTER Single $pesterGUID" -Fields member
             $addrGrp | Should -Not -BeNullOrEmpty
@@ -35,7 +35,7 @@ Describe  "Tests around address group objects" {
             $addrGrp | Should -Not -BeNullOrEmpty
             $addrGrp.member | Should -HaveCount 2
             # Add the third address to the group
-            Update-FMAddressGroupMember -Action add -Name "PESTER Single3 $pesterGUID" -Member ((3..5) | ForEach-Object { "PESTER $_ $pesterGUID" }) -Verbose
+            Update-FMAddressGroupMember -Action add -Name "PESTER Single3 $pesterGUID" -Member ((3..5) | ForEach-Object { "PESTER $_ $pesterGUID" })
             Write-PSFMessage -Level Host "Update done"
             $addrGrp = Get-FMAddressGroup -Filter "name -eq PESTER Single3 $pesterGUID" -Fields member
             $addrGrp | Should -Not -BeNullOrEmpty
@@ -60,7 +60,7 @@ Describe  "Tests around address group objects" {
                     $addGrp.member | Should -HaveCount 2
                 }
                 # Add the third address to the group
-                { Update-FMAddressGroupMember -Action add -Name $addrGrpArray.name -Member ((3..5) | ForEach-Object { "PESTER $_ $pesterGUID" }) -Verbose } | Should -Not -Throw
+                { Update-FMAddressGroupMember -Action add -Name $addrGrpArray.name -Member ((3..5) | ForEach-Object { "PESTER $_ $pesterGUID" })  } | Should -Not -Throw
                 Write-PSFMessage -Level Host "Update done"
                 $addrGrpArray = Get-FMAddressGroup -Filter "name -like PESTER Twin%$pesterGUID" -Fields name, member
                 foreach ($addGrp in $addrGrpArray) {
@@ -77,7 +77,7 @@ Describe  "Tests around address group objects" {
                     $addGrp.member | Should -HaveCount 5
                 }
                 # remove the third address from the group
-                { Update-FMAddressGroupMember -Action remove -Name $addrGrpArray.name -Member "PESTER 3 $pesterGUID"  -Verbose } | Should -Not -Throw
+                { Update-FMAddressGroupMember -Action remove -Name $addrGrpArray.name -Member "PESTER 3 $pesterGUID" } | Should -Not -Throw
                 Write-PSFMessage -Level Host "Update done"
                 $addrGrpArray = Get-FMAddressGroup -Filter "name -like PESTER Twin%$pesterGUID" -Fields name, member
                 foreach ($addGrp in $addrGrpArray) {
@@ -108,7 +108,7 @@ Describe  "Tests around address group objects" {
                         action      = "remove"
                     }
                 )
-                { Update-FMAddressGroupMember -ActionMap $actionMap  -Verbose } | Should -Not -Throw
+                { Update-FMAddressGroupMember -ActionMap $actionMap   } | Should -Not -Throw
                 Write-PSFMessage -Level Host "Update done"
                 $addrGrpArray = Get-FMAddressGroup -Filter "name -like PESTER Twin%$pesterGUID" -Fields name, member
                 foreach ($index in (1..2)) {
@@ -127,12 +127,12 @@ Describe  "Tests around address group objects" {
                 $addrGrp | Should -Not -BeNullOrEmpty
                 $addrGrp.member | Should -HaveCount 4
                 # remove all addresses from the group
-                { Update-FMAddressGroupMember -Action remove -Name $addrGrp.name -Member $addrGrp.member  -Verbose } | Should -Not -Throw
+                { Update-FMAddressGroupMember -Action remove -Name $addrGrp.name -Member $addrGrp.member  } | Should -Not -Throw
                 $addrGrp = Get-FMAddressGroup -Filter "name -like PESTER Twin1 $pesterGUID" -Fields name, member
                 Write-PSFMessage "`$addrGrp.member=$($addrGrp.member -join ',')"
                 $addrGrp.member | Should -HaveCount 1
                 $addrGrp.member | Should -Contain "none"
-                { Update-FMAddressGroupMember -Action add -Name $addrGrp.name -Member "PESTER 3 $pesterGUID"  -Verbose } | Should -Not -Throw
+                { Update-FMAddressGroupMember -Action add -Name $addrGrp.name -Member "PESTER 3 $pesterGUID"  } | Should -Not -Throw
                 $addrGrp = Get-FMAddressGroup -Filter "name -like PESTER Twin1 $pesterGUID" -Fields name, member
                 Write-PSFMessage "`$addrGrp2.member=$($addrGrp.member -join ',')"
                 $addrGrp.member | Should -HaveCount 1
@@ -160,13 +160,15 @@ Describe  "Tests around address group objects" {
             $addrGrp | Should -Not -BeNullOrEmpty
         }
         It "Add member to first scope" {
-            Update-FMAddressGroupMember -Name $addrGrpName -Action add -Member $addrNames[0] -Scope $firstScope -Verbose
+            Update-FMAddressGroupMember -Name $addrGrpName -Action add -Member $addrNames[0] -Scope $firstScope
             $addrGrp = Get-FMAddressGroup -Filter "name -eq $addrGrpName"
             Write-PSFMessage -Level Host "`$addrGrp=$($addrGrp|ConvertTo-Json -Depth 5)"
             $addrGrp.dynamic_mapping | Should -HaveCount 1
         }
         It "Add member to all available scopes" {
-            Update-FMAddressGroupMember -Name $addrGrpName -Action add -Member $addrNames[1] -Scope "*" -Verbose
+            Write-Host "ReqIds: $($connection.forti.requestId+1)"
+            Update-FMAddressGroupMember -Name $addrGrpName -Action add -Member $addrNames[1] -Scope "*" #-Debug
+            Write-Host "ReqId2: $($connection.forti.requestId)"
             $addrGrp = Get-FMAddressGroup -Filter "name -eq $addrGrpName"
             Write-PSFMessage -Level Host "`$addrGrp=$($addrGrp|ConvertTo-Json -Depth 5)"
             $addrGrp.dynamic_mapping | Should -HaveCount $allScopes.count
@@ -174,11 +176,11 @@ Describe  "Tests around address group objects" {
                 $mapping.member | Should -Contain $addrNames[1]
             }
         }
-        It "Default member should still be 'none'" {
-            $addrGrp = Get-FMAddressGroup -Filter "name -eq $addrGrpName"
-            $addrGrp.member | Should -HaveCount 1
-            $addrGrp.member | Should -Contain "none"
-        }
+        # It "Default member should still be 'none'" {
+        #     $addrGrp = Get-FMAddressGroup -Filter "name -eq $addrGrpName"
+        #     $addrGrp.member | Should -HaveCount 1
+        #     $addrGrp.member | Should -Contain "none"
+        # }
     }
 
 
