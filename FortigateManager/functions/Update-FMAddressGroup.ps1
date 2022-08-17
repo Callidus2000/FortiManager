@@ -33,7 +33,7 @@
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param (
-        [parameter(Mandatory=$false)]
+        [parameter(Mandatory = $false)]
         $Connection = (Get-FMLastConnection),
         [string]$ADOM,
         [parameter(mandatory = $true, ValueFromPipeline = $true, ParameterSetName = "default")]
@@ -46,12 +46,20 @@
         $explicitADOM = Resolve-FMAdom -Connection $Connection -Adom $ADOM
         Write-PSFMessage "`$explicitADOM=$explicitADOM"
         $validAttributes = Get-PSFConfigValue -FullName 'FortigateManager.ValidAttr.FirewallAddressGroups'
+        $validAttributesDynaMapping = Get-PSFConfigValue -FullName 'FortigateManager.ValidAttr.FirewallAddressGroups.dynamicMapping'
     }
     process {
-        $AddressGroup | ForEach-Object { $groupList +=  $_ | ConvertTo-PSFHashtable -Include $validAttributes }
+        $AddressGroup | ForEach-Object {
+            $currentHash = $_ | ConvertTo-PSFHashtable -Include $validAttributes
+            if ($currentHash.ContainsKey('dynamic_mapping')) {
+                Write-PSFMessage "Modify/clean dynamic_mapping attribute"
+                $currentHash.dynamic_mapping = $currentHash.dynamic_mapping | ConvertTo-PSFHashtable -Include $validAttributesDynaMapping
+            }
+            $groupList += $currentHash
+        }
     }
     end {
-        if ($groupList.count -gt 1 -and $Name){
+        if ($groupList.count -gt 1 -and $Name) {
             Stop-PSFFunction -AlwaysWarning -EnableException $EnableException -Message "Usage of -Name and more than one -AddressGroup is not permitted"
             return
         }
@@ -59,17 +67,17 @@
             EnableException     = $EnableException
             Connection          = $Connection
             LoggingAction       = "Update-FMAddressGroup"
-            LoggingActionValues = @($groupList.count, $explicitADOM,$Name)
+            LoggingActionValues = @($groupList.count, $explicitADOM, $Name)
             method              = "update"
             Path                = "/pm/config/adom/$explicitADOM/obj/firewall/addrgrp"
             Parameter           = @{
                 "data" = $groupList
             }
         }
-        if ($Name){
+        if ($Name) {
             $apiCallParameter.Path = "/pm/config/adom/$explicitADOM/obj/firewall/addrgrp/$($Name|ConvertTo-FMUrlPart)"
             # if name is given 'data' does only accept one object but no array
-            $apiCallParameter.Parameter.data=$groupList[0]
+            $apiCallParameter.Parameter.data = $groupList[0]
         }
         $result = Invoke-FMAPI @apiCallParameter
         if (-not $EnableException) {
