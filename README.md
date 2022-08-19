@@ -222,7 +222,7 @@ everything else is documented in the module itself.
 ## Roadmap
 New features will be added if any of my scripts need it ;-)
 
-Until V2.0.0 I cannot guarantee that no breaking change will occur as the development follows my internal DevOps need completely. Likewise I will not insert full documentation of all parameters as I don't have time for this copy&paste. Sorry.
+I cannot guarantee that no breaking change will occur as the development follows my internal DevOps need completely. Likewise I will not insert full documentation of all parameters as I don't have time for this copy&paste. Sorry. But major changes which classify as breaking changes will result in an increment of the major version. See [Changelog](FortigateManager\changelog.md) for information regarding breaking changes.
 
 See the [open issues](https://github.com/Callidus2000/FortiManager/issues) for a list of proposed features (and known issues).
 

@@ -19,6 +19,9 @@
     .PARAMETER Interface
     The new Interface, generated e.g. by using New-FMObjInterface or Get-FMInterface
 
+    .PARAMETER RevisionNote
+    The change note which should be saved for this revision, see about_RevisionNote
+
   	.PARAMETER EnableException
 	Should Exceptions been thrown?
 
@@ -35,12 +38,13 @@
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param (
-        [parameter(Mandatory=$false)]
+        [parameter(Mandatory = $false)]
         $Connection = (Get-FMLastConnection),
         [string]$ADOM,
         [parameter(mandatory = $true, ValueFromPipeline = $true, ParameterSetName = "default")]
         [object[]]$Interface,
         [string]$Name,
+        [string]$RevisionNote,
         [bool]$EnableException = $true
     )
     begin {
@@ -53,25 +57,26 @@
         $Interface | ForEach-Object { $InterfaceList += $_ | ConvertTo-PSFHashtable -Include $validAttributes }
     }
     end {
-        if ($InterfaceList.count -gt 1 -and $Name){
+        if ($InterfaceList.count -gt 1 -and $Name) {
             Stop-PSFFunction -AlwaysWarning -EnableException $EnableException -Message "Usage of -Name and more than one -Interface is not permitted"
             return
         }
         $apiCallParameter = @{
+            RevisionNote        = $RevisionNote
             EnableException     = $EnableException
             Connection          = $Connection
             LoggingAction       = "Update-FMInterface"
-            LoggingActionValues = @($InterfaceList.count, $explicitADOM,$Name)
+            LoggingActionValues = @($InterfaceList.count, $explicitADOM, $Name)
             method              = "update"
             Path                = "/pm/config/adom/$explicitADOM/obj/dynamic/interface"
             Parameter           = @{
                 "data" = $InterfaceList
             }
         }
-        if ($Name){
+        if ($Name) {
             $apiCallParameter.Path = "/pm/config/adom/$explicitADOM/obj/firewall/Interface/$($Name|ConvertTo-FMUrlPart)"
             # if name is given 'data' does only accept one object but no array
-            $apiCallParameter.Parameter.data=$InterfaceList[0]
+            $apiCallParameter.Parameter.data = $InterfaceList[0]
         }
         $result = Invoke-FMAPI @apiCallParameter
         if (-not $EnableException) {

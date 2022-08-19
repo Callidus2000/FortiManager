@@ -39,6 +39,9 @@
     -scope
     for performing multiple changes in one API call.
 
+    .PARAMETER RevisionNote
+    The change note which should be saved for this revision, see about_RevisionNote
+
   	.PARAMETER EnableException
 	Should Exceptions been thrown?
 
@@ -103,6 +106,7 @@
         [parameter(mandatory = $true, ParameterSetName = "table")]
         [object[]]$ActionMap,
         [string]$NoneMember = "none",
+        [string]$RevisionNote,
         [bool]$EnableException = $true
     )
     begin {
@@ -117,7 +121,7 @@
             Write-PSFMessage "`$Scope=$($Scope|ConvertTo-Json -Compress)"
             foreach ($group in $Name) {
                 foreach ($memberName in $Member) {
-                    if($Scope){
+                    if ($Scope) {
                         if ($Scope -eq '*') {
                             Write-PSFMessage "Scope should be all available scopes"
                             if ($availableScopes.Count -eq 0) {
@@ -135,7 +139,8 @@
                                 scope       = $singleScope
                             }
                         }
-                    }else{
+                    }
+                    else {
                         $internalActionMap += @{
                             addrGrpName = $group
                             addrName    = $memberName
@@ -219,6 +224,6 @@
 
             $modifiedAddrGroups.$addressGroupName = $group
         }
-        $modifiedAddrGroups.values | Update-FMAddressGroup -Connection $Connection -ADOM $explicitADOM -EnableException $EnableException
+        $modifiedAddrGroups.values | Update-FMAddressGroup -Connection $Connection -ADOM $explicitADOM -EnableException $EnableException -RevisionNote $RevisionNote
     }
 }

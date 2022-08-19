@@ -15,6 +15,9 @@
     .PARAMETER Name
     Name of the address group to be removed.
 
+    .PARAMETER RevisionNote
+    The change note which should be saved for this revision, see about_RevisionNote
+
   	.PARAMETER EnableException
 	Should Exceptions been thrown?
 
@@ -42,6 +45,7 @@
         [parameter(Mandatory=$false)]
         $Connection = (Get-FMLastConnection),
         [string]$ADOM,
+        [string]$RevisionNote,
         [bool]$EnableException = $true,
         [parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
         [string[]]$Name
@@ -54,6 +58,7 @@
         }
         $apiCallParameter = @{
             EnableException     = $EnableException
+            RevisionNote        = $RevisionNote
             Connection          = $Connection
             LoggingAction       = "Remove-FMAddressGroup"
             LoggingActionValues = $explicitADOM

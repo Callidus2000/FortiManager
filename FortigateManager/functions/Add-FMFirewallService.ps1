@@ -18,6 +18,9 @@
     .PARAMETER Overwrite
     If used and an address with the given name already exists the data will be overwritten.
 
+    .PARAMETER RevisionNote
+    The change note which should be saved for this revision, see about_RevisionNote
+
   	.PARAMETER EnableException
 	Should Exceptions been thrown?
 
@@ -47,6 +50,7 @@
         [parameter(mandatory = $true, ValueFromPipeline = $true, ParameterSetName = "default")]
         [object[]]$Service,
         [switch]$Overwrite,
+        [string]$RevisionNote,
         [bool]$EnableException = $true
     )
     begin {
@@ -61,6 +65,7 @@
     end {
         $apiCallParameter = @{
             EnableException     = $EnableException
+            RevisionNote        = $RevisionNote
             Connection          = $Connection
             LoggingAction       = "Add-FMFirewallService"
             LoggingActionValues = @($serviceList.count, $explicitADOM)

@@ -1,0 +1,28 @@
+﻿TOPIC
+	about_RevisionNote
+
+SHORT DESCRIPTION
+	Explains how to use the RevisionNote parameters.
+
+LONG DESCRIPTION
+    The Web-GUI enforces the user to enter a "Change Note" which appears beside
+    the revision entry. The "Change Note" can be used within the API eco system
+    as the additional attribute "revision note", but it's not mandatory.
+    Resulting from this it is completely possible to modify anything without the
+    need to fill out this change Message. As a *breaking change* in
+    version 2.0.0 such RevisionNote is a mandatory information for all API calls
+    using one of this methods:
+    set, add, update, delete, move, clone
+
+    You can provide the data either for each function call like
+    > $address|Update-FMAddress -RevisionNote "changed the color"
+    or you can provide a default revision note while locking the ADOM:
+    > Lock-FMAdom -RevisionNote "changed the color"
+
+    This default note will be used until the ADOM is unlocked again. By
+    providing this default message entry point most scripts prior v2 should be
+    easy updatable.
+
+
+KEYWORDS
+	Fortigate, Revision, Change, Note

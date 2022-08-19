@@ -20,7 +20,10 @@
     overwritten. Attention! If used and the new address lacks attributes which
     are already present in the table, this will result in a delta update.
 
-  	.PARAMETER EnableException
+  	.PARAMETER RevisionNote
+    The change note which should be saved for this revision, see about_RevisionNote
+
+    .PARAMETER EnableException
 	Should Exceptions been thrown?
 
     .EXAMPLE
@@ -43,12 +46,13 @@
     General notes
     #>
     param (
-        [parameter(Mandatory=$false)]
+        [parameter(Mandatory = $false)]
         $Connection = (Get-FMLastConnection),
         [string]$ADOM,
         [parameter(mandatory = $true, ValueFromPipeline = $true, ParameterSetName = "default")]
         [object[]]$Address,
         [switch]$Overwrite,
+        [string]$RevisionNote,
         [bool]$EnableException = $true
     )
     begin {
@@ -63,6 +67,7 @@
     end {
         $apiCallParameter = @{
             EnableException     = $EnableException
+            RevisionNote        = $RevisionNote
             Connection          = $Connection
             LoggingAction       = "Add-FMAddress"
             LoggingActionValues = @($addressList.count, $explicitADOM)
@@ -72,9 +77,9 @@
                 "data" = $addressList
             }
         }
-        if ($Overwrite){
-            Write-PSFMessage "Existing data should be overwritten"
-            $apiCallParameter.method="set"
+        if ($Overwrite) {
+            Write-PSFMessage "Existi   n g data should be overwritten"
+            $apiCallParameter.method = "set"
         }
         $result = Invoke-FMAPI @apiCallParameter
         if (-not $EnableException) {

@@ -19,10 +19,10 @@ Describe  "Lock and Unlock tests" {
         }
         Context "FirstLocked" {
             BeforeAll {
-                Lock-FMAdom -Connection $firstConnection
+                Lock-FMAdom -RevisionNote "Pester Tests" -Connection $firstConnection
             }
             AfterAll {
-                UnLock-FMAdom -Connection $firstConnection
+                UnLock-FMAdom  -Connection $firstConnection
             }
             It "Check Lock from 1st Connection" {
                 Get-FMAdomLockStatus -Connection $firstConnection |Should -Not -BeNullOrEmpty
@@ -33,13 +33,13 @@ Describe  "Lock and Unlock tests" {
                 (Get-FMAdomLockStatus -Connection $secondConnection).lock_user | Should -Be $secondConnection.AuthenticatedUser
             }
             It "Lock from 2nd Session has to fail" {
-                { Lock-FMAdom -Connection $secondConnection } | Should -Throw "*Workspace is locked by other user*"
+                { Lock-FMAdom -RevisionNote "Pester Tests" -Connection $secondConnection } | Should -Throw "*Workspace is locked by other user*"
             }
         }
         Context "FirstUnLocked" {
             It "Lock from 2nd Session now should succeed" {
-                { Lock-FMAdom -Connection $secondConnection } | Should -Not -Throw
-                { UnLock-FMAdom -Connection $secondConnection } | Should -Not -Throw
+                { Lock-FMAdom -RevisionNote "Pester Tests" -Connection $secondConnection } | Should -Not -Throw
+                { UnLock-FMAdom  -Connection $secondConnection } | Should -Not -Throw
             }
         }
     }

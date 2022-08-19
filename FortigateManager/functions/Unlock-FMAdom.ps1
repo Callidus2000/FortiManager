@@ -38,6 +38,10 @@
     if ($Commit) {
         Publish-FMAdomChange -Connection $Connection -Adom $explicitADOM -EnableException $EnableException
     }
+    if (-not [string]::IsNullOrEmpty($Connection.forti.defaultRevisionNote)){
+        Write-PSFMessage "Removing defaultRevisionNote from Connection"
+        $Connection.forti.remove("defaultRevisionNote")
+    }
     $apiCallParameter = @{
         EnableException     = $EnableException
         Connection          = $Connection

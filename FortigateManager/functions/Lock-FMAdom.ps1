@@ -11,6 +11,10 @@
 
     .PARAMETER ADOM
     The (non-default) ADOM for the requests.
+
+    .PARAMETER RevisionNote
+    The default revision note for all set, add, update, delete, move and clone calls
+
   	.PARAMETER EnableException
 	Should Exceptions been thrown?
 
@@ -27,10 +31,13 @@
         [parameter(Mandatory=$false)]
         $Connection = (Get-FMLastConnection),
         [string]$ADOM,
+        [parameter(Mandatory=$true)]
+        [string]$RevisionNote,
         [bool]$EnableException = $true
     )
     # $ErrorActionPreference = [System.Management.Automation.ActionPreference]::Stop
-
+    Write-PSFMessage "Adding defaultRevisionNote to Connection"
+    $Connection.forti.defaultRevisionNote = $RevisionNote
     $explicitADOM = Resolve-FMAdom -Connection $Connection -Adom $ADOM
     # Write-PSFMessage "`$explicitADOM=$explicitADOM"
     $apiCallParameter = @{

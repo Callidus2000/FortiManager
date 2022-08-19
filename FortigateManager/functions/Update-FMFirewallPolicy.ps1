@@ -27,6 +27,9 @@
     .PARAMETER Overwrite
     If used and an policy with the given name already exists the data will be overwritten.
 
+    .PARAMETER RevisionNote
+    The change note which should be saved for this revision, see about_RevisionNote
+
   	.PARAMETER EnableException
 	Should Exceptions been thrown?
 
@@ -61,6 +64,7 @@
         [Int64[]]$PolicyID,
         [parameter(mandatory = $true, ValueFromPipeline = $false, ParameterSetName = "multiUpdate")]
         [hashtable]$Attribute,
+        [string]$RevisionNote,
         [bool]$EnableException = $true
     )
     begin {
@@ -86,6 +90,7 @@
                 $Attribute = $Attribute | ConvertTo-PSFHashtable -Include $validAttributes
                 $apiCallParameter = @{
                     EnableException     = $EnableException
+                    RevisionNote        = $RevisionNote
                     Connection          = $Connection
                     LoggingAction       = "Update-FMFirewallPolicy"
                     LoggingActionValues = @($PolicyID.count, $explicitADOM, $Package)
@@ -94,8 +99,9 @@
                 }
                 foreach ($polId in $PolicyID) {
                     $apiCallParameter.Parameter += @{
-                        url  = "/pm/config/adom/$explicitADOM/pkg/$Package/firewall/policy/$polId"
-                        data = $Attribute
+                        url          = "/pm/config/adom/$explicitADOM/pkg/$Package/firewall/policy/$polId"
+                        RevisionNote = $RevisionNote
+                        data         = $Attribute
                     }
                 }
 
@@ -104,6 +110,7 @@
             Default {
                 $apiCallParameter = @{
                     EnableException     = $EnableException
+                    RevisionNote        = $RevisionNote
                     Connection          = $Connection
                     LoggingAction       = "Update-FMFirewallPolicy"
                     LoggingActionValues = @($policyList.count, $explicitADOM, $Package)

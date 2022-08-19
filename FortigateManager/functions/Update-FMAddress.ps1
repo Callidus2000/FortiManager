@@ -19,6 +19,9 @@
     .PARAMETER Address
     The new address, generated e.g. by using New-FMObjAddress or Get-FMAddress
 
+    .PARAMETER RevisionNote
+    The change note which should be saved for this revision, see about_RevisionNote
+
   	.PARAMETER EnableException
 	Should Exceptions been thrown?
 
@@ -47,12 +50,13 @@
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param (
-        [parameter(Mandatory=$false)]
+        [parameter(Mandatory = $false)]
         $Connection = (Get-FMLastConnection),
         [string]$ADOM,
         [parameter(mandatory = $true, ValueFromPipeline = $true, ParameterSetName = "default")]
         [object[]]$Address,
         [string]$Name,
+        [string]$RevisionNote,
         [bool]$EnableException = $true
     )
     begin {
@@ -65,25 +69,26 @@
         $Address | ForEach-Object { $addressList += $_ | ConvertTo-PSFHashtable -Include $validAttributes }
     }
     end {
-        if ($addressList.count -gt 1 -and $Name){
+        if ($addressList.count -gt 1 -and $Name) {
             Stop-PSFFunction -AlwaysWarning -EnableException $EnableException -Message "Usage of -Name and more than one -Address is not permitted"
             return
         }
         $apiCallParameter = @{
             EnableException     = $EnableException
+            RevisionNote        = $RevisionNote
             Connection          = $Connection
             LoggingAction       = "Update-FMAddress"
-            LoggingActionValues = @($addressList.count, $explicitADOM,$Name)
+            LoggingActionValues = @($addressList.count, $explicitADOM, $Name)
             method              = "update"
             Path                = "/pm/config/adom/$explicitADOM/obj/firewall/address"
             Parameter           = @{
                 "data" = $addressList
             }
         }
-        if ($Name){
+        if ($Name) {
             $apiCallParameter.Path = "/pm/config/adom/$explicitADOM/obj/firewall/address/$($Name|ConvertTo-FMUrlPart)"
             # if name is given 'data' does only accept one object but no array
-            $apiCallParameter.Parameter.data=$addressList[0]
+            $apiCallParameter.Parameter.data = $addressList[0]
         }
         $result = Invoke-FMAPI @apiCallParameter
         if (-not $EnableException) {
