@@ -21,6 +21,9 @@
     .PARAMETER Mapping
     A mapping table between old (=Key) and new (=Value) name.
 
+    .PARAMETER RevisionNote
+    The change note which should be saved for this revision, see about_RevisionNote
+
     .PARAMETER EnableException
     If set to true, inner exceptions will be rethrown. Otherwise the an empty result will be returned.
 
@@ -51,6 +54,7 @@
         [string]$NewName,
         [parameter(mandatory = $true, ParameterSetName = "multiple")]
         [Hashtable]$Mapping,
+        [string]$RevisionNote,
         [bool]$EnableException = $true
     )
     $explicitADOM = Resolve-FMAdom -Connection $Connection -Adom $ADOM
@@ -59,6 +63,7 @@
         $Mapping = @{$name = $NewName }
     }
     $apiCallParameter = @{
+        RevisionNote        = $RevisionNote
         EnableException     = $EnableException
         Connection          = $Connection
         LoggingAction       = "Rename-FMInterface"

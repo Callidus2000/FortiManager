@@ -20,6 +20,9 @@
     overwritten. Attention! If used and the new Interface lacks attributes which
     are already present in the table, this will result in a delta update.
 
+    .PARAMETER RevisionNote
+    The change note which should be saved for this revision, see about_RevisionNote
+
   	.PARAMETER EnableException
 	Should Exceptions been thrown?
 
@@ -37,6 +40,7 @@
         [parameter(mandatory = $true, ValueFromPipeline = $true, ParameterSetName = "default")]
         [object[]]$Interface,
         [switch]$Overwrite,
+        [string]$RevisionNote,
         [bool]$EnableException = $true
     )
     begin {
@@ -51,6 +55,7 @@
     end {
         $apiCallParameter = @{
             EnableException     = $EnableException
+            RevisionNote        = $RevisionNote
             Connection          = $Connection
             LoggingAction       = "Add-FMInterface"
             LoggingActionValues = @($InterfaceList.count, $explicitADOM)

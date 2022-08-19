@@ -1,7 +1,7 @@
 Describe  "Tests around address group objects" {
     BeforeAll {
         . $PSScriptRoot\Connect4Testing.ps1
-        Lock-FMAdom
+        Lock-FMAdom -RevisionNote "Pester Tests"
         $pesterGUID = (New-Guid).guid -replace '.*-.*-.*-.*-'
         $newAddresses = @()
         $newAddresses += New-FMObjAddress -Name "PESTER ipmask $pesterGUID" -Type ipmask -Subnet "192.168.1.1/32"

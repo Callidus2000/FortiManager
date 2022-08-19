@@ -29,6 +29,10 @@
     .PARAMETER Overwrite
     If used and an policy with the given name already exists the data will be
     overwritten.
+
+    .PARAMETER RevisionNote
+    The change note which should be saved for this revision, see about_RevisionNote
+
   	.PARAMETER EnableException
 	Should Exceptions been thrown?
 
@@ -69,6 +73,7 @@
         [parameter( ParameterSetName = "default")]
         #[parameter( ParameterSetName = "undocumentedAfter")]
         #[parameter( ParameterSetName = "undocumentedBefore")]
+        [string]$RevisionNote,
         [bool]$EnableException = $true
     )
     begin {
@@ -85,6 +90,7 @@
     end {
         $apiCallParameter = @{
             EnableException     = $EnableException
+            RevisionNote        = $RevisionNote
             Connection          = $Connection
             LoggingAction       = "Add-FMFirewallPolicy"
             LoggingActionValues = @($policyList.count, $explicitADOM, $Package)

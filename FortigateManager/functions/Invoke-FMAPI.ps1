@@ -52,6 +52,9 @@
     On which level should die diagnostic Messages be logged?
     Defaults to PSFConfig "FortigateManager.Logging.Api"
 
+    .PARAMETER RevisionNote
+    The change note which should be saved for this revision, see about_RevisionNote
+
     .PARAMETER EnableException
     If set to true, inner exceptions will be rethrown. Otherwise the an empty result will be returned.
 
@@ -83,13 +86,22 @@
         [string]$LoggingAction = "Invoke-FMAPI",
         [ValidateSet("Critical", "Important", "Output", "Host", "Significant", "VeryVerbose", "Verbose", "SomewhatVerbose", "System", "Debug", "InternalComment", "Warning")]
         [string]$LoggingLevel = (Get-PSFConfigValue -FullName "FortigateManager.Logging.Api" -Fallback "Verbose"),
-        [string[]]$LoggingActionValues = ""
+        [string[]]$LoggingActionValues = "",
+        [string]$RevisionNote
     )
     if (-not $Connection) {
         Write-PSFMessage "Keine Connection als Parameter erhalten, frage die letzte ab"
         $Connection = Get-FMLastConnection -EnableException $EnableException
         if (-not $Connection) {
             Stop-PSFFunction "No last connection available" -EnableException $EnableException -AlwaysWarning
+            return
+        }
+    }
+    if ($Method -in @("set", "add", "update", "delete", "move", "clone")){
+        Write-PSFMessage "Performing API call with change character, determin revisionNote"
+        $RevisionNote=Resolve-FMRevisionNote -RevisionNote $RevisionNote -EnableException $EnableException -Connection $Connection
+        if ($null -eq $RevisionNote){
+            Stop-PSFFunction -Message "RevisionNote is needed, provide it for the API-Call or while locking the ADOM" -EnableException $EnableException
             return
         }
     }
@@ -131,7 +143,12 @@
             if ([string]::IsNullOrEmpty($_.url)) { $_.url = $Path }
         }
     }
-
+    if ([string]::IsNullOrEmpty($RevisionNote) -eq $false) {
+        Write-PSFMessage "Adding RevisionNote '$RevisionNote' to all parameters"
+        $apiCallParameter.body.params | ForEach-Object {
+            $_."revision note"=$RevisionNote
+        }
+    }
     # $apiCallParameter.Body.params[0].url=$Path
     # Invoke-PSFProtectedCommand -ActionString "APICall.$LoggingAction" -ActionStringValues $Url -Target $Url -ScriptBlock {
     Invoke-PSFProtectedCommand -ActionString "APICall.$LoggingAction" -ActionStringValues (,$requestId+$LoggingActionValues) -ScriptBlock {

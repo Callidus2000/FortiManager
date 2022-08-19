@@ -15,6 +15,9 @@
     .PARAMETER AddressGroup
     The new address group, generated e.g. by using New-FMObjAddressGroup
 
+    .PARAMETER RevisionNote
+    The change note which should be saved for this revision, see about_RevisionNote
+
   	.PARAMETER EnableException
 	Should Exceptions been thrown?
 
@@ -36,6 +39,7 @@
         [parameter(mandatory = $true, ValueFromPipeline = $true, ParameterSetName = "default")]
         [object[]]$AddressGroup,
         [switch]$Overwrite,
+        [string]$RevisionNote,
         [bool]$EnableException = $true
     )
     begin {
@@ -49,6 +53,7 @@
     }
     end {
         $apiCallParameter = @{
+            RevisionNote        = $RevisionNote
             EnableException     = $EnableException
             Connection          = $Connection
             LoggingAction       = "Add-FMAddressGroup"

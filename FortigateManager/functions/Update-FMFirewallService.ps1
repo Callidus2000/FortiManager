@@ -19,6 +19,9 @@
     .PARAMETER Service
     The new service, generated e.g. by using New-FMObjFirewallService
 
+    .PARAMETER RevisionNote
+    The change note which should be saved for this revision, see about_RevisionNote
+
   	.PARAMETER EnableException
 	Should Exceptions been thrown?
 
@@ -43,12 +46,13 @@
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param (
-        [parameter(Mandatory=$false)]
+        [parameter(Mandatory = $false)]
         $Connection = (Get-FMLastConnection),
         [string]$ADOM,
         [parameter(mandatory = $true, ValueFromPipeline = $true, ParameterSetName = "default")]
         [object[]]$Service,
         [string]$Name,
+        [string]$RevisionNote,
         [bool]$EnableException = $true
     )
     begin {
@@ -58,7 +62,7 @@
         $validAttributes = Get-PSFConfigValue -FullName 'FortigateManager.ValidAttr.FirewallService'
     }
     process {
-        $Service | ForEach-Object { $serviceList += $_|ConvertTo-PSFHashtable -Include $validAttributes }
+        $Service | ForEach-Object { $serviceList += $_ | ConvertTo-PSFHashtable -Include $validAttributes }
     }
     end {
         if ($serviceList.count -gt 1 -and $Name) {
@@ -66,10 +70,11 @@
             return
         }
         $apiCallParameter = @{
+            RevisionNote        = $RevisionNote
             EnableException     = $EnableException
             Connection          = $Connection
             LoggingAction       = "Update-FMFirewallService"
-            LoggingActionValues = @($serviceList.count, $explicitADOM,$Name)
+            LoggingActionValues = @($serviceList.count, $explicitADOM, $Name)
             method              = "update"
             Path                = "/pm/config/adom/$explicitADOM/obj/firewall/service/custom"
             Parameter           = @{

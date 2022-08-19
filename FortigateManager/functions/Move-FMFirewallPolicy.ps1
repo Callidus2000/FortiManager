@@ -26,6 +26,9 @@
     .PARAMETER Target
     The Policy-ID the policies should be moved before/after
 
+    .PARAMETER RevisionNote
+    The change note which should be saved for this revision, see about_RevisionNote
+
   	.PARAMETER EnableException
 	Should Exceptions been thrown?
 
@@ -63,6 +66,7 @@
         [parameter(mandatory = $true)]
         [ValidateSet("before", "after")]
         [string]$Position,
+        [string]$RevisionNote,
         [bool]$EnableException = $true
     )
     begin {
@@ -87,6 +91,7 @@
         $basePath = "/pm/config/adom/$explicitADOM/pkg/$Package/firewall/policy"
         $apiCallParameter = @{
             EnableException     = $EnableException
+            RevisionNote        = $RevisionNote
             Connection          = $Connection
             LoggingAction       = "Move-FMFirewallPolicy"
             LoggingActionValues = @(0, $Position, $Target, $explicitADOM, $Package)

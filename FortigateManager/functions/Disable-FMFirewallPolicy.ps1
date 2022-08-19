@@ -18,6 +18,9 @@
     .PARAMETER PolicyID
     The policyid attribut of the policy to modify.
 
+    .PARAMETER RevisionNote
+    The change note which should be saved for this revision, see about_RevisionNote
+
   	.PARAMETER EnableException
 	Should Exceptions been thrown?
 
@@ -49,6 +52,7 @@
         [string]$Package,
         [parameter(mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, ParameterSetName = "multiUpdate")]
         [Int64[]]$PolicyID,
+        [string]$RevisionNote,
         [bool]$EnableException = $true
     )
     begin {
@@ -63,6 +67,6 @@
     }
     end {
         Write-PSFMessage "Disabling Policies $($policyIdList|Join-String ',')"
-        return Update-FMFirewallPolicy -Connection $Connection -Adom $explicitADOM -Package $Package -PolicyId $policyIdList -Attribute $attributesToModify -EnableException $EnableException
+        return Update-FMFirewallPolicy -Connection $Connection -Adom $explicitADOM -Package $Package -PolicyId $policyIdList -Attribute $attributesToModify -EnableException $EnableException -RevisionNote $RevisionNote
     }
 }

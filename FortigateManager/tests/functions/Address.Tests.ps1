@@ -1,7 +1,7 @@
 Describe  "Tests around address objects" {
     BeforeAll {
         . $PSScriptRoot\Connect4Testing.ps1
-        Lock-FMAdom
+        Lock-FMAdom -RevisionNote "Pester Tests"
         $pesterGUID = (New-Guid).guid -replace '.*-.*-.*-.*-'
     }
     AfterAll {

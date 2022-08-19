@@ -1,7 +1,7 @@
 Describe  "Publish-FMAdomChange tests" {
     BeforeAll {
         . $PSScriptRoot\Connect4Testing.ps1
-        Lock-FMAdom
+        Lock-FMAdom -RevisionNote "Pester Tests"
         $pesterGUID = (New-Guid).guid -replace '.*-.*-.*-.*-'
     }
     AfterAll {
@@ -23,7 +23,7 @@ Describe  "Publish-FMAdomChange tests" {
         It "Remove published address" {
             $addr = Get-FMAddress -Filter "name -eq PESTER ipmask $pesterGUID"
             $addr | Should -Not -BeNullOrEmpty
-            Lock-FMAdom
+            Lock-FMAdom -RevisionNote "Pester Tests"
             $addr|Remove-FMAddress
             Publish-FMAdomChange
             UnLock-FMAdom
