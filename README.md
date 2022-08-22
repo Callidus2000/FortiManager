@@ -118,7 +118,7 @@ The `AllowClobber` option is currently necessary because of an issue in the curr
 
 The module is a wrapper for the Fortinet FortiManager API. For getting started take a look at the integrated help of the included functions. As inspiration you can take a look at the use-cases which led to the development of this module.
 
-### Currently supported firewall object types (v1.5)
+### Currently supported firewall object types (v2.0)
 The following types of objects can handled (the list is not exhaustive):
 
 | functionPrefix | `Get-FM*` | `New-FMObj*` | `Add-FM*` | `Update-FM*` | `Rename-FM*` | `Remove-FM*` |
@@ -129,6 +129,9 @@ The following types of objects can handled (the list is not exhaustive):
 | FirewallService | X | X | X | X | * | | 
 | FirewallInterfaces | X | X | X | X | X | X | 
 | DeviceInfo | X |   |   |   |   |   | 
+| Task | X |   |   |   |   |   | 
+| Firewall Hitcounts | X |   |   |   |   |   | 
+| ADOM LockStatus | X |   |   |   |   |   | 
 
 An * in Rename means there is no specific function for it, you may use the `Update-FM*` to do it manually.
 
@@ -157,7 +160,7 @@ First task was to import 400 new address objects from Excel. The business requir
 * Login to the manager (**Connect-FM**)
 * Query existing addresses (**Get-FMAddress**) and address groups (**Get-FMADdressGroup**)
 * Create new objects for the API (**New-FMObjAddressGroup** and **New-FMObjAddress**) out of the excel file (Thanks to ImportExcel)
-* Lock the ADOM for writing (**Lock-FMAdom**)
+* Lock the ADOM for writing (**Lock-FMAdom**) - **Breaking Change in v2.0.0** Provide the default RevisionNote as a parameter
 * Add the new address objects to the ADOM (**Add-FMAddress** and **Add-FMAddressGroup**)
 * Save the changes (**Publish-FMAdomChange**)
 * Unlock the ADOM after work (**UnlockFMAdom**)
@@ -199,7 +202,7 @@ foreach ($newAddress in $missingAddresses) {
     Write-PSFMessage -Level Host "Create address object: $newAddress"
     $newFMAddresses += New-FMObjAddress -Name "$newAddress" -Type ipmask -Subnet "$newAddress"  -Comment "Created ByScript"
 }
-Lock-FMAdom -Connection $connection
+Lock-FMAdom -Connection $connection -RevisionNote "Changes by API"
 try {
     $newFMAddresses | add-fmaddress -connection $connection
     Publish-FMAdomChange -Connection $connection
