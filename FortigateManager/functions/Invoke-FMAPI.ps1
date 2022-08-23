@@ -167,6 +167,7 @@
         if ($statusCode -ne 0) {
             Stop-PSFFunction -Message "API-Error, statusCode: $statusCode, Message $($result.result.status.Message)" -EnableException $EnableException -StepsUpward 3 #-AlwaysWarning
         }
+        $connection.forti.lastApiAccessDate=Get-Date
         return $result
 
         # } -PSCmdlet $PSCmdlet  -EnableException $EnableException -Level (Get-PSFConfigValue -FullName "FortigateManager.Logging.Api" -Fallback "Verbose")
