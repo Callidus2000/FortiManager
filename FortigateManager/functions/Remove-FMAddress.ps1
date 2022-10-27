@@ -21,6 +21,9 @@
   	.PARAMETER EnableException
 	Should Exceptions been thrown?
 
+    .PARAMETER Force
+    If used addresses can be removed even if it is used within the ADOM.
+
     .EXAMPLE
     $testAddresses = Get-FMAddress -Connection $Connection -Filter "comment -like %API Test%" |select -first 3
     Lock-FMAdom -Connection $connection
@@ -47,7 +50,8 @@
         [string]$RevisionNote,
         [bool]$EnableException = $true,
         [parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
-        [string[]]$Name
+        [string[]]$Name,
+        [switch]$Force
     )
     begin {
         $explicitADOM = Resolve-FMAdom -Connection $Connection -Adom $ADOM
@@ -64,6 +68,9 @@
             method              = "delete"
         }
         $addressList = @()
+        if ($Force){
+            $apiCallParameter.parameter=@{option='force'}
+        }
     }
     process {
         $addressList += $Name #-replace '/', '\/'

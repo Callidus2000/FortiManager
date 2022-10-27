@@ -5,3 +5,5 @@
  - Follow/Watch the repository ;-)
 ## 2.0.0 (2022-08-19)
  - **Breaking Change** for [introducing mandatory revision notes](https://github.com/Callidus2000/FortiManager/blob/master/FortigateManager/en-us/about_RevisionNote.help.txt)
+## 2.0.2 (2022-10-27)
+ - Addresses can be removed even if they are used.

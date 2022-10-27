@@ -122,8 +122,8 @@ Describe  "Tests around address objects" {
                 }
                 {
                     $result = Rename-FMAddress -Mapping $renameMatrix -Verbose
-                    $result= Rename-FMAddress -Mapping $renameMatrix -EnableException $false
-                 } | Should -Throw
+                    $result = Rename-FMAddress -Mapping $renameMatrix -EnableException $false
+                } | Should -Throw
 
                 Write-PSFMessage -Level Host "Bogey=$result"
             }
@@ -149,6 +149,17 @@ Describe  "Tests around address objects" {
                 $addr | Should -Not -BeNullOrEmpty
                 $addr."end-ip" | Should -Be "192.168.1.60"
                 $addr."start-ip" | Should -Be "192.168.1.8"
+            }
+            It "Remove Address which is in Use" {
+                $addrName = "PESTER RemoveMe $pesterGUID"
+                $groupName = "PESTER UseMyAddress $pesterGUID"
+                New-FMObjAddress -Name $addrName -Type iprange -IpRange "192.168.1.1-192.168.1.5" | Add-FMAddress | Should -BeNullOrEmpty
+                New-FMobjAddressGroup -Name $groupName -member $addrName | Add-FMAddressGroup | Should -BeNullOrEmpty
+                Get-FMAddress -Filter "name -eq $addrName" | Should -Not -BeNullOrEmpty
+                { Remove-FMAddress -Name $addrName } | Should -Throw
+                Get-FMAddress -Filter "name -eq $addrName" | Should -Not -BeNullOrEmpty
+                { Remove-FMAddress -Name $addrName -Force } | Should -Not -Throw
+                Get-FMAddress -Filter "name -eq $addrName" | Should -BeNullOrEmpty
             }
         }
     }
