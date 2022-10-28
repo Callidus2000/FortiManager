@@ -83,84 +83,105 @@ Describe  "Tests around address objects" {
                 $addr."start-ip" | Should -Be "192.168.1.2"
                 $addr."end-ip" | Should -Be "192.168.1.6"
             }
-            It "Remove pester addresses" {
+            It "Remove pester addresses - Pipeline by attribute" {
                 $existingAddresses = Get-FMAddress -Filter "name -like PESTER%"
                 $existingAddresses | Remove-FMAddress
                 $postCheck = Get-FMAddress -Filter "name -like PESTER%"
                 $postCheck | Should -BeNullOrEmpty
             }
-            It "Rename Address" {
-                $newAddress = New-FMObjAddress -Name "PESTER Mickey $pesterGUID" -Type iprange -IpRange "192.168.1.1-192.168.1.5"
-                { $newAddress | Add-FMAddress } | should -Not -Throw
-                { Rename-FMAddress -Name "PESTER Mickey $pesterGUID" -NewName "PESTER Donald $pesterGUID" } | Should -Not -Throw
-                $addr = Get-FMAddress -Filter "name -eq PESTER Donald $pesterGUID"
-                $addr | Should -Not -BeNullOrEmpty
-                $addr."start-ip" | Should -Be "192.168.1.1"
-                Get-FMAddress -Filter "name -eq PESTER Mickey $pesterGUID" | Should -BeNullOrEmpty
-            }
-            It "Rename Multiple Addresses" {
-                { New-FMObjAddress -Name "PESTER Tick $pesterGUID" -Type iprange -IpRange "192.168.1.1-192.168.1.5" | Add-FMAddress } | should -Not -Throw
-                { New-FMObjAddress -Name "PESTER Trick $pesterGUID" -Type iprange -IpRange "192.168.1.1-192.168.1.5" | Add-FMAddress } | should -Not -Throw
-                { New-FMObjAddress -Name "PESTER Track $pesterGUID" -Type iprange -IpRange "192.168.1.1-192.168.1.5" | Add-FMAddress } | should -Not -Throw
-                $renameMatrix = @{
-                    "PESTER Tick $pesterGUID"  = "PESTER Huey $pesterGUID"
-                    "PESTER Trick $pesterGUID" = "PESTER Dewey $pesterGUID"
-                    "PESTER Track $pesterGUID" = "PESTER Louie $pesterGUID"
-                }
-                { Rename-FMAddress -Mapping $renameMatrix } | Should -Not -Throw
-                Get-FMAddress -Filter "name -eq PESTER Huey $pesterGUID" | Should -Not -BeNullOrEmpty
-                Get-FMAddress -Filter "name -eq PESTER Dewey $pesterGUID" | Should -Not -BeNullOrEmpty
-                Get-FMAddress -Filter "name -eq PESTER Dewey $pesterGUID" | Should -Not -BeNullOrEmpty
-                Get-FMAddress -Filter "name -eq PESTER Tick $pesterGUID" | Should -BeNullOrEmpty
-                Get-FMAddress -Filter "name -eq PESTER Trick $pesterGUID" | Should -BeNullOrEmpty
-                Get-FMAddress -Filter "name -eq PESTER Track $pesterGUID" | Should -BeNullOrEmpty
-            }
-            It "Rename Multiple Addresses a second time" {
-                $renameMatrix = @{
-                    "PESTER Pinky $pesterGUID" = "PESTER Brain $pesterGUID"
-                    "PESTER Brain $pesterGUID" = "PESTER Pinky $pesterGUID"
-                }
-                {
-                    $result = Rename-FMAddress -Mapping $renameMatrix -Verbose
-                    $result = Rename-FMAddress -Mapping $renameMatrix -EnableException $false
-                } | Should -Throw
+            It "Remove pester addresses - Array to Foreach-Object" {
+                { 1..5 | ForEach-Object { New-FMObjAddress -Name "PESTER WillBeKilled No $_ / $pesterGUID"  -Type ipmask -Subnet "192.168.1.1/32" } | Add-FMAddress }  | Should -Not -Throw
 
-                Write-PSFMessage -Level Host "Bogey=$result"
+                $existingAddresses = Get-FMAddress -Filter "name -like PESTER%"
+                $existingAddresses | Should -Not -BeNullOrEmpty
+                $existingAddresses | Select-Object -ExpandProperty name | ForEach-Object { Remove-FMAddress -Name $_}
+
+                $postCheck = Get-FMAddress -Filter "name -like PESTER%"
+                $postCheck | Should -BeNullOrEmpty
             }
-            It "Add Address, Overwrite" {
-                $newAddress = New-FMObjAddress -Name "PESTER Scroodge $pesterGUID" -Type iprange -IpRange "192.168.1.10-192.168.1.50"
-                { $newAddress | Add-FMAddress } | should -Not -Throw
-                $addr = Get-FMAddress -Filter "name -eq PESTER Scroodge $pesterGUID"
-                $addr."end-ip" = "192.168.1.60"
-                { $addr | Add-FMAddress -Overwrite } | Should -Not -Throw
-                $addr = Get-FMAddress -Filter "name -eq PESTER Scroodge $pesterGUID"
-                $addr | Should -Not -BeNullOrEmpty
-                $addr."start-ip" | Should -Be "192.168.1.10"
-                $addr."end-ip" | Should -Be "192.168.1.60"
+            It "Remove pester addresses - Pipeline from Array" {
+                { 1..5 | ForEach-Object { New-FMObjAddress -Name "PESTER WillBeKilled No $_ / $pesterGUID"  -Type ipmask -Subnet "192.168.1.1/32" } | Add-FMAddress }  | Should -Not -Throw
+
+                $existingAddresses = Get-FMAddress -Filter "name -like PESTER%"
+                $existingAddresses | Should -Not -BeNullOrEmpty
+                $array=$existingAddresses | Select-Object -ExpandProperty name
+                $array | Remove-FMAddress -Connection $connection -Force
+
+                $postCheck = Get-FMAddress -Filter "name -like PESTER%"
+                $postCheck | Should -BeNullOrEmpty
             }
-            It "Add Address, Overwrite with insufficient data works" {
-                $addr = Get-FMAddress -Filter "name -eq PESTER Scroodge $pesterGUID" | ConvertTo-PSFHashtable -Exclude "end-ip"
-                $addr."start-ip" | Should -Be "192.168.1.10"
-                $addr."end-ip" | Should -BeNullOrEmpty
-                $addr."start-ip" = "192.168.1.8"
-                { $addr | Add-FMAddress } | Should -Throw
-                { $addr | Add-FMAddress -Overwrite -Verbose } | Should -Not -Throw
-                $addr = Get-FMAddress -Filter "name -eq PESTER Scroodge $pesterGUID"
-                $addr | Should -Not -BeNullOrEmpty
-                $addr."end-ip" | Should -Be "192.168.1.60"
-                $addr."start-ip" | Should -Be "192.168.1.8"
-            }
-            It "Remove Address which is in Use" {
-                $addrName = "PESTER RemoveMe $pesterGUID"
-                $groupName = "PESTER UseMyAddress $pesterGUID"
-                New-FMObjAddress -Name $addrName -Type iprange -IpRange "192.168.1.1-192.168.1.5" | Add-FMAddress | Should -BeNullOrEmpty
-                New-FMobjAddressGroup -Name $groupName -member $addrName | Add-FMAddressGroup | Should -BeNullOrEmpty
-                Get-FMAddress -Filter "name -eq $addrName" | Should -Not -BeNullOrEmpty
-                { Remove-FMAddress -Name $addrName } | Should -Throw
-                Get-FMAddress -Filter "name -eq $addrName" | Should -Not -BeNullOrEmpty
-                { Remove-FMAddress -Name $addrName -Force } | Should -Not -Throw
-                Get-FMAddress -Filter "name -eq $addrName" | Should -BeNullOrEmpty
-            }
+            # It "Rename Address" {
+            #     $newAddress = New-FMObjAddress -Name "PESTER Mickey $pesterGUID" -Type iprange -IpRange "192.168.1.1-192.168.1.5"
+            #     { $newAddress | Add-FMAddress } | should -Not -Throw
+            #     { Rename-FMAddress -Name "PESTER Mickey $pesterGUID" -NewName "PESTER Donald $pesterGUID" } | Should -Not -Throw
+            #     $addr = Get-FMAddress -Filter "name -eq PESTER Donald $pesterGUID"
+            #     $addr | Should -Not -BeNullOrEmpty
+            #     $addr."start-ip" | Should -Be "192.168.1.1"
+            #     Get-FMAddress -Filter "name -eq PESTER Mickey $pesterGUID" | Should -BeNullOrEmpty
+            # }
+            # It "Rename Multiple Addresses" {
+            #     { New-FMObjAddress -Name "PESTER Tick $pesterGUID" -Type iprange -IpRange "192.168.1.1-192.168.1.5" | Add-FMAddress } | should -Not -Throw
+            #     { New-FMObjAddress -Name "PESTER Trick $pesterGUID" -Type iprange -IpRange "192.168.1.1-192.168.1.5" | Add-FMAddress } | should -Not -Throw
+            #     { New-FMObjAddress -Name "PESTER Track $pesterGUID" -Type iprange -IpRange "192.168.1.1-192.168.1.5" | Add-FMAddress } | should -Not -Throw
+            #     $renameMatrix = @{
+            #         "PESTER Tick $pesterGUID"  = "PESTER Huey $pesterGUID"
+            #         "PESTER Trick $pesterGUID" = "PESTER Dewey $pesterGUID"
+            #         "PESTER Track $pesterGUID" = "PESTER Louie $pesterGUID"
+            #     }
+            #     { Rename-FMAddress -Mapping $renameMatrix } | Should -Not -Throw
+            #     Get-FMAddress -Filter "name -eq PESTER Huey $pesterGUID" | Should -Not -BeNullOrEmpty
+            #     Get-FMAddress -Filter "name -eq PESTER Dewey $pesterGUID" | Should -Not -BeNullOrEmpty
+            #     Get-FMAddress -Filter "name -eq PESTER Dewey $pesterGUID" | Should -Not -BeNullOrEmpty
+            #     Get-FMAddress -Filter "name -eq PESTER Tick $pesterGUID" | Should -BeNullOrEmpty
+            #     Get-FMAddress -Filter "name -eq PESTER Trick $pesterGUID" | Should -BeNullOrEmpty
+            #     Get-FMAddress -Filter "name -eq PESTER Track $pesterGUID" | Should -BeNullOrEmpty
+            # }
+            # It "Rename Multiple Addresses a second time" {
+            #     $renameMatrix = @{
+            #         "PESTER Pinky $pesterGUID" = "PESTER Brain $pesterGUID"
+            #         "PESTER Brain $pesterGUID" = "PESTER Pinky $pesterGUID"
+            #     }
+            #     {
+            #         $result = Rename-FMAddress -Mapping $renameMatrix -Verbose
+            #         $result = Rename-FMAddress -Mapping $renameMatrix -EnableException $false
+            #     } | Should -Throw
+
+            #     Write-PSFMessage -Level Host "Bogey=$result"
+            # }
+            # It "Add Address, Overwrite" {
+            #     $newAddress = New-FMObjAddress -Name "PESTER Scroodge $pesterGUID" -Type iprange -IpRange "192.168.1.10-192.168.1.50"
+            #     { $newAddress | Add-FMAddress } | should -Not -Throw
+            #     $addr = Get-FMAddress -Filter "name -eq PESTER Scroodge $pesterGUID"
+            #     $addr."end-ip" = "192.168.1.60"
+            #     { $addr | Add-FMAddress -Overwrite } | Should -Not -Throw
+            #     $addr = Get-FMAddress -Filter "name -eq PESTER Scroodge $pesterGUID"
+            #     $addr | Should -Not -BeNullOrEmpty
+            #     $addr."start-ip" | Should -Be "192.168.1.10"
+            #     $addr."end-ip" | Should -Be "192.168.1.60"
+            # }
+            # It "Add Address, Overwrite with insufficient data works" {
+            #     $addr = Get-FMAddress -Filter "name -eq PESTER Scroodge $pesterGUID" | ConvertTo-PSFHashtable -Exclude "end-ip"
+            #     $addr."start-ip" | Should -Be "192.168.1.10"
+            #     $addr."end-ip" | Should -BeNullOrEmpty
+            #     $addr."start-ip" = "192.168.1.8"
+            #     { $addr | Add-FMAddress } | Should -Throw
+            #     { $addr | Add-FMAddress -Overwrite -Verbose } | Should -Not -Throw
+            #     $addr = Get-FMAddress -Filter "name -eq PESTER Scroodge $pesterGUID"
+            #     $addr | Should -Not -BeNullOrEmpty
+            #     $addr."end-ip" | Should -Be "192.168.1.60"
+            #     $addr."start-ip" | Should -Be "192.168.1.8"
+            # }
+            # It "Remove Address which is in Use" {
+            #     $addrName = "PESTER RemoveMe $pesterGUID"
+            #     $groupName = "PESTER UseMyAddress $pesterGUID"
+            #     New-FMObjAddress -Name $addrName -Type iprange -IpRange "192.168.1.1-192.168.1.5" | Add-FMAddress | Should -BeNullOrEmpty
+            #     New-FMobjAddressGroup -Name $groupName -member $addrName | Add-FMAddressGroup | Should -BeNullOrEmpty
+            #     Get-FMAddress -Filter "name -eq $addrName" | Should -Not -BeNullOrEmpty
+            #     { Remove-FMAddress -Name $addrName } | Should -Throw
+            #     Get-FMAddress -Filter "name -eq $addrName" | Should -Not -BeNullOrEmpty
+            #     { Remove-FMAddress -Name $addrName -Force } | Should -Not -Throw
+            #     Get-FMAddress -Filter "name -eq $addrName" | Should -BeNullOrEmpty
+            # }
         }
     }
 }
