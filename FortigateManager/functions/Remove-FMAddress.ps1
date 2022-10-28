@@ -44,7 +44,7 @@
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param (
-        [parameter(Mandatory=$false)]
+        [parameter(Mandatory = $false)]
         $Connection = (Get-FMLastConnection),
         [string]$ADOM,
         [string]$RevisionNote,
@@ -63,14 +63,11 @@
             EnableException     = $EnableException
             RevisionNote        = $RevisionNote
             Connection          = $Connection
-            LoggingAction       = "Remove-FMAddress"
             LoggingActionValues = $explicitADOM
             method              = "delete"
+            parameter           = @()
         }
         $addressList = @()
-        if ($Force){
-            $apiCallParameter.parameter=@{option='force'}
-        }
     }
     process {
         $addressList += $Name #-replace '/', '\/'
@@ -78,11 +75,25 @@
     end {
         # Removing potential Null values
         $addressList = $addressList | Where-Object { $_ } | ConvertTo-FMUrlPart
-        foreach ($addrName in $addressList) {
-            $apiCallParameter.Path = "/pm/config/adom/$explicitADOM/obj/firewall/address/$addrName"
-            $apiCallParameter.LoggingActionValues = $addrName
-            $result = Invoke-FMAPI @apiCallParameter
+        # Different Logging if multiple or single address should be deleted
+        if ($addressList.count -gt 1) {
+            $apiCallParameter.LoggingAction = "Remove-FMAddress-Multiple"
+            $apiCallParameter.LoggingActionValues = $addressList.count
         }
+        else {
+            $apiCallParameter.LoggingAction = "Remove-FMAddress"
+            $apiCallParameter.LoggingActionValues = $addressList
+        }
+        foreach ($addrName in $addressList) {
+            $dataSet = @{
+                url = "/pm/config/adom/$explicitADOM/obj/firewall/address/$addrName"
+            }
+            if ($Force) {
+                $dataSet.option = 'force'
+            }
+            $apiCallParameter.parameter += $dataSet
+        }
+        $result = Invoke-FMAPI @apiCallParameter
         # If EnableException an exception would have be thrown, otherwise the function returns true for success or false for failure
         if (-not $EnableException) {
             return ($null -ne $result)
