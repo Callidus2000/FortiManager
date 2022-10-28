@@ -83,9 +83,30 @@ Describe  "Tests around address objects" {
                 $addr."start-ip" | Should -Be "192.168.1.2"
                 $addr."end-ip" | Should -Be "192.168.1.6"
             }
-            It "Remove pester addresses" {
+            It "Remove pester addresses - Pipeline by attribute" {
                 $existingAddresses = Get-FMAddress -Filter "name -like PESTER%"
                 $existingAddresses | Remove-FMAddress
+                $postCheck = Get-FMAddress -Filter "name -like PESTER%"
+                $postCheck | Should -BeNullOrEmpty
+            }
+            It "Remove pester addresses - Array to Foreach-Object" {
+                { 1..5 | ForEach-Object { New-FMObjAddress -Name "PESTER WillBeKilled No $_ / $pesterGUID"  -Type ipmask -Subnet "192.168.1.1/32" } | Add-FMAddress }  | Should -Not -Throw
+
+                $existingAddresses = Get-FMAddress -Filter "name -like PESTER%"
+                $existingAddresses | Should -Not -BeNullOrEmpty
+                $existingAddresses | Select-Object -ExpandProperty name | ForEach-Object { Remove-FMAddress -Name $_}
+
+                $postCheck = Get-FMAddress -Filter "name -like PESTER%"
+                $postCheck | Should -BeNullOrEmpty
+            }
+            It "Remove pester addresses - Pipeline from Array" {
+                { 1..5 | ForEach-Object { New-FMObjAddress -Name "PESTER WillBeKilled No $_ / $pesterGUID"  -Type ipmask -Subnet "192.168.1.1/32" } | Add-FMAddress }  | Should -Not -Throw
+
+                $existingAddresses = Get-FMAddress -Filter "name -like PESTER%"
+                $existingAddresses | Should -Not -BeNullOrEmpty
+                $array=$existingAddresses | Select-Object -ExpandProperty name
+                $array | Remove-FMAddress -Connection $connection -Force
+
                 $postCheck = Get-FMAddress -Filter "name -like PESTER%"
                 $postCheck | Should -BeNullOrEmpty
             }

@@ -24,6 +24,7 @@
 	'APICall.Move-FMFirewallPolicy'         = '#{0}: Moving Policy {1} {2} {3}, ADOM {4}/Policy Package {5}'
 	'APICall.Publish-FMAdomChange'          = '#{0}: Saving changes'
 	'APICall.Remove-FMAddress'              = '#{0}: Remove address {1}'
+	'APICall.Remove-FMAddress-Multiple'     = '#{0}: Remove {1} addresses'
 	'APICall.Remove-FMAddressGroup'         = '#{0}: Remove address group {1}'
 	'APICall.Remove-FMFirewallPolicy'       = '#{0}: Remove firewall policy {1}'
 	'APICall.Remove-FMFirewallPolicy.Multi' = '#{0}: Removing {1} firewall policy rules'

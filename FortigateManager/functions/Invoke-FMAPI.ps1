@@ -130,8 +130,9 @@
     if ($Parameter) {
         # $global:hubba = $apiCallParameter
         $Parameter | ForEach-Object {
-            if ([string]::IsNullOrEmpty($_.url)){$_.url=$Path}
-            $apiCallParameter.body.params+= $_
+            $hashTableClone=$_|ConvertTo-PSFHashtable
+            if ([string]::IsNullOrEmpty($hashTableClone.url)) { $hashTableClone.url = $Path }
+            $apiCallParameter.body.params += $hashTableClone
         }
         # $apiCallParameter.body.params[0]+=$Parameter
     }else{
