@@ -48,6 +48,9 @@
     .PARAMETER Fields
     Limit the output by returning only the attributes specified in the string array. If none specified, all attributes will be returned.
 
+    .PARAMETER LoggingLevel
+    On which level should die diagnostic Messages be logged?
+
     .PARAMETER NullHandler
     Parameter description
 
@@ -86,6 +89,7 @@
         [System.Object[]]$Fields,
         [parameter(mandatory = $false, ParameterSetName = "default", Position = 0)]
         [String]$Name,
+        [string]$LoggingLevel,
         [ValidateSet("Keep", "RemoveAttribute", "ClearContent")]
         [parameter(mandatory = $false, ParameterSetName = "default")]
         $NullHandler = "RemoveAttribute"
@@ -118,6 +122,7 @@
         Parameter           = $Parameter
         Path                = "/pm/config/adom/$explicitADOM/obj/firewall/address"
     }
+    if (-not [string]::IsNullOrEmpty($LoggingLevel)) { $apiCallParameter.LoggingLevel = $LoggingLevel }
 
     $result = Invoke-FMAPI @apiCallParameter
     Write-PSFMessage "Result-Status: $($result.result.status)"
