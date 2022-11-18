@@ -1,10 +1,10 @@
-﻿function Get-FMAddress {
+﻿function Get-FMAdomRevision {
     <#
     .SYNOPSIS
-    Querys existing addresses.
+    Querys existing ADOM Revisions.
 
     .DESCRIPTION
-    Querys existing addresses.
+    Querys existing ADOM Revisions.
 
     .PARAMETER Connection
     The API connection object.
@@ -14,9 +14,6 @@
 
     .PARAMETER EnableException
     If set to True, errors will throw an exception
-
-    .PARAMETER Attr
-    The name of the attribute to retrieve its datasource. Only used with datasrc option.
 
     .PARAMETER Sortings
     Specify the sorting of the returned result.
@@ -32,15 +29,13 @@
     get reserved - Also return reserved objects in the result.
     syntax - Return the attribute syntax of a table or an object, instead of the actual entry data. All filter parameters will be ignored.
 
+    .PARAMETER ExpandMembers
+    Fetch all or selected attributes of object members.
+    string($expand member object)
+
     .PARAMETER Filter
     Filter the result according to a set of criteria. For detailed help
     see about_FortigateManagerFilter
-
-    .PARAMETER Name
-    Shortcut for -Filter "name -eq $Name"
-
-    .PARAMETER GetUsed
-    Parameter description
 
     .PARAMETER Range
     Limit the number of output. For a range of [a, n], the output will contain n elements, starting from the ath matching result.
@@ -55,9 +50,9 @@
     Parameter description
 
     .EXAMPLE
-    An example
+    Get-FMAdomRevision
 
-    may be provided later
+    Lists the existing Adom Revisions
 
     .NOTES
     General notes
@@ -70,57 +65,41 @@
         [bool]$EnableException = $true,
 
         [parameter(mandatory = $false, ParameterSetName = "default")]
-        [string]$Attr,
-        [parameter(mandatory = $false, ParameterSetName = "default")]
         [System.Object[]]$Sortings,
         [parameter(mandatory = $false, ParameterSetName = "default")]
-        [long]$Loadsub = -1,
-        [parameter(mandatory = $false, ParameterSetName = "default")]
-        [ValidateSet("count", "scope member", "datasrc", "get reserved", "syntax")]
+        [ValidateSet("count", "object member", "syntax")]
         [string]$Option,
+        [parameter(mandatory = $false, ParameterSetName = "default")]
+        [string]$ExpandMembers,
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [string[]]$Filter,
         [parameter(mandatory = $false, ParameterSetName = "default")]
-        [long]$GetUsed = -1,
-        [parameter(mandatory = $false, ParameterSetName = "default")]
         [System.Object[]]$Range,
         [parameter(mandatory = $false, ParameterSetName = "default")]
-        [ValidateSet("_image-base64", "allow-routing", "associated-interface", "cache-ttl", "clearpass-spt", "color", "comment", "country", "dirty", "end-ip", "epg-name", "fabric-object", "filter", "fqdn", "fsso-group", "interface", "macaddr", "name", "node-ip-only", "obj-id", "obj-tag", "obj-type", "organization", "policy-group", "sdn", "sdn-addr-type", "sdn-tag", "start-ip", "sub-type", "subnet", "subnet-name", "tag-detection-level", "tag-type", "tenant", "type", "uuid", "wildcard", "wildcard-fqdn")]
+        [ValidateSet("created_by", "created_time", "desc", "locked", "name", "version")]
         [System.Object[]]$Fields,
-        [parameter(mandatory = $false, ParameterSetName = "default", Position = 0)]
-        [String]$Name,
         [string]$LoggingLevel,
         [ValidateSet("Keep", "RemoveAttribute", "ClearContent")]
         [parameter(mandatory = $false, ParameterSetName = "default")]
         $NullHandler = "RemoveAttribute"
     )
-    if ($Name) {
-        If ($Filter) {
-            $Filter += , "name -eq $Name"
-        }
-        else {
-            $Filter = "name -eq $Name"
-        }
-    }
     $Parameter = @{
-        'attr'     = "$Attr"
         'sortings' = @($Sortings)
-        'loadsub'  = $Loadsub
         'option'   = "$Option"
         'filter'   = ($Filter | ConvertTo-FMFilterArray)
-        'get used' = $GetUsed
         'range'    = @($Range)
         'fields'   = @($Fields)
+        'expand members'="$ExpandMembers"
     } | Remove-FMNullValuesFromHashtable -NullHandler $NullHandler
     $explicitADOM = Resolve-FMAdom -Connection $Connection -Adom $ADOM -EnableException $EnableException
     $apiCallParameter = @{
         EnableException     = $EnableException
         Connection          = $Connection
-        LoggingAction       = "Get-FMAddress"
-        LoggingActionValues = ($Parameter.Keys.Count)
+        LoggingAction       = "Get-FMAdomRevision"
+        LoggingActionValues = $explicitADOM
         method              = "get"
         Parameter           = $Parameter
-        Path                = "/pm/config/adom/$explicitADOM/obj/firewall/address"
+        Path                = "/dvmdb/adom/$explicitADOM/revision"
     }
     if (-not [string]::IsNullOrEmpty($LoggingLevel)) { $apiCallParameter.LoggingLevel = $LoggingLevel }
 

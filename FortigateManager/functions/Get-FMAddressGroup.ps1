@@ -49,6 +49,10 @@
     .PARAMETER NullHandler
     Parameter description
 
+    .PARAMETER LoggingLevel
+    On which level should die diagnostic Messages be logged?
+
+
     .PARAMETER EnableException
     If set to True, errors will throw an exception
 
@@ -88,7 +92,7 @@
         [ValidateSet("Keep", "RemoveAttribute", "ClearContent")]
         [parameter(mandatory = $false, ParameterSetName = "default")]
         $NullHandler = "RemoveAttribute",
-
+        [string]$LoggingLevel,
         [bool]$EnableException = $true
     )
     if ($Name) {
@@ -120,6 +124,7 @@
         Parameter           = $Parameter
         Path                = "/pm/config/adom/$explicitADOM/obj/firewall/addrgrp"
     }
+    if (-not [string]::IsNullOrEmpty($LoggingLevel)) { $apiCallParameter.LoggingLevel = $LoggingLevel }
 
     $result = Invoke-FMAPI @apiCallParameter
     Write-PSFMessage "Result-Status: $($result.result.status)"

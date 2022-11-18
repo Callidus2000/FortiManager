@@ -175,7 +175,7 @@
                 $group = $modifiedAddrGroups.$addressGroupName
             }
             else {
-                $group = Get-FMAddressGroup -Connection $Connection  -ADOM $explicitADOM -Filter "name -eq $addressGroupName" -Option 'scope member' -Fields name, member
+                $group = Get-FMAddressGroup -Connection $Connection  -ADOM $explicitADOM -Filter "name -eq $addressGroupName" -Option 'scope member' -Fields name, member -LoggingLevel Verbose
             }
             # Write-PSFMessage "`$group= $($group.member.gettype())"
             if ($null -eq $dynaScope) {
@@ -197,10 +197,10 @@
                 # Write-PSFMessage "`$memberAction=$($memberAction|ConvertTo-Json -Depth 4)"
                 Write-PSFMessage "$($memberAction.action) $($memberAction.addrName)"
                 if ($memberAction.action -eq 'add') {
-                    $members.Add($memberAction.addrName)
+                    $members.Add($memberAction.addrName) | Out-Null
                 }
                 else {
-                    $members.Remove($memberAction.addrName)
+                    $members.Remove($memberAction.addrName) | Out-Null
                 }
             }
             $oldMembers = $group.member
