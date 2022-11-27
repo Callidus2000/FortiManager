@@ -71,6 +71,7 @@
 		'Get-FMTaskStatus'
 		'Invoke-FMAPI'
 		'Lock-FMAdom'
+		'Merge-FMStringHashMap'
 		'Move-FMFirewallPolicy'
 		'New-FMObjAddress'
 		'New-FMObjAddressGroup'
