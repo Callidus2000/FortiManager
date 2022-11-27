@@ -55,19 +55,14 @@
         $currentInterfaces = Invoke-FMAPI @apiCallParameter # | ConvertTo-Json -Depth 6
         foreach ($interface in $currentInterfaces.result.data) {
             $name = $interface.name
-            if ($interface.ip[1] -eq '0.0.0.0') {
-                $address = "$($interface.ip[0])/0"
-            }
-            else {
-                $address = Convert-FMSubnetMask -IPMask "$($interface.ip[0])/$($interface.ip[1])"
-            }
-            $device.vlanHash.$name = $address
-            # Write-PSFMessage "Add: $($device.name), $name, $address"
-            # $vlanDataPerVDOM += [PSCustomObject]@{
-            #     deviceName    = $device.name
-            #     interfaceName = $name
-            #     addresses     = $address
+            $device.vlanHash.$name = $interface.ip
+            # if ($interface.ip[1] -eq '0.0.0.0') {
+            #     $address = "$($interface.ip[0])/0"
             # }
+            # else {
+            #     $address = Convert-FMSubnetMask -IPMask "$($interface.ip[0])/$($interface.ip[1])"
+            # }
+            # $device.vlanHash.$name = $address
         }
     }
     switch -regex ($ReturnType) {
@@ -81,6 +76,9 @@
     Write-PSFMessage "`$returnValue.type=$($returnValue.GetType())"
     foreach ($curZone in $Zone) {
         Write-PSFMessage "Checking Zone: $curZone"
+        switch ($ReturnType) {
+            'ZoneVLANHash' { $returnValue.$curZone = @() }
+        }
         $queryData = @{zone = $curZone | convertto-fmurlpart }
         $apiCallParameter = @{
             EnableException     = $true
@@ -102,17 +100,21 @@
                 Write-PSFMessage "interfaceList for $($queryData|ConvertTo-Json -compress): $($interfaceList -join ',')"
                 foreach ($interface in $interfaceList) {
                     $vlanIP = $queryData.vlanHash.$interface
+                    if ($vlanIP[1] -eq '0.0.0.0') {
+                        $address = "$($vlanIP[0])/0"
+                    }
+                    else {
+                        $address = Convert-FMSubnetMask -IPMask "$($vlanIP[0])/$($vlanIP[1])"
+                    }
+
                     switch ($ReturnType) {
                         'simpleIpList' {
                             Write-PSFMessage "Adding VLAN Info to simpleIpListList"
-                            $returnValue += $vlanIP
+                            $returnValue += $address
                         }
                         'ZoneVLANHash' {
                             Write-PSFMessage "Adding Interfaces to ZoneVLANHash"
-                            if ( -not $returnValue.ContainsKey($curZone)) {
-                                $returnValue.$curZone = @()
-                            }
-                            $returnValue.$curZone = $vlanIP
+                            $returnValue.$curZone += $address
                         }
                         default {
                             Write-PSFMessage "`$ReturnType $ReturnType unknown"
