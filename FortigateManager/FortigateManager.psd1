@@ -61,6 +61,7 @@
 		'Get-FMDeviceInfo'
 		'Get-FMFirewallHitCount'
 		'Get-FMFirewallPolicy'
+		'Get-FMFirewallScope'
 		'Get-FMFirewallService'
 		'Get-FMInterface'
 		'Get-FMLastConnection'
