@@ -10,3 +10,12 @@
 ## 2.0.3 (2022-10-28)
  - Multiple Addresses can be removed in one request
  - fixed race condition in Invoke-FMApi which occurred while re-using a HashTable for splatting
+## 2.2.0 (2022-11-30)
+ - Added functionality:
+   - ADOM revisions can be created/queried/removed
+   - Merge-FMStringHashMap  
+     Helper funtion to replace placeholders in an url with values from a hashtable.
+   - Convert-FMZone2VLAN  
+     Converts an interface from a firewall policy to the addresses of the physical interfaces/vlan on the relevant devices.
+   - Get-FMFirewallScope  
+   Queries firewall scopes for dynamic mapping etc

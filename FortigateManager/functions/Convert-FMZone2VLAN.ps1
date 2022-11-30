@@ -1,16 +1,13 @@
 ﻿function Convert-FMZone2VLAN {
     <#
     .SYNOPSIS
-    Short description
+    Converts an interface from a firewall policy to the addresses of the physical interfaces/vlan on the relevant devices.
 
     .DESCRIPTION
-    Long description
+    Converts an interface from a firewall policy to the addresses of the physical interfaces/vlan on the relevant devices.
 
     .PARAMETER Connection
     The API connection object.
-
-    .PARAMETER ADOM
-    The (non-default) ADOM for the requests.
 
     .PARAMETER LoggingLevel
     On which level should die diagnostic Messages be logged?
@@ -18,8 +15,34 @@
     .PARAMETER EnableException
     If set to True, errors will throw an exception
 
+    .PARAMETER Zone
+    The names of the interface/Zone/localiced interface name (found in policy rules)
+
+    .PARAMETER ReturnType
+    How should the results be returned?
+    'simpleIpList': Array of ipmasks
+    'ZoneVLANHash': Hashtable, @{"$zoneName"=[Array of ipmasks]}
+    'ZoneVDOMVLANHash': Hashtable,
+        values=[Array of ipmasks]
+        keys= "{ZONE-Name}|{VDOM}"
+
+    .PARAMETER Scope
+    The scope which should be looked up.
+    @(@{name='deviceName';vdom='vdom name'})
+
+    By default all available devices/vdoms will be looked up.
+
     .EXAMPLE
-    An example
+     $policy=Get-FMFirewallPolicy -Package ALL -Option 'scope member' -filter "policyid -eq 1234"
+     Convert-FMZone2VLAN -Zone $policy.srcintf,$policy.dstintf
+
+     Returns a list of ipmasks
+
+    .EXAMPLE
+     $policy=Get-FMFirewallPolicy -Package ALL -Option 'scope member' -filter "policyid -eq 1234"
+     Convert-FMZone2VLAN -Zone $policy.srcintf,$policy.dstintf
+
+     Returns a list of ipmasks
 
     .NOTES
     General notes
@@ -28,12 +51,11 @@
     param (
         [parameter(Mandatory = $false)]
         $Connection = (Get-FMLastConnection),
-        [string]$ADOM,
         [parameter(Mandatory = $true)]
         [string[]]$Zone,
         [ValidateSet('simpleIpList', 'ZoneVLANHash', 'ZoneVDOMVLANHash')]
         $ReturnType = 'simpleIpList',
-        [string]$LoggingLevel,
+        [string]$LoggingLevel='Verbose',
         $Scope,
         [bool]$EnableException = $true
     )
@@ -41,9 +63,11 @@
     Write-PSFMessage "Query all VDOMs and corresponding VLANs"
     if ($null -eq $Scope) {
         Write-PSFMessage "Scope is ALL devices and vdoms"
-        $Scope = Get-FMDeviceInfo -Connection $connection -Option 'object member' | Select-Object -ExpandProperty "object member" | Where-Object { $_.vdom } | ConvertTo-PSFHashtable -Include name, vdom
+        # $Scope = Get-FMDeviceInfo -Connection $connection -Option 'object member' | Select-Object -ExpandProperty "object member" | Where-Object { $_.vdom } | ConvertTo-PSFHashtable -Include name, vdom
+        $Scope = Get-FMFirewallScope -Connection $Connection | ConvertTo-PSFHashtable -Include name, vdom
+    }else{
+        $Scope = $Scope|ConvertTo-PSFHashtable
     }
-    $targetScopeStrings = $Scope | ForEach-Object { "$($_.name)|$($_.vdom)" }
     # Query all localized interface names into a HashTable
     # Key-Format: [Localized Interface Name]|[Device Name]|[Device VDOM]
     # Value: List of local Zone/Interface Names
@@ -62,12 +86,12 @@
     foreach ($device in $Scope) {
         Write-PSFMessage "Query Device $($device|ConvertTo-Json -Compress)"
         $apiCallParameter = @{
-            EnableException     = $true
+            EnableException     = $EnableException
             LoggingAction       = "Undocumented"
             Connection          = $Connection
             LoggingActionValues = "Query all interface VLAN from a specific Device/VDOM"
             method              = "get"
-            LoggingLevel        = "Verbose"
+            LoggingLevel        = $LoggingLevel
             path                = "/pm/config/device/{name}/vdom/{vdom}/system/interface" | Merge-FMStringHashMap -Data $device
         }
         $device.vlanHash = @{}
@@ -120,7 +144,7 @@
             }
             $queryData.zone = $localZoneName | convertto-fmurlpart
             $apiCallParameter.path = $singleDeviceVdomURL | Merge-FMStringHashMap -Data $queryData
-            Write-PSFMessage "`$queryData=$($queryData|json -compress), Path=$($apiCallParameter.path)"
+            Write-PSFMessage "`$queryData=$($queryData|ConvertTo-Json -compress), Path=$($apiCallParameter.path)"
             try {
                 $result = Invoke-FMAPI @apiCallParameter
                 Write-PSFMessage "Found"
