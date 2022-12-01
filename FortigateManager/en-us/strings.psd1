@@ -42,6 +42,7 @@
 	'APICall.Update-FMFirewallPolicy'        = '#{0}: Updating {1} policies in ADOM {2}, Policy Package {3}'
 	'APICall.Update-FMFirewallService'       = '#{0}: Updating {1} firewall services in ADOM {2}, additional -Name: {3}'
 	'APICall.Update-FMInterface'             = '#{0}: Updating {1} interfaces in ADOM {2}, additional -Name: {3}'
+	'APICall.Undocumented'                   = '#{0}: Using undocumented API for: {1}'
 	'Connect-FM.Connected'                   = '#{0}: Connection established' #
 	'Connect-FM.NotConnected'                = '#{0}: Connection could not be established'
 }
