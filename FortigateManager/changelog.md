@@ -19,3 +19,6 @@
      Converts an interface from a firewall policy to the addresses of the physical interfaces/vlan on the relevant devices.
    - Get-FMFirewallScope  
    Queries firewall scopes for dynamic mapping etc
+## 2.2.1 (2023-01-18)
+ - Added Parameter SkipCheck to Connect-FM  
+   Allows e.g. to skip SSL checks while performing the HTTP requests
