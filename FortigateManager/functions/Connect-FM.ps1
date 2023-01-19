@@ -15,6 +15,11 @@
 	.PARAMETER ADOM
 	The default ADOM for the requests.
 
+    .PARAMETER SkipCheck
+    Array of checks which should be skipped while using Invoke-WebRequest.
+    Possible Values 'CertificateCheck', 'HttpErrorCheck', 'HeaderValidation'.
+    If neccessary by default for the connection set $connection.SkipCheck
+
 	.PARAMETER EnableException
 	Should Exceptions been thrown?
 
@@ -37,12 +42,15 @@
 		[string]$ADOM,
 		[parameter(mandatory = $true, ParameterSetName = "credential")]
 		[pscredential]$Credential,
+		[ValidateSet('CertificateCheck', 'HttpErrorCheck', 'HeaderValidation')]
+		[String[]]$SkipCheck,
 		[bool]$EnableException = $true
 	)
 	begin {
 	}
 	end {
 		$connection = Get-ARAHConnection -Url $Url -APISubPath ""
+		if ($SkipCheck) { $connection.SkipCheck = $SkipCheck}
 		Add-Member -InputObject $connection -MemberType NoteProperty -Name "forti" -Value @{
 			requestId = 1
 			session   = $null
