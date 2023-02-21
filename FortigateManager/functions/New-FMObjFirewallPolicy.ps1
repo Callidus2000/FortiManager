@@ -196,7 +196,16 @@
     Parameter description
 
     .PARAMETER Logtraffic
-    Parameter description
+    Enable or disable logging. Log all sessions or security profile sessions.
+    "disable" Disable all logging for this policy.
+    "all"     Log all sessions accepted or denied by this policy.
+    "utm"     Log traffic that has a security profile applied to it.
+
+    Log 'Security Events' will only log Security (UTM) events (e.g. AV, IPS,
+    firewall web filter), providing you have applied one of them to a firewall
+    (rule) policy.
+    'Log all sessions' will include traffic log include both match and non-match
+    UTM profile defined.
 
     .PARAMETER LogtrafficStart
     Parameter description
@@ -625,7 +634,7 @@
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [string]$Label,
         [parameter(mandatory = $false, ParameterSetName = "default")]
-        [ValidateSet("disable", "enable")]
+        [ValidateSet("disable", "all", "utm")]
         [string]$Logtraffic,
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [ValidateSet("disable", "enable")]
@@ -716,7 +725,7 @@
         [ValidateSet("disable", "enable")]
         [string]$RtpNat,
         [parameter(mandatory = $false, ParameterSetName = "default")]
-        [string]$Schedule="always",
+        [string]$Schedule = "always",
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [ValidateSet("disable", "enable")]
         [string]$ScheduleTimeout,
