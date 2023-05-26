@@ -15,6 +15,9 @@
 	.PARAMETER ADOM
 	The default ADOM for the requests.
 
+	.PARAMETER OldConnection
+	An old connection to be revived. This can be obtained e.g. by Export-Clixml/Import-Clixml.
+
     .PARAMETER SkipCheck
     Array of checks which should be skipped while using Invoke-WebRequest.
     Possible Values 'CertificateCheck', 'HttpErrorCheck', 'HeaderValidation'.
@@ -27,6 +30,13 @@
 	$connection=Connect-FM -Url $url -Credential $cred
 
 	Connect directly with a Credential-Object
+	.EXAMPLE
+	$connection=Connect-FM -Url $url -Credential $cred
+	$connection=Export-Clixml -Path ".\connection.xml"
+	$importedConnection=Import-Clixml -Path ".\connection.xml"
+	$secondConnection=Connect-FM -OldConnection $importedConnection
+
+	Connect with the information from a serialized object
 
 	.NOTES
 	#>
@@ -42,20 +52,36 @@
 		[string]$ADOM,
 		[parameter(mandatory = $true, ParameterSetName = "credential")]
 		[pscredential]$Credential,
+		[parameter(mandatory = $true, ParameterSetName = "oldConnection")]
+		$OldConnection,
 		[ValidateSet('CertificateCheck', 'HttpErrorCheck', 'HeaderValidation')]
 		[String[]]$SkipCheck,
 		[bool]$EnableException = $true
 	)
 	begin {
+		if ($OldConnection){
+			Write-PSFMessage "Getting parameters from existing (mistyped) Connection object"
+			$Url=$OldConnection.ServerRoot
+			$Credential = $OldConnection.credential
+			if ($OldConnection.SkipCheck){
+				$connection.SkipCheck
+			}
+			$additionalParams = $OldConnection.forti
+			if ($OldConnection.forti.defaultADOM) {
+				$ADOM = $OldConnection.forti.defaultADOM
+			}
+		}else{
+			$additionalParams = @{
+				requestId       = 1
+				session         = $null
+				EnableException = $EnableException
+			}
+		}
 	}
 	end {
 		$connection = Get-ARAHConnection -Url $Url -APISubPath ""
 		if ($SkipCheck) { $connection.SkipCheck = $SkipCheck}
-		Add-Member -InputObject $connection -MemberType NoteProperty -Name "forti" -Value @{
-			requestId = 1
-			session   = $null
-			EnableException=$EnableException
-		}
+		Add-Member -InputObject $connection -MemberType NoteProperty -Name "forti" -Value $additionalParams
 		$connection.credential = $Credential
 		$connection.ContentType = "application/json;charset=UTF-8"
 		$connection.authenticatedUser = $Credential.UserName
@@ -96,7 +122,12 @@
 				$this.forti.session = $result.session
 			}
 		}
-		$connection.Refresh()
+		switch ($PsCmdlet.ParameterSetName){
+			'credential'{
+				$connection.Refresh()
+			}
+			'oldConnection'{}
+		}
 		if ($connection.forti.session) {
 			Write-PSFMessage -string "Connect-FM.Connected"
 			Set-PSFConfig -Module 'FortigateManager' -Name 'LastConnection' -Value $connection -Description "Last known Connection" -AllowDelete
