@@ -60,7 +60,7 @@
         $taskID = $initTaskResult.result[0].taskid
         Write-PSFMessage "taskID=$taskID"
         $taskStatus = Get-FMTaskStatus -Id $taskID -Wait -Verbose
-        Write-PSFMessage "Status of Task $($taskID): $($taskStatus|ConvertTo-Json -Depth 3)"
+        Write-PSFMessage "Status of Task $($taskID): $($taskStatus| ConvertTo-Json -WarningAction SilentlyContinue -Depth 3)"
     }
     else {
         $taskID = $packageInfo."package settings"."hitc-taskid"

@@ -42,7 +42,7 @@ Describe  "Tests around address objects" {
             }
             It "Query pester addresses" {
                 $existingAddresses = Get-FMAddress -Filter "name -like PESTER%"
-                Write-PSFMessage "`$existingAddresses=$($existingAddresses|ConvertTo-Json)" -Level Host
+                Write-PSFMessage "`$existingAddresses=$($existingAddresses| ConvertTo-Json -WarningAction SilentlyContinue)" -Level Host
                 $existingAddresses | Should -Not -BeNullOrEmpty
                 $existingAddresses | Should -HaveCount 3
             }

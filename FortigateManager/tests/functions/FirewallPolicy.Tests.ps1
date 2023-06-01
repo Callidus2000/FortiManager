@@ -21,7 +21,7 @@ Describe  "Tests around FirewallPolicy objects" {
             $policyPackage | Should -Not -BeNullOrEmpty
             $policyPackage.name | Should -Be $packageName
             $policyPackage."package settings" | Should -Not -BeNullOrEmpty
-            # Write-PSFMessage "`$policyPackage=$($policyPackage|convertto-json)"
+            # Write-PSFMessage "`$policyPackage=$($policyPackage| ConvertTo-Json -WarningAction SilentlyContinue)"
         }
         It "Create Policy" {
             $newPolicy = New-FMObjFirewallPolicy -Name "PESTER policy A $pesterGUID" -Srcaddr $srcAddrName -Dstaddr $dstAddrName -Srcintf "any" -Dstintf "any" -Service "ALL" -Action accept

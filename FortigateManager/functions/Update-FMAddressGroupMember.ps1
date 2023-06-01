@@ -118,7 +118,7 @@
     }
     process {
         if ($PSCmdlet.ParameterSetName -eq 'default') {
-            Write-PSFMessage "`$Scope=$($Scope|ConvertTo-Json -Compress)"
+            Write-PSFMessage "`$Scope=$($Scope| ConvertTo-Json -WarningAction SilentlyContinue -Compress)"
             foreach ($group in $Name) {
                 foreach ($memberName in $Member) {
                     if ($Scope) {
@@ -152,8 +152,8 @@
         }
     }
     end {
-        Write-PSFMessage "`$ActionMap=$($ActionMap|ConvertTo-Json -Depth 4)"
-        Write-PSFMessage "`$internalActionMap=$($internalActionMap|ConvertTo-Json -Depth 4)"
+        Write-PSFMessage "`$ActionMap=$($ActionMap| ConvertTo-Json -WarningAction SilentlyContinue -Depth 4)"
+        Write-PSFMessage "`$internalActionMap=$($internalActionMap| ConvertTo-Json -WarningAction SilentlyContinue -Depth 4)"
         if ($ActionMap) {
             Write-PSFMessage "Using ActionMap from parameter"
             $groupedActions = $ActionMap | Group-Object -Property addrGrpName, scope
@@ -162,11 +162,11 @@
             $groupedActions = $internalActionMap | Group-Object -Property addrGrpName, scope
             Write-PSFMessage "Using internalActionMap from manual mapping"
         }
-        # Write-PSFMessage "`$groupedActions=$($groupedActions|ConvertTo-Json -Depth 4)"
+        # Write-PSFMessage "`$groupedActions=$($groupedActions| ConvertTo-Json -WarningAction SilentlyContinue -Depth 4)"
         foreach ($actionGroup in $groupedActions) {
             $addressGroupName = $actionGroup.Values[0]
             $dynaScope = $actionGroup.Values[1]
-            # Write-PSFMessage "`$actionGroup=$($actionGroup|ConvertTo-Json -Depth 4)"
+            # Write-PSFMessage "`$actionGroup=$($actionGroup| ConvertTo-Json -WarningAction SilentlyContinue -Depth 4)"
             Write-PSFMessage "Modify AddressGroup $addressGroupName"
             Write-PSFMessage "`$dynaScope=$dynaScope"
             Write-PSFMessage "`$dynaScope=null=$($null -eq $dynaScope)"
@@ -183,7 +183,7 @@
             }
             else {
                 Write-PSFMessage "Verwende Scope $($dynaScope.name) VDOM $($dynaScope.vdom)"
-                Write-PSFMessage "`$group= $($group |ConvertTo-Json -Depth 5)"
+                Write-PSFMessage "`$group= $($group | ConvertTo-Json -WarningAction SilentlyContinue -Depth 5)"
                 $dynamapping = $group.dynamic_mapping | Where-Object { $_._scope.name -eq $dynaScope.name -and $_._scope.vdom -eq $dynaScope.vdom }
                 if ($null -eq $dynamapping) {
                     Write-PSFMessage "dynamic_mapping does not exist, create it"
@@ -194,7 +194,7 @@
                 $members = [System.Collections.ArrayList]($dynamapping.member)
             }
             foreach ($memberAction in $actionGroup.Group) {
-                # Write-PSFMessage "`$memberAction=$($memberAction|ConvertTo-Json -Depth 4)"
+                # Write-PSFMessage "`$memberAction=$($memberAction| ConvertTo-Json -WarningAction SilentlyContinue -Depth 4)"
                 Write-PSFMessage "$($memberAction.action) $($memberAction.addrName)"
                 if ($memberAction.action -eq 'add') {
                     $members.Add($memberAction.addrName) | Out-Null

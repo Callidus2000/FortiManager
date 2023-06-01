@@ -75,7 +75,7 @@
                 Write-PSFMessage -Level Warning "No valid filter string: $filterString"
             }
         }
-        Write-PSFMessage "Result= $($resultArray|ConvertTo-Json)"
+        Write-PSFMessage "Result= $($resultArray| ConvertTo-Json -WarningAction SilentlyContinue)"
         return $resultArray
     }
 }

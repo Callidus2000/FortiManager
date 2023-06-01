@@ -32,7 +32,7 @@ Describe  "Tests around Interface objects" {
             }
             It "Query pester Interfacees" {
                 $existingInterfacees = Get-FMInterface -Filter "name -like PESTER%"
-                Write-PSFMessage "`$existingInterfacees=$($existingInterfacees|ConvertTo-Json)" -Level Host
+                Write-PSFMessage "`$existingInterfacees=$($existingInterfacees| ConvertTo-Json -WarningAction SilentlyContinue)" -Level Host
                 $existingInterfacees | Should -Not -BeNullOrEmpty
                 $existingInterfacees | Should -HaveCount 3
             }

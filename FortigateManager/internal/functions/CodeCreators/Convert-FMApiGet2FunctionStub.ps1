@@ -153,7 +153,7 @@
 #         Write-Host "Error, $_"
 #         throw $_
 #     }
-#     return $syntax #|convertto-json -Depth 10
+#     return $syntax #| ConvertTo-Json -WarningAction SilentlyContinue -Depth 10
 #     $json = Get-Clipboard
 
 #     $newLineCommaDelim = @"

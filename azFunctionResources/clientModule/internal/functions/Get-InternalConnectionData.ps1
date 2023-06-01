@@ -3,17 +3,17 @@
 <#
 	.SYNOPSIS
 		Creates parameter hashtables for Invoke-RestMethod calls.
-	
+
 	.DESCRIPTION
 		Creates parameter hashtables for Invoke-RestMethod calls.
 		This is the main abstraction layer for public functions.
-	
+
 	.PARAMETER Method
 		The Rest Method to use when calling this function.
-	
+
 	.PARAMETER Parameters
 		The PSBoundParameters object. Will be passed online using PowerShell Serialization.
-	
+
 	.PARAMETER FunctionName
 		The name of the Azure Function to call.
 		This should always be the condensed name of the function.
@@ -22,23 +22,23 @@
 	param (
 		[string]
 		$Method,
-		
+
 		$Parameters,
-		
+
 		[string]
 		$FunctionName
 	)
-	
+
 	process
 	{
 		try { $uri = '{0}{1}' -f (Get-PSFConfigValue -FullName 'FortigateManager.Client.Uri' -NotNull), $FunctionName }
 		catch { $PSCmdlet.ThrowTerminatingError($_) }
 		$header = @{ }
-		
+
 		#region Authentication
 		$unprotectedToken = Get-PSFConfigValue -FullName 'FortigateManager.Client.UnprotectedToken'
 		$protectedToken = Get-PSFConfigValue -FullName 'FortigateManager.Client.ProtectedToken'
-		
+
 		$authenticationDone = $false
 		if ($protectedToken -and -not $authenticationDone)
 		{
@@ -55,8 +55,8 @@
 			throw "No Authentication configured!"
 		}
 		#endregion Authentication
-		
-		
+
+
 		@{
 			Method  = $Method
 			Uri	    = $uri
@@ -64,7 +64,7 @@
 			Body    = (@{
 				__SerializedParameters = ($Parameters | ConvertTo-PSFHashtable | ConvertTo-PSFClixml)
 				__PSSerialize		   = $true
-			} | ConvertTo-Json)
+			} | ConvertTo-Json -WarningAction SilentlyContinue)
 		}
 	}
 }
