@@ -109,9 +109,8 @@ To get a local copy up and running follow these simple steps.
 
 The releases are published in the Powershell Gallery, therefor it is quite simple:
   ```powershell
-  Install-Module FortiManager -Force -AllowClobber
+  Install-Module FortigateManager -Force
   ```
-The `AllowClobber` option is currently necessary because of an issue in the current PowerShellGet module. Hopefully it will not be needed in the future any more.
 
 <!-- USAGE EXAMPLES -->
 ## Usage
