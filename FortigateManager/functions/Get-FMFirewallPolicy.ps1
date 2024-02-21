@@ -148,9 +148,9 @@
         $addAttributesAsDate = @('first_hit', 'first_session', 'last_hit', 'last_session')
         Write-PSFMessage "Query hitcount statistics, statistics will be added as attributes: _byte, _first_hit, _first_session, _hitcount, _pkts, _sesscount, _first_hit, _first_session, _last_hit, _last_session"
         if($IncludeHitCountForce){
-            $hitCountData = Get-FMFirewallHitCount -Package $packageName -Force
+            $hitCountData = Get-FMFirewallHitCount -Package $Package -Force
         }else{
-            $hitCountData = Get-FMFirewallHitCount -Package $packageName
+            $hitCountData = Get-FMFirewallHitCount -Package $Package
         }
         Write-PSFMessage "Associating hitcount data to policy rules"
         $hitCountDataHash = @{}
