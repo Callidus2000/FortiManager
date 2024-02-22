@@ -59,6 +59,7 @@
 		'Get-FMAdomLockStatus'
 		'Get-FMAdomRevision'
 		'Get-FMADeviceInfo'
+		'Get-FMALogSearchStatus'
 		'Get-FMDeviceInfo'
 		'Get-FMFirewallHitCount'
 		'Get-FMFirewallPolicy'

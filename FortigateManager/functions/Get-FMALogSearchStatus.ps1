@@ -1,34 +1,29 @@
-﻿function Remove-FMALogSearch {
+﻿function Get-FMALogSearchStatus {
     <#
     .SYNOPSIS
-    Removes a log search task from a FortiAnalyzer instance.
+    Retrieves the status of a log search task from a FortiAnalyzer instance.
 
     .DESCRIPTION
-    The Remove-FMALogSearch function removes a specific log search task from a FortiAnalyzer instance.
-    It allows cleaning up log search tasks that are no longer needed.
+    The Get-FMALogSearchStatus function retrieves the status of a log search task from a FortiAnalyzer instance.
+    It allows checking the status of a specific log search task identified by its TaskId.
 
     .PARAMETER Connection
     Specifies the connection to the FortiAnalyzer instance. If not specified, it uses the last connection
     to an Analyzer obtained by Get-FMLastConnection.
 
     .PARAMETER ADOM
-    Specifies the administrative domain (ADOM) from which to remove the log search task.
+    Specifies the administrative domain (ADOM) from which to retrieve log search status.
 
     .PARAMETER EnableException
     Indicates whether exceptions should be enabled or not. By default, exceptions are enabled.
 
     .PARAMETER TaskId
-    Specifies the TaskId of the log search task to remove. This parameter is mandatory.
+    Specifies the TaskId of the log search task to retrieve the status for. This parameter is mandatory.
 
     .EXAMPLE
-    Remove-FMALogSearch -TaskId 123456
+    Get-FMALogSearchStatus -TaskId 123456
 
-    Removes the log search task with TaskId 123456.
-
-    .NOTES
-    Author: [Author Name]
-    Date: [Date]
-    Version: [Version]
+    Retrieves the status of the log search task with TaskId 123456.
     #>
     [CmdletBinding()]
     param (
@@ -40,16 +35,20 @@
         [long]$TaskId
     )
     $explicitADOM = Resolve-FMAdom -Connection $Connection -Adom $ADOM -EnableException $EnableException
-    Write-PSFMessage ($Parameter|convertto-json)
+    $parameter=@{
+        apiver=3
+    }
+    # Write-PSFMessage ($Parameter|convertto-json)
     $apiCallParameter = @{
         EnableException     = $EnableException
         Connection          = $Connection
-        LoggingAction       = "Remove-FMALogSearch"
+        LoggingAction       = "Get-FMALogSearchStatus"
         LoggingActionValues = $TaskId
-        method              = "delete"
-        Path                = "/logview/adom/$explicitADOM/logsearch/$TaskId"
+        method              = "get"
+        Path                = "/logview/adom/$explicitADOM/logsearch/count/$TaskId"
+        Parameter           = $parameter
     }
     $result = Invoke-FMAPI @apiCallParameter
     Write-PSFMessage "Result-Status: $($result.result.status)"
-    # return $result.result.tid
+    return $result.result
 }
