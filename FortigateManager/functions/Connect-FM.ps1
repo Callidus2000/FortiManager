@@ -23,6 +23,13 @@
     Possible Values 'CertificateCheck', 'HttpErrorCheck', 'HeaderValidation'.
     If neccessary by default for the connection set $connection.SkipCheck
 
+	.PARAMETER Type
+	To which type of endpoint server should the connection be established?
+	Manager -  FortiManager
+	Analyzer - Forti Analyzer
+	Connections of type 'manager' (default) are used for [Verb]-FM[Noun] commands,
+	type 'Analyzer' is needed for the [Verb]-FMA[Noun] commands
+
 	.PARAMETER EnableException
 	Should Exceptions been thrown?
 
@@ -56,31 +63,36 @@
 		$OldConnection,
 		[ValidateSet('CertificateCheck', 'HttpErrorCheck', 'HeaderValidation')]
 		[String[]]$SkipCheck,
+		[parameter(mandatory = $false, ParameterSetName = "credential")]
+		[ValidateSet("Manager", "Analyzer")]
+		[string]$Type = "Manager",
 		[bool]$EnableException = $true
 	)
 	begin {
-		if ($OldConnection){
+		if ($OldConnection) {
 			Write-PSFMessage "Getting parameters from existing (mistyped) Connection object"
-			$Url=$OldConnection.ServerRoot
+			$Url = $OldConnection.ServerRoot
 			$Credential = $OldConnection.credential
-			if ($OldConnection.SkipCheck){
+			if ($OldConnection.SkipCheck) {
 				$connection.SkipCheck
 			}
 			$additionalParams = $OldConnection.forti
 			if ($OldConnection.forti.defaultADOM) {
 				$ADOM = $OldConnection.forti.defaultADOM
 			}
-		}else{
+		}
+		else {
 			$additionalParams = @{
 				requestId       = 1
 				session         = $null
 				EnableException = $EnableException
+				ConnectionType  = $Type
 			}
 		}
 	}
 	end {
 		$connection = Get-ARAHConnection -Url $Url -APISubPath ""
-		if ($SkipCheck) { $connection.SkipCheck = $SkipCheck}
+		if ($SkipCheck) { $connection.SkipCheck = $SkipCheck }
 		Add-Member -InputObject $connection -MemberType NoteProperty -Name "forti" -Value $additionalParams
 		$connection.credential = $Credential
 		$connection.ContentType = "application/json;charset=UTF-8"
@@ -122,15 +134,16 @@
 				$this.forti.session = $result.session
 			}
 		}
-		switch ($PsCmdlet.ParameterSetName){
-			'credential'{
+		switch ($PsCmdlet.ParameterSetName) {
+			'credential' {
 				$connection.Refresh()
 			}
-			'oldConnection'{}
+			'oldConnection' {}
 		}
 		if ($connection.forti.session) {
 			Write-PSFMessage -string "Connect-FM.Connected"
-			Set-PSFConfig -Module 'FortigateManager' -Name 'LastConnection' -Value $connection -Description "Last known Connection" -AllowDelete
+			Write-PSFMessage "Saving last connection as Config LastConnection.$($connection.forti.ConnectionType)"
+			Set-PSFConfig -Module 'FortigateManager' -Name "LastConnection.$($connection.forti.ConnectionType)" -Value $connection -Description "Last known Connection" -AllowDelete
 			return $connection
 		}
 		Write-PSFMessage -string "Connect-FM.NotConnected" -Level Warning
