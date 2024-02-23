@@ -3,7 +3,7 @@
 	RootModule        = 'FortigateManager.psm1'
 
 	# Version number of this module.
-	ModuleVersion     = '2.3.1'
+	ModuleVersion     = '3.0.0'
 
 	# ID used to uniquely identify this module
 	GUID              = '6c74c0d7-80cf-4bef-8fe1-19ac4a89c438'
@@ -100,9 +100,9 @@
 		'Update-FMFirewallService'
 		'Update-FMInterface'
 
-		'Get-FMALogSearchStatus'
-		'Remove-FMALogSearch'
-		'Start-FMALogSearch'
+		# 'Get-FMALogSearchStatus'
+		# 'Remove-FMALogSearch'
+		# 'Start-FMALogSearch'
 	)
 
 	# Cmdlets to export from this module

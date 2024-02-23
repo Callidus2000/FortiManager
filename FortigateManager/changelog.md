@@ -27,3 +27,8 @@
 - Connect-FM allows to reconnect based on (de)serialized connection objects
 ### Changed
 - Version 2.3.0
+## 3.0.0 (2024-02-23)
+### Added
+- Search-FMALog for search a Forti Analyzer Logfile
+### Changed
+- Connect-FM allows to connect to a Forti Analyzer

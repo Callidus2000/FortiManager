@@ -58,6 +58,8 @@
     Starts a log search task for traffic logs on "Device1" within the last 5 hours.
     #>
     [CmdletBinding()]
+    [OutputType([int])]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessforStateChangingFunctions', '')]
     param (
         [parameter(Mandatory = $false)]
         $Connection = (Get-FMLastConnection -Type Analyzer),
@@ -93,6 +95,7 @@
         'logtype'    = "$Logtype"
         'time-order' = "$TimeOrder"
         'timezone'   = "$Timezone"
+        'case-sensitive' = "$CaseSensitive"
         'time-range' = @{
             start = $TimeRangeStart.ToString("yyyy-MM-dd'T'HH:mm:ssz")
             end   = $TimeRangeEnd.ToString("yyyy-MM-dd'T'HH:mm:ssz")

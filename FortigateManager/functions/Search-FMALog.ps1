@@ -26,6 +26,9 @@
     .PARAMETER Device
     Specifies the device(s) to search logs on. Use TabExpansion attribute to provide completion for FortiAnalyzer devices.
 
+    .PARAMETER Fields
+    Which log attributes should be returned?
+
     .PARAMETER Filter
     Specifies the filter to apply when searching logs. This is a filter string equal to the usage within the analyzer GUI
 
@@ -57,6 +60,7 @@
     Starts a log search task for traffic logs on "Device1" within the last 5 hours.
     #>
     [CmdletBinding()]
+    [OutputType([object[]])]
     param (
         [parameter(Mandatory = $false)]
         $Connection = (Get-FMLastConnection -Type Analyzer),
@@ -79,10 +83,12 @@
         [datetime]$TimeRangeEnd,
         [parameter(mandatory = $true, ParameterSetName = "timeSpan")]
         [timespan]$Last,
-        [string]$Timezone
+        [string]$Timezone,
+        [ValidateSet('date', 'time', 'id', 'itime', 'euid', 'epid', 'dsteuid', 'dstepid', 'logflag', 'logver', 'type', 'subtype', 'level', 'action', 'policyid', 'sessionid', 'srcip', 'dstip', 'srcport', 'dstport', 'trandisp', 'duration', 'proto', 'sentbyte', 'rcvdbyte', 'sentpkt', 'rcvdpkt', 'logid', 'service', 'app', 'appcat', 'srcintfrole', 'dstintfrole', 'srcserver', 'dstserver', 'policytype', 'eventtime', 'poluuid', 'srcmac', 'mastersrcmac', 'dstmac', 'masterdstmac', 'srchwvendor', 'srcswversion', 'dsthwvendor', 'dstswversion', 'devtype', 'osname', 'dstosname', 'srccountry', 'dstcountry', 'srcintf', 'dstintf', 'policyname', 'tz', 'devid', 'vd', 'dtime', 'itime_t', 'devname')]
+        [string[]]$Fields
     )
     $PageSize = 1000
-    $searchParam = $PSBoundParameters | ConvertTo-PSFHashtable #-Exclude PageSize
+    $searchParam = $PSBoundParameters | ConvertTo-PSFHashtable -Exclude Fields
     $taskId = start-fmalogsearch @searchParam
     if ($taskId -eq 0) {
         Stop-PSFFunction -Level Critical -Message "Could not obtain a taskId/start the logsearch"
@@ -105,8 +111,8 @@
         Path                = "/logview/adom/$explicitADOM/logsearch/$taskId"
         LoggingLevel        = "Verbose"
     }
-    # $dataCollector=[System.Collections.ArrayList]::new()
-    $dataCollector = @()
+    $dataCollector=[System.Collections.ArrayList]::new()
+    # $dataCollector = @()
     do {
         $currentStatus = Get-FMALogSearchStatus -TaskId $taskId -Connection $Connection -Adom $ADOM -LoggingLevel Verbose
         if ($currentStatus.status -and $currentStatus.status.code -ne 0) {
@@ -150,9 +156,15 @@
             return
         }
         $collectedRecords += $response.result."return-lines"
-        $dataCollector += $response.result.data
+        # TODO ArrayList
+        if($Fields){
+            [void]$dataCollector.AddRange(($response.result.data|Select-Object -Property $Fields))
+        }else{
+            [void]$dataCollector.AddRange($response.result.data)
+        }
+        # $dataCollector += $response.result.data
         $Parameter.Offset = $dataCollector.Count
         $apiCallParameter.LoggingActionValues = @($Parameter.limit, $Parameter.offset)
     }while (($dataCollector.Count -lt $maxRows) -and ($response.result.data.Count -gt 0) -and ($collectedRecords -lt $maxRows))
-    return $dataCollector
+    return $dataCollector.ToArray()
 }

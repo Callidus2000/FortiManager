@@ -31,6 +31,7 @@
     Version: [Version]
     #>
     [CmdletBinding()]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessforStateChangingFunctions', '')]
     param (
         [parameter(Mandatory = $false)]
         $Connection = (Get-FMLastConnection -Type Analyzer),

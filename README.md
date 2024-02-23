@@ -185,6 +185,9 @@ New plan:
 ### Part three
 As the module has the ability to read/create/add Firewall policy rules, why not import the new global rules directly from excel? No problem, just had to implement the functions around Firewall Services (**Get/Add/Update-FMFirewallService**). Voila, every necessary task can be automated.
 
+### Part four
+I needed detailed log access which is handled by a Forti Analyzer instance in our company. As the API structure is the same as for the manager I added the `Search-FMALog` function to this module in release v3.0.0.
+
 # Example code
 ```Powershell
 # Connect
@@ -219,6 +222,11 @@ If you need an overview of the existing commands use
 ```powershell
 # List available commands
 Get-Command -Module FortiManager
+```
+Connect to an Analyzer instance and search the logs for a specific device, last 1 hour, only specific fields:
+```powershell
+$faCon = Connect-FM -Credential (Get-Secret 'FortiAnalyzer') -Url myanalyzer.mycompany.com -Adom 'root' -Type Analyzer
+$logResults=Search-FMALog -Device CompFW001 -Logtype traffic -Last ([timespan]::FromHours(1)) -Fields action,policyid,policyname,srcip,dstip
 ```
 everything else is documented in the module itself.
 <!-- ROADMAP -->
