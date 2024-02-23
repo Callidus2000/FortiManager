@@ -59,7 +59,6 @@
 		'Get-FMAdomLockStatus'
 		'Get-FMAdomRevision'
 		'Get-FMADeviceInfo'
-		'Get-FMALogSearchStatus'
 		'Get-FMDeviceInfo'
 		'Get-FMFirewallHitCount'
 		'Get-FMFirewallPolicy'
@@ -84,16 +83,15 @@
 		'New-FMObjFirewallService'
 		'New-FMObjInterface'
 		'Publish-FMAdomChange'
-		'Start-FMALogSearch'
 		'Remove-FMAddress'
 		'Remove-FMAddressGroup'
 		'Remove-FMAdomRevision'
-		'Remove-FMALogSearch'
 		'Rename-FMAddress'
 		'Rename-FMAddressGroup'
 		'Rename-FMInterface'
 		'Remove-FMFirewallPolicy'
 		'Remove-FMInterface'
+		'Search-FMALog'
 		'Unlock-FMAdom'
 		'Update-FMAddress'
 		'Update-FMAddressGroup'
@@ -101,6 +99,10 @@
 		'Update-FMFirewallPolicy'
 		'Update-FMFirewallService'
 		'Update-FMInterface'
+
+		'Get-FMALogSearchStatus'
+		'Remove-FMALogSearch'
+		'Start-FMALogSearch'
 	)
 
 	# Cmdlets to export from this module

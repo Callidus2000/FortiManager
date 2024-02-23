@@ -109,6 +109,7 @@
         Path                = "/logview/adom/$explicitADOM/logsearch"
     }
     $result = Invoke-FMAPI @apiCallParameter
-    Write-PSFMessage "Result-Status: $($result.result.status)"
+    Write-PSFMessage "Result-Status:  $($result.result.status)"
+    Write-PSFMessage "Search Task-ID: $($result.result.tid)"
     return $result.result.tid
 }

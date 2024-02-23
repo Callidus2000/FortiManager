@@ -15,6 +15,7 @@
 	'APICall.Get-FMAdomLockStatus'           = '#{0}: Query current Lockstatus of ADOM {1}'
 	'APICall.Get-FMAdomRevision'             = '#{0}: Query existing revisions of ADOM {1}'
 	'APICall.Get-FMALogSearchStatus'         = '#{0}: Query status of logsearch task {1}'
+	'APICall.Get-FMALogSearchResults'        = '#{0}: Query log search results, Limit {1}, Offset {2}'
 	'APICall.Get-FMDeviceInfo'               = '#{0}: Query device Info of ADOM {1}'
 	'APICall.Get-FMFirewallPolicy'           = '#{0}: Query Firewall-Policy from ADOM {1}/Policy Package {2}'
 	'APICall.Get-FMFirewallService'          = '#{0}: Query Firewall-Services from ADOM {1}'
