@@ -84,36 +84,36 @@
         [timespan]$Last,
         [string]$Timezone
     )
-    if($Last){
-        $TimeRangeEnd=Get-Date
+    if ($Last) {
+        $TimeRangeEnd = Get-Date
         $TimeRangeStart = $TimeRangeEnd - $Last
     }
     $Parameter = @{
-        'apiver'     = $Apiver
-        'device'     = [array]($Device | ForEach-Object { @{devname =$_}})
-        'filter'     = "$Filter"
-        'logtype'    = "$Logtype"
-        'time-order' = "$TimeOrder"
-        'timezone'   = "$Timezone"
+        'apiver'         = $Apiver
+        'device'         = [array]($Device | ForEach-Object { @{devname = $_ } })
+        'filter'         = "$Filter"
+        'logtype'        = "$Logtype"
+        'time-order'     = "$TimeOrder"
+        'timezone'       = "$Timezone"
         'case-sensitive' = $CaseSensitive
-        'time-range' = @{
+        'time-range'     = @{
             start = $TimeRangeStart.ToString("yyyy-MM-dd'T'HH:mm:ssz")
             end   = $TimeRangeEnd.ToString("yyyy-MM-dd'T'HH:mm:ssz")
         }
     } | Remove-FMNullValuesFromHashtable -NullHandler "RemoveAttribute"
     $explicitADOM = Resolve-FMAdom -Connection $Connection -Adom $ADOM -EnableException $EnableException
-    Write-PSFMessage ($Parameter|convertto-json)
+    Write-PSFMessage ($Parameter | convertto-json)
     $apiCallParameter = @{
         EnableException     = $EnableException
         Connection          = $Connection
         LoggingAction       = "Start-FMALogSearch"
-        LoggingActionValues = @(($Device|join-string -Separator ','),$Filter)
+        LoggingActionValues = @(($Device | join-string -Separator ','), $Filter)
         method              = "add"
         Parameter           = $Parameter
         Path                = "/logview/adom/$explicitADOM/logsearch"
     }
     $result = Invoke-FMAPI @apiCallParameter
-    if ($result.result.status -and $result.result.status.code -ne 0){
+    if ($result.result.status -and $result.result.status.code -ne 0) {
         Stop-PSFFunction -Level Critical -Message "Could not obtain a taskId/start the logsearch, $($result.result.status|ConvertTo-Json -Compress)"
         return 0
     }
