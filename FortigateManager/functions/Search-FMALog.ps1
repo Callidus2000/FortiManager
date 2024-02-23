@@ -130,6 +130,11 @@
         Start-Sleep -Seconds $secondsRemaining
     }while ($currentStatus."progress-percent" -ne 100 )
     $maxRows = $currentStatus."matched-logs"
+    if ($maxRows -eq 0){
+        Write-PSFMessage -Level Warning -Message "Search did not return any data"
+        return
+    }
+    Write-PSFMessage -Level Host -Message "Fetching $maxRows rows of data"
     $collectedRecords = 0
     $i = 0
     do {
@@ -145,7 +150,7 @@
             $response = Invoke-FMAPI @apiCallParameter #-Verbose
             if ($response.result."return-lines" -eq 0) {
                 $retryCount++
-                if ($response.result."return-lines" -gt 15) {Start-Sleep -Seconds 1}
+                if ($retryCount -gt 15) { Start-Sleep -Seconds 1}
             }
         }until($response.result."return-lines" -gt 0 -or $retryCount -gt 40)
         if ($retryCount -gt 0) {
