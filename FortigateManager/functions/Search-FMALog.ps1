@@ -67,7 +67,7 @@
         [string]$ADOM,
         [bool]$EnableException = $true,
         [long]$Apiver = 3,
-        [bool]$CaseSensitive,
+        [bool]$CaseSensitive=$false,
         [parameter(mandatory = $true)]
         [PSFramework.TabExpansion.PsfArgumentCompleterAttribute("FortiAnalyzer.Devices")]
         [System.Object[]]$Device,

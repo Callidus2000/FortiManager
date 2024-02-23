@@ -95,7 +95,7 @@
         'logtype'    = "$Logtype"
         'time-order' = "$TimeOrder"
         'timezone'   = "$Timezone"
-        'case-sensitive' = "$CaseSensitive"
+        'case-sensitive' = $CaseSensitive
         'time-range' = @{
             start = $TimeRangeStart.ToString("yyyy-MM-dd'T'HH:mm:ssz")
             end   = $TimeRangeEnd.ToString("yyyy-MM-dd'T'HH:mm:ssz")
