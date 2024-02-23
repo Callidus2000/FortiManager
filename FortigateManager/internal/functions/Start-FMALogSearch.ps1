@@ -6,6 +6,7 @@
     .DESCRIPTION
     The Start-FMALogSearch function initiates a log search task on a FortiAnalyzer instance. It allows searching logs
     based on specified criteria such as devices, log types, time range, etc.
+    If successful the function returns the taskId of the logsearch, otherwise 0
 
     .PARAMETER Connection
     Specifies the connection to the FortiAnalyzer instance. If not specified, it uses the last connection
@@ -109,6 +110,10 @@
         Path                = "/logview/adom/$explicitADOM/logsearch"
     }
     $result = Invoke-FMAPI @apiCallParameter
+    if ($result.result.status -and $result.result.status.code -ne 0){
+        Stop-PSFFunction -Level Critical -Message "Could not obtain a taskId/start the logsearch, $($result.result.status|ConvertTo-Json -Compress)"
+        return 0
+    }
     Write-PSFMessage "Result-Status:  $($result.result.status)"
     Write-PSFMessage "Search Task-ID: $($result.result.tid)"
     return $result.result.tid

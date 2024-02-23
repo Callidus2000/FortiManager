@@ -81,15 +81,20 @@
         [timespan]$Last,
         [string]$Timezone
     )
-    $searchParam=$PSBoundParameters|ConvertTo-PSFHashtable
-    $taskId=start-fmalogsearch @searchParam
-        $Parameter = @{
-        'apiver'     = $Apiver
-        "limit"  = 1000
+    $PageSize = 1000
+    $searchParam = $PSBoundParameters | ConvertTo-PSFHashtable #-Exclude PageSize
+    $taskId = start-fmalogsearch @searchParam
+    if ($taskId -eq 0) {
+        Stop-PSFFunction -Level Critical -Message "Could not obtain a taskId/start the logsearch"
+        return
+    }
+    $Parameter = @{
+        'apiver' = $Apiver
+        "limit"  = $PageSize
         "offset" = 0
     } | Remove-FMNullValuesFromHashtable -NullHandler "RemoveAttribute"
     $explicitADOM = Resolve-FMAdom -Connection $Connection -Adom $ADOM -EnableException $EnableException
-    Write-PSFMessage ($Parameter|convertto-json)
+    Write-PSFMessage ($Parameter | convertto-json)
     $apiCallParameter = @{
         EnableException     = $EnableException
         Connection          = $Connection
@@ -98,12 +103,18 @@
         method              = "get"
         Parameter           = $Parameter
         Path                = "/logview/adom/$explicitADOM/logsearch/$taskId"
+        LoggingLevel        = "Verbose"
     }
     # $dataCollector=[System.Collections.ArrayList]::new()
-    $dataCollector=@()
-    do{
-        $currentStatus = Get-FMALogSearchStatus -TaskId $taskId -Connection $Connection -Adom $ADOM
-        if ([string]::IsNullOrEmpty($currentStatus)){
+    $dataCollector = @()
+    do {
+        $currentStatus = Get-FMALogSearchStatus -TaskId $taskId -Connection $Connection -Adom $ADOM -LoggingLevel Verbose
+        if ($currentStatus.status -and $currentStatus.status.code -ne 0) {
+            Stop-PSFFunction -Level Critical -Message "Error while querying the current logsearch status, $($currentStatus.status|ConvertTo-Json -Compress)"
+            return
+        }
+
+        if ([string]::IsNullOrEmpty($currentStatus)) {
             Stop-PSFFunction -Level Critical -Message "No current count status available for taskId $taskId" -EnableException $EnableException
             return
         }
@@ -113,53 +124,35 @@
         Start-Sleep -Seconds $secondsRemaining
     }while ($currentStatus."progress-percent" -ne 100 )
     $maxRows = $currentStatus."matched-logs"
-    Write-Host "`$maxRows=$maxRows"
-    $collectedRecords=0
-    $i=0
+    $collectedRecords = 0
+    $i = 0
     do {
         $i++
         $remainingRecords = $maxRows - $dataCollector.Count
-        if ($remainingRecords -lt $apiCallParameter.Parameter.limit){
+        if ($remainingRecords -lt $apiCallParameter.Parameter.limit) {
             $apiCallParameter.Parameter.limit = $remainingRecords
         }
-        Write-Progress -Activity "Getting logdata" -PercentComplete ($dataCollector.Count / $maxRows/100)
-        write-host "`$apiCallParameter=$($apiCallParameter|ConvertTo-PSFHashtable -Include Path,Parameter,LoggingActionValues | ConvertTo-Json )"
-        $retryCount=0
-        do{
-            $response = Invoke-FMAPI @apiCallParameter -Verbose
-            if ($response.result."return-lines" -eq 0){
+        $percentCompleted = [int]($dataCollector.Count / $maxRows * 100)
+        Write-Progress -Activity "Getting logdata" -PercentComplete $percentCompleted -Status "$percentCompleted% completed, $($dataCollector.Count) rows fetched"
+        $retryCount = 0
+        do {
+            $response = Invoke-FMAPI @apiCallParameter #-Verbose
+            if ($response.result."return-lines" -eq 0) {
                 $retryCount++
-                Start-Sleep -Seconds 1
+                if ($response.result."return-lines" -gt 15) {Start-Sleep -Seconds 1}
             }
-        }until($response.result."return-lines" -gt 0 -or $retryCount -gt 10)
-        if($retryCount -gt 0){
-            Write-PSFMessage "Needed $retryCount retries before the API provided data" -Level Warning
+        }until($response.result."return-lines" -gt 0 -or $retryCount -gt 40)
+        if ($retryCount -gt 0) {
+            Write-PSFMessage "Needed $retryCount retries before the API provided data" -Level Debug
+        }
+        if ($retryCount -gt 40) {
+            Stop-PSFFunction -Message "Needed $retryCount retries before the API provided data" -Level Error
+            return
         }
         $collectedRecords += $response.result."return-lines"
-        write-host "`$response=$($response | convertto-json -Depth 1 -Compress)"
-        write-host "`$collectedRecords=$collectedRecords"
-        write-host "data.count=$($response.result.data.count)"
-        # [void]$dataCollector.AddRange($response.result.data)
-        Write-Host "`$dataCollector.count="$($dataCollector.count)
-        $dataCollector+=$response.result.data
-        Write-Host "`$dataCollector.count="$($dataCollector.count)
+        $dataCollector += $response.result.data
         $Parameter.Offset = $dataCollector.Count
         $apiCallParameter.LoggingActionValues = @($Parameter.limit, $Parameter.offset)
-        write-host "(`$dataCollector.Count -lt `$maxRows)=$($dataCollector.Count -lt $maxRows)"
-        write-host "(`$response.result.data.Count -gt 0)=$($response.result.data.Count -gt 0)"
-        write-host "(`$collectedRecords -lt `$maxRows)=$($collectedRecords -lt $maxRows)"
-        # write-host "(`$i -lt 5)=$($i -lt 5)"
-        Write-Host "`$maxRows=$maxRows"
     }while (($dataCollector.Count -lt $maxRows) -and ($response.result.data.Count -gt 0) -and ($collectedRecords -lt $maxRows))
-    # Remove-FMALogSearch -TaskId $taskId
-    # total-logs           : 29246891
-    # scanned-logs         : 24320638
-    # matched-logs         : 1479712
-    # elapsed-time-ms      : 9225
-    # estimated-remain-sec : 1
-    # progress-percent     : 82
-    # $result = Invoke-FMAPI @apiCallParameter
-    # Write-PSFMessage "Result-Status: $($result.result.status)"
-    # return $result.result.tid
     return $dataCollector
 }

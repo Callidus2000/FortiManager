@@ -20,6 +20,10 @@
     .PARAMETER TaskId
     Specifies the TaskId of the log search task to retrieve the status for. This parameter is mandatory.
 
+    .PARAMETER LoggingLevel
+    On which level should die diagnostic Messages be logged?
+    Defaults to PSFConfig "FortigateManager.Logging.Api"
+
     .EXAMPLE
     Get-FMALogSearchStatus -TaskId 123456
 
@@ -32,7 +36,9 @@
         [string]$ADOM,
         [bool]$EnableException = $true,
         [parameter(mandatory = $true)]
-        [long]$TaskId
+        [long]$TaskId,
+        [ValidateSet("Critical", "Important", "Output", "Host", "Significant", "VeryVerbose", "Verbose", "SomewhatVerbose", "System", "Debug", "InternalComment", "Warning")]
+        [string]$LoggingLevel = (Get-PSFConfigValue -FullName "FortigateManager.Logging.Api" -Fallback "Verbose")
     )
     $explicitADOM = Resolve-FMAdom -Connection $Connection -Adom $ADOM -EnableException $EnableException
     $parameter=@{
@@ -47,6 +53,7 @@
         method              = "get"
         Path                = "/logview/adom/$explicitADOM/logsearch/count/$TaskId"
         Parameter           = $parameter
+        LoggingLevel        = $LoggingLevel
     }
     $result = Invoke-FMAPI @apiCallParameter
     Write-PSFMessage "Result-Status: $($result.result.status)"
