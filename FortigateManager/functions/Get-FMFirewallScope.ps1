@@ -70,6 +70,6 @@
         "False|True" { $result = $availableScopes | Where-Object { $_.name -in $DeviceName } }
         "True|False" { $result = $availableScopes | Where-Object { $_.VDOM -in $VDOM } }
     }
-    # Write-PSFMessage "`$result = $($result |ConvertTo-Json)"
+    # Write-PSFMessage "`$result = $($result | ConvertTo-Json -WarningAction SilentlyContinue)"
     return $result
 }

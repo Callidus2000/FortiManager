@@ -97,10 +97,10 @@
             return
         }
     }
-    if ($Method -in @("set", "add", "update", "delete", "move", "clone")){
+    if ($connection.forti.ConnectionType -eq 'Manager' -and $Method -in @("set", "add", "update", "delete", "move", "clone")) {
         Write-PSFMessage "Performing API call with change character, determin revisionNote"
-        $RevisionNote=Resolve-FMRevisionNote -RevisionNote $RevisionNote -EnableException $EnableException -Connection $Connection
-        if ($null -eq $RevisionNote){
+        $RevisionNote = Resolve-FMRevisionNote -RevisionNote $RevisionNote -EnableException $EnableException -Connection $Connection
+        if ($null -eq $RevisionNote) {
             Stop-PSFFunction -Message "RevisionNote is needed, provide it for the API-Call or while locking the ADOM" -EnableException $EnableException
             return
         }
@@ -127,19 +127,23 @@
             "verbose" = 1
         }
     }
+    if ($connection.forti.ConnectionType -eq 'Analyzer') {
+        $apiCallParameter.Body.jsonrpc = "2.0"
+    }
     if ($Parameter) {
         # $global:hubba = $apiCallParameter
         $Parameter | ForEach-Object {
-            $hashTableClone=$_|ConvertTo-PSFHashtable
+            $hashTableClone = $_ | ConvertTo-PSFHashtable
             if ([string]::IsNullOrEmpty($hashTableClone.url)) { $hashTableClone.url = $Path }
             $apiCallParameter.body.params += $hashTableClone
         }
         # $apiCallParameter.body.params[0]+=$Parameter
-    }else{
+    }
+    else {
         # No parameter given, use only the $Path url
         $apiCallParameter.body.params += @{}
     }
-    if (-not [string]::IsNullOrEmpty($Path)){
+    if (-not [string]::IsNullOrEmpty($Path)) {
         $apiCallParameter.body.params | ForEach-Object {
             if ([string]::IsNullOrEmpty($_.url)) { $_.url = $Path }
         }
@@ -147,12 +151,12 @@
     if ([string]::IsNullOrEmpty($RevisionNote) -eq $false) {
         Write-PSFMessage "Adding RevisionNote '$RevisionNote' to all parameters"
         $apiCallParameter.body.params | ForEach-Object {
-            $_."revision note"=$RevisionNote
+            $_."revision note" = $RevisionNote
         }
     }
     # $apiCallParameter.Body.params[0].url=$Path
     # Invoke-PSFProtectedCommand -ActionString "APICall.$LoggingAction" -ActionStringValues $Url -Target $Url -ScriptBlock {
-    Invoke-PSFProtectedCommand -ActionString "APICall.$LoggingAction" -ActionStringValues (,$requestId+$LoggingActionValues) -ScriptBlock {
+    Invoke-PSFProtectedCommand -ActionString "APICall.$LoggingAction" -ActionStringValues (, $requestId + $LoggingActionValues) -ScriptBlock {
         $result = Invoke-ARAHRequest @apiCallParameter #-PagingHandler 'FM.PagingHandler'
         # if ($null -eq $result) {
         #     Stop-PSFFunction -Message "ADOM could not be locked" -EnableException $EnableException -AlwaysWarning
@@ -164,11 +168,13 @@
             Stop-PSFFunction -Message "No Result delivered" -EnableException $true
             return $false
         }
-        $statusCode = $result.result.status.code
-        if ($statusCode -ne 0) {
-            Stop-PSFFunction -Message "API-Error, statusCode: $statusCode, Message $($result.result.status.Message)" -EnableException $EnableException -StepsUpward 3 #-AlwaysWarning
+        if ($connection.forti.ConnectionType -eq 'Manager') {
+            $statusCode = $result.result.status.code
+            if ($statusCode -ne 0) {
+                Stop-PSFFunction -Message "API-Error, statusCode: $statusCode, Message $($result.result.status.Message)" -EnableException $EnableException -StepsUpward 3 #-AlwaysWarning
+            }
         }
-        $connection.forti.lastApiAccessDate=Get-Date
+        $connection.forti.lastApiAccessDate = Get-Date
         return $result
 
         # } -PSCmdlet $PSCmdlet  -EnableException $EnableException -Level (Get-PSFConfigValue -FullName "FortigateManager.Logging.Api" -Fallback "Verbose")

@@ -84,7 +84,7 @@
     }
     # $Scope = Get-FMDeviceInfo -Connection $connection -Option 'object member' | Select-Object -ExpandProperty "object member" | Where-Object { $_.vdom } | ConvertTo-PSFHashtable -Include name, vdom -Remap @{name = 'device' }
     foreach ($device in $Scope) {
-        Write-PSFMessage "Query Device $($device|ConvertTo-Json -Compress)"
+        Write-PSFMessage "Query Device $($device| ConvertTo-Json -WarningAction SilentlyContinue -Compress)"
         $apiCallParameter = @{
             EnableException     = $EnableException
             LoggingAction       = "Undocumented"
@@ -96,7 +96,7 @@
         }
         $device.vlanHash = @{}
 
-        $currentInterfaces = Invoke-FMAPI @apiCallParameter # | ConvertTo-Json -Depth 6
+        $currentInterfaces = Invoke-FMAPI @apiCallParameter # | ConvertTo-Json -WarningAction SilentlyContinue -Depth 6
         foreach ($interface in $currentInterfaces.result.data) {
             $name = $interface.name
             $device.vlanHash.$name = $interface.ip
@@ -144,13 +144,13 @@
             }
             $queryData.zone = $localZoneName | convertto-fmurlpart
             $apiCallParameter.path = $singleDeviceVdomURL | Merge-FMStringHashMap -Data $queryData
-            Write-PSFMessage "`$queryData=$($queryData|ConvertTo-Json -compress), Path=$($apiCallParameter.path)"
+            Write-PSFMessage "`$queryData=$($queryData| ConvertTo-Json -WarningAction SilentlyContinue -compress), Path=$($apiCallParameter.path)"
             try {
                 $result = Invoke-FMAPI @apiCallParameter
                 Write-PSFMessage "Found"
                 $interfaceList = $result.result.data.interface
-                # Write-PSFMessage "Query: $($queryData|ConvertTo-Json -compress), Results: $($result|ConvertTo-Json -Depth 4)"
-                Write-PSFMessage "interfaceList for $($queryData|ConvertTo-Json -compress): $($interfaceList -join ',')"
+                # Write-PSFMessage "Query: $($queryData| ConvertTo-Json -WarningAction SilentlyContinue -compress), Results: $($result| ConvertTo-Json -WarningAction SilentlyContinue -Depth 4)"
+                Write-PSFMessage "interfaceList for $($queryData| ConvertTo-Json -WarningAction SilentlyContinue -compress): $($interfaceList -join ',')"
                 foreach ($interface in $interfaceList) {
                     $vlanIP = $queryData.vlanHash.$interface
                     if ($vlanIP[1] -eq '0.0.0.0') {
@@ -182,10 +182,10 @@
 
             }
             catch {
-                Write-PSFMessage "Zone does not exist for $($queryData|Select-Object name,vdom|ConvertTo-Json -Compress)"
+                Write-PSFMessage "Zone does not exist for $($queryData|Select-Object name,vdom| ConvertTo-Json -WarningAction SilentlyContinue -Compress)"
             }
         }
     }
-    # Write-PSFMessage "`$returnValue=$($returnValue|ConvertTo-Json)"        # $localizedInterfaceHashMap | json
+    # Write-PSFMessage "`$returnValue=$($returnValue| ConvertTo-Json -WarningAction SilentlyContinue)"        # $localizedInterfaceHashMap | json
     return $returnValue
 }

@@ -53,7 +53,7 @@
                 $repeat=$true
             }
             elseif (($result.result.data.num_err) -gt 0) {
-                Write-PSFMessage "Task-Error: $($result.result.data |ConvertTo-Json)"
+                Write-PSFMessage "Task-Error: $($result.result.data | ConvertTo-Json -WarningAction SilentlyContinue)"
                 if($EnableException){
                     throw "Task Error"
                 }

@@ -14,7 +14,7 @@
  - Added functionality:
    - ADOM revisions can be created/queried/removed
    - Merge-FMStringHashMap  
-     Helper funtion to replace placeholders in an url with values from a hashtable.
+     Helper function to replace placeholders in an url with values from a hashtable.
    - Convert-FMZone2VLAN  
      Converts an interface from a firewall policy to the addresses of the physical interfaces/vlan on the relevant devices.
    - Get-FMFirewallScope  
@@ -22,3 +22,13 @@
 ## 2.2.1 (2023-01-18)
  - Added Parameter SkipCheck to Connect-FM  
    Allows e.g. to skip SSL checks while performing the HTTP requests
+## 2.3.0 (2023-05-26)
+### Added
+- Connect-FM allows to reconnect based on (de)serialized connection objects
+### Changed
+- Version 2.3.0
+## 3.0.0 (2024-02-23)
+### Added
+- Search-FMALog for search a Forti Analyzer Logfile
+### Changed
+- Connect-FM allows to connect to a Forti Analyzer

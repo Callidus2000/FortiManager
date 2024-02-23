@@ -162,7 +162,7 @@ Describe  "Tests around address group objects" {
         It "Add member to first scope" {
             Update-FMAddressGroupMember -Name $addrGrpName -Action add -Member $addrNames[0] -Scope $firstScope
             $addrGrp = Get-FMAddressGroup -Filter "name -eq $addrGrpName"
-            Write-PSFMessage -Level Host "`$addrGrp=$($addrGrp|ConvertTo-Json -Depth 5)"
+            Write-PSFMessage -Level Host "`$addrGrp=$($addrGrp| ConvertTo-Json -WarningAction SilentlyContinue -Depth 5)"
             $addrGrp.dynamic_mapping | Should -HaveCount 1
         }
         It "Add member to all available scopes" {
@@ -170,7 +170,7 @@ Describe  "Tests around address group objects" {
             Update-FMAddressGroupMember -Name $addrGrpName -Action add -Member $addrNames[1] -Scope "*" #-Debug
             Write-Host "ReqId2: $($connection.forti.requestId)"
             $addrGrp = Get-FMAddressGroup -Filter "name -eq $addrGrpName"
-            Write-PSFMessage -Level Host "`$addrGrp=$($addrGrp|ConvertTo-Json -Depth 5)"
+            Write-PSFMessage -Level Host "`$addrGrp=$($addrGrp| ConvertTo-Json -WarningAction SilentlyContinue -Depth 5)"
             $addrGrp.dynamic_mapping | Should -HaveCount $allScopes.count
             foreach ($mapping in $addrGrp.dynamic_mapping) {
                 $mapping.member | Should -Contain $addrNames[1]
