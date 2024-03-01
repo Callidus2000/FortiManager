@@ -40,7 +40,7 @@
 	'APICall.Rename-FMAddress'               = '#{0}: Renaming {1} addresses in ADOM {2}'
 	'APICall.Rename-FMAddressGroup'          = '#{0}: Renaming {1} addressgroups in ADOM {2}'
 	'APICall.Rename-FMInterface'             = '#{0}: Renaming {1} interfaces in ADOM {2}'
-	'APICall.Start-FMALogSearch'             = '#{0}: Starting LogSerach on Device {1} with filter "{2}"'
+	'APICall.Start-FMALogSearch'             = '#{0}: Starting LogSearch on Device {1} with filter "{2}", Time-Range {3} until {4}'
 	'APICall.Unlock-FMAdom'                  = '#{0}: Unlocking ADOM {1}'
 	'APICall.Update-FMAddress'               = '#{0}: Updating {1} addresses in ADOM {2}, additional -Name: {3}'
 	'APICall.Update-FMAddressGroup'          = '#{0}: Updating {1} addressgroups in ADOM {2}, additional -Name: {3}'

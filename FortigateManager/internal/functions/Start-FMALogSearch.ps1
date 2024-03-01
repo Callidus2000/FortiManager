@@ -79,15 +79,19 @@
         [parameter(mandatory = $true, ParameterSetName = "timeRange")]
         [datetime]$TimeRangeStart,
         [parameter(mandatory = $true, ParameterSetName = "timeRange")]
-        [datetime]$TimeRangeEnd,
+                [datetime]$TimeRangeEnd,
         [parameter(mandatory = $true, ParameterSetName = "timeSpan")]
         [timespan]$Last,
-        [string]$Timezone
+                [string]$Timezone
     )
-    if ($Last) {
+        if ($Last) {
         $TimeRangeEnd = Get-Date
         $TimeRangeStart = $TimeRangeEnd - $Last
     }
+    $timeRange=@{
+            start = $TimeRangeStart.ToString("yyyy-MM-dd'T'HH:mm:ssz")
+            end   = $TimeRangeEnd.ToString("yyyy-MM-dd'T'HH:mm:ssz")
+        }
     $Parameter = @{
         'apiver'         = $Apiver
         'device'         = [array]($Device | ForEach-Object { @{devname = $_ } })
@@ -96,10 +100,7 @@
         'time-order'     = "$TimeOrder"
         'timezone'       = "$Timezone"
         'case-sensitive' = $CaseSensitive
-        'time-range'     = @{
-            start = $TimeRangeStart.ToString("yyyy-MM-dd'T'HH:mm:ssz")
-            end   = $TimeRangeEnd.ToString("yyyy-MM-dd'T'HH:mm:ssz")
-        }
+        'time-range'     = $timeRange
     } | Remove-FMNullValuesFromHashtable -NullHandler "RemoveAttribute"
     $explicitADOM = Resolve-FMAdom -Connection $Connection -Adom $ADOM -EnableException $EnableException
     Write-PSFMessage ($Parameter | convertto-json)
@@ -107,7 +108,7 @@
         EnableException     = $EnableException
         Connection          = $Connection
         LoggingAction       = "Start-FMALogSearch"
-        LoggingActionValues = @(($Device | join-string -Separator ','), $Filter)
+        LoggingActionValues = @(($Device | join-string -Separator ','), $Filter, $timeRange.start, $timeRange.end)
         method              = "add"
         Parameter           = $Parameter
         Path                = "/logview/adom/$explicitADOM/logsearch"
