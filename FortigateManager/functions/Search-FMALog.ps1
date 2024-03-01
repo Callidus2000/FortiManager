@@ -163,9 +163,9 @@
         $collectedRecords += $response.result."return-lines"
         # TODO ArrayList
         if($Fields){
-            [void]$dataCollector.AddRange(($response.result.data|Select-Object -Property $Fields))
+            [void]$dataCollector.AddRange(([array]($response.result.data | Select-Object -Property $Fields)))
         }else{
-            [void]$dataCollector.AddRange($response.result.data)
+            [void]$dataCollector.AddRange(([array]($response.result.data)))
         }
         # $dataCollector += $response.result.data
         $Parameter.Offset = $dataCollector.Count
