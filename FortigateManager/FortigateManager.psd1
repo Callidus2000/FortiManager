@@ -100,9 +100,9 @@
 		'Update-FMFirewallService'
 		'Update-FMInterface'
 
-		# 'Get-FMALogSearchStatus'
-		# 'Remove-FMALogSearch'
-		# 'Start-FMALogSearch'
+		'Get-FMALogSearchStatus'
+		'Remove-FMALogSearch'
+		'Start-FMALogSearch'
 	)
 
 	# Cmdlets to export from this module

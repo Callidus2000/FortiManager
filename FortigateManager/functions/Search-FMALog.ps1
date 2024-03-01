@@ -68,7 +68,7 @@
         [bool]$EnableException = $true,
         [long]$Apiver = 3,
         [bool]$CaseSensitive=$false,
-        [parameter(mandatory = $true)]
+        [parameter(mandatory = $false)]
         [PSFramework.TabExpansion.PsfArgumentCompleterAttribute("FortiAnalyzer.Devices")]
         [System.Object[]]$Device,
         [string]$Filter,
@@ -78,17 +78,96 @@
         [ValidateSet('desc', 'asc')]
         [string]$TimeOrder,
         [parameter(mandatory = $true, ParameterSetName = "timeRange")]
+        [parameter(mandatory = $true, ParameterSetName = "timeSpanFromStart")]
+        [parameter(mandatory = $true, ParameterSetName = "MaxLogCountFromStart")]
         [datetime]$TimeRangeStart,
         [parameter(mandatory = $true, ParameterSetName = "timeRange")]
+        [parameter(mandatory = $true, ParameterSetName = "timeSpanUntilEnd")]
+        [parameter(mandatory = $true, ParameterSetName = "MaxLogCountUntilEnd")]
         [datetime]$TimeRangeEnd,
+        [parameter(mandatory = $true, ParameterSetName = "timeSpanUntilEnd")]
+        [parameter(mandatory = $true, ParameterSetName = "timeSpanFromStart")]
         [parameter(mandatory = $true, ParameterSetName = "timeSpan")]
         [timespan]$Last,
+        [parameter(mandatory = $true, ParameterSetName = "MaxLogCountUntilEnd")]
+        [parameter(mandatory = $true, ParameterSetName = "MaxLogCountFromStart")]
+        [parameter(mandatory = $true, ParameterSetName = "MaxLogCount")]
+        [long]$TargetLogCount,
         [string]$Timezone,
         [ValidateSet('date', 'time', 'id', 'itime', 'euid', 'epid', 'dsteuid', 'dstepid', 'logflag', 'logver', 'type', 'subtype', 'level', 'action', 'policyid', 'sessionid', 'srcip', 'dstip', 'srcport', 'dstport', 'trandisp', 'duration', 'proto', 'sentbyte', 'rcvdbyte', 'sentpkt', 'rcvdpkt', 'logid', 'service', 'app', 'appcat', 'srcintfrole', 'dstintfrole', 'srcserver', 'dstserver', 'policytype', 'eventtime', 'poluuid', 'srcmac', 'mastersrcmac', 'dstmac', 'masterdstmac', 'srchwvendor', 'srcswversion', 'dsthwvendor', 'dstswversion', 'devtype', 'osname', 'dstosname', 'srccountry', 'dstcountry', 'srcintf', 'dstintf', 'policyname', 'tz', 'devid', 'vd', 'dtime', 'itime_t', 'devname')]
         [string[]]$Fields
     )
     $PageSize = 1000
-    $searchParam = $PSBoundParameters | ConvertTo-PSFHashtable -Exclude Fields
+    # if ($PSCmdlet.ParameterSetName -eq )
+    $searchParam = $PSBoundParameters | ConvertTo-PSFHashtable -Exclude Fields, TargetLogCount,Last
+    if ($PSCmdlet.ParameterSetName -ne 'timeRange'){
+        $tempHash = $PSBoundParameters | ConvertTo-PSFHashtable -Include TimeRangeStart, TimeRangeEnd, TargetLogCount, Last -IncludeEmpty
+        $tempHash.last = $tempHash.last.ToString("g")
+        Write-PSFMessage "Calculate TimeRangeStart and TimeRangeEnd from $($tempHash|ConvertTo-Json -Compress)"
+    }
+    switch -regex ($PSCmdlet.ParameterSetName){
+        'timeSpan$'{
+            $searchParam.TimeRangeEnd = Get-Date
+            $searchParam.TimeRangeStart = $searchParam.TimeRangeEnd - $Last
+        }
+        'timeSpanUntilEnd' {
+            $searchParam.TimeRangeStart = $searchParam.TimeRangeEnd - $Last
+        }
+        'timeSpanFromStart' {
+            $searchParam.TimeRangeEnd = $searchParam.TimeRangeStart + $Last
+        }
+        'MaxLogCount' {
+            $searchWindowDuration = Get-PSFConfigValue -FullName 'FortigateManager.Search.DefaultMaxRowDuration'
+        }
+        'MaxLogCount$' {
+            $searchParam.TimeRangeEnd = Get-Date
+            $searchParam.TimeRangeStart = $searchParam.TimeRangeEnd - $searchWindowDuration
+        }
+        'MaxLogCountUntilEnd' {
+            $searchParam.TimeRangeStart = $searchParam.TimeRangeEnd - $searchWindowDuration
+        }
+        'MaxLogCountFromStart' {
+            $searchParam.TimeRangeEnd = Get-Date
+            $searchParam.TimeRangeStart = $searchParam.TimeRangeEnd - $searchWindowDuration
+        }
+    }
+    if ($PSCmdlet.ParameterSetName -match 'MaxLogCount') {
+        Write-PSFMessage "Performing initial search for duration of $searchWindowDuration"
+        $taskId = start-fmalogsearch @searchParam
+         if($taskId -eq 0) {
+            Stop-PSFFunction -Level Critical -Message "Could not obtain a taskId/start the logsearch"
+            return
+        }
+        $currentStatus = Get-FMALogSearchStatus -TaskId $taskId -Connection $Connection -Adom $ADOM -LoggingLevel Verbose -Wait
+        Remove-FMALogSearch -TaskId $taskId
+        # Applying the Rule of three
+        $matchedLogs = $currentStatus."matched-logs"
+        if ($matchedLogs -eq 0){
+            Write-PSFMessage "Found 0 logs in timespan $($searchWindowDuration.ToString('g')), cannot auto adjust" -Level Warning
+        }
+        $timeMultiplier=$TargetLogCount/$matchedLogs
+        $usedDurationInSeconds = $searchWindowDuration.TotalSeconds
+        $neededSeconds = $usedDurationInSeconds * $timeMultiplier
+        $newSearchWindowDuration=[timespan]::FromSeconds([long]$neededSeconds)
+        Write-PSFMessage "Found $matchedLogs logs in timespan $($searchWindowDuration.ToString('g')), Esteminated $($newSearchWindowDuration.ToString('g')) needed for gathering $TargetLogCount logs"
+        switch -regex ($PSCmdlet.ParameterSetName) {
+            'MaxLogCount$' {
+                $searchParam.TimeRangeEnd = Get-Date
+                $searchParam.TimeRangeStart = $searchParam.TimeRangeEnd - $newSearchWindowDuration
+            }
+            'MaxLogCountUntilEnd' {
+                $searchParam.TimeRangeStart = $searchParam.TimeRangeEnd - $newSearchWindowDuration
+            }
+            'MaxLogCountFromStart' {
+                $searchParam.TimeRangeEnd = Get-Date
+                $searchParam.TimeRangeStart = $searchParam.TimeRangeEnd - $newSearchWindowDuration
+            }
+        }
+    }
+    if ($PSCmdlet.ParameterSetName -ne 'timeRange') {
+        Write-PSFMessage "Result of calculation: $($searchParam | ConvertTo-PSFHashtable -Include TimeRangeStart,TimeRangeEnd|ConvertTo-Json -Compress)"
+    }
+    # return
     $taskId = start-fmalogsearch @searchParam
     if ($taskId -eq 0) {
         Stop-PSFFunction -Level Critical -Message "Could not obtain a taskId/start the logsearch"
@@ -113,22 +192,9 @@
     }
     $dataCollector=[System.Collections.ArrayList]::new()
     # $dataCollector = @()
-    do {
-        $currentStatus = Get-FMALogSearchStatus -TaskId $taskId -Connection $Connection -Adom $ADOM -LoggingLevel Verbose
-        if ($currentStatus.status -and $currentStatus.status.code -ne 0) {
-            Stop-PSFFunction -Level Critical -Message "Error while querying the current logsearch status, $($currentStatus.status|ConvertTo-Json -Compress)"
-            return
-        }
+    $retryCount=Get-PSFConfigValue -FullName 'FortigateManager.Analyzer.RetryCountForStatus' -Fallback 4
+    $currentStatus = Get-FMALogSearchStatus -TaskId $taskId -Connection $Connection -Adom $ADOM -LoggingLevel Verbose -Wait
 
-        if ([string]::IsNullOrEmpty($currentStatus)) {
-            Stop-PSFFunction -Level Critical -Message "No current count status available for taskId $taskId" -EnableException $EnableException
-            return
-        }
-        $secondsRemaining = ($currentStatus."estimated-remain-sec" + 1)
-        Write-Progress -Activity "Waiting for logsearch to be finished" -SecondsRemaining $secondsRemaining
-        Write-PSFMessage "`$currentStatus=$($currentStatus|ConvertTo-Json -Compress)"
-        Start-Sleep -Seconds $secondsRemaining
-    }while ($currentStatus."progress-percent" -ne 100 )
     $maxRows = $currentStatus."matched-logs"
     if ($maxRows -eq 0){
         Write-PSFMessage -Level Warning -Message "Search did not return any data"
@@ -161,7 +227,6 @@
             return
         }
         $collectedRecords += $response.result."return-lines"
-        # TODO ArrayList
         if($Fields){
             [void]$dataCollector.AddRange(([array]($response.result.data | Select-Object -Property $Fields)))
         }else{
@@ -171,5 +236,6 @@
         $Parameter.Offset = $dataCollector.Count
         $apiCallParameter.LoggingActionValues = @($Parameter.limit, $Parameter.offset)
     }while (($dataCollector.Count -lt $maxRows) -and ($response.result.data.Count -gt 0) -and ($collectedRecords -lt $maxRows))
+    Remove-FMALogSearch -TaskId $taskId
     return $dataCollector.ToArray()
 }

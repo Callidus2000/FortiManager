@@ -67,7 +67,7 @@
         [bool]$EnableException = $true,
         [long]$Apiver = 3,
         [bool]$CaseSensitive,
-        [parameter(mandatory = $true)]
+        [parameter(mandatory = $false)]
         [PSFramework.TabExpansion.PsfArgumentCompleterAttribute("FortiAnalyzer.Devices")]
         [System.Object[]]$Device,
         [string]$Filter,
@@ -80,14 +80,14 @@
         [datetime]$TimeRangeStart,
         [parameter(mandatory = $true, ParameterSetName = "timeRange")]
                 [datetime]$TimeRangeEnd,
-        [parameter(mandatory = $true, ParameterSetName = "timeSpan")]
-        [timespan]$Last,
+        # [parameter(mandatory = $true, ParameterSetName = "timeSpan")]
+        # [timespan]$Last,
                 [string]$Timezone
     )
-        if ($Last) {
-        $TimeRangeEnd = Get-Date
-        $TimeRangeStart = $TimeRangeEnd - $Last
-    }
+    #     if ($Last) {
+    #     $TimeRangeEnd = Get-Date
+    #     $TimeRangeStart = $TimeRangeEnd - $Last
+    # }
     $timeRange=@{
             start = $TimeRangeStart.ToString("yyyy-MM-dd'T'HH:mm:ssz")
             end   = $TimeRangeEnd.ToString("yyyy-MM-dd'T'HH:mm:ssz")

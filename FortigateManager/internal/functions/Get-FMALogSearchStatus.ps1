@@ -38,7 +38,8 @@
         [parameter(mandatory = $true)]
         [long]$TaskId,
         [ValidateSet("Critical", "Important", "Output", "Host", "Significant", "VeryVerbose", "Verbose", "SomewhatVerbose", "System", "Debug", "InternalComment", "Warning")]
-        [string]$LoggingLevel = (Get-PSFConfigValue -FullName "FortigateManager.Logging.Api" -Fallback "Verbose")
+        [string]$LoggingLevel = (Get-PSFConfigValue -FullName "FortigateManager.Logging.Api" -Fallback "Verbose"),
+        [switch]$Wait
     )
     $explicitADOM = Resolve-FMAdom -Connection $Connection -Adom $ADOM -EnableException $EnableException
     $parameter=@{
@@ -54,8 +55,26 @@
         Path                = "/logview/adom/$explicitADOM/logsearch/count/$TaskId"
         Parameter           = $parameter
         LoggingLevel        = $LoggingLevel
+        RetryCountOnEmptyResult = (Get-PSFConfigValue -FullName 'FortigateManager.Analyzer.RetryCountForStatus')
+        RetryWaitOnEmptyResult  = (Get-PSFConfigValue -FullName 'FortigateManager.Analyzer.RetryWaitForStatus')
     }
-    $result = Invoke-FMAPI @apiCallParameter
-    Write-PSFMessage "Result-Status: $($result.result.status)"
-    return $result.result
+    do {
+        $result = Invoke-FMAPI @apiCallParameter
+        $currentStatus = $result.result
+        if ($currentStatus.status -and $currentStatus.status.code -ne 0) {
+            Stop-PSFFunction -Level Critical -Message "Error while querying the current logsearch status, $($currentStatus.status|ConvertTo-Json -Compress)"
+            return
+        }
+
+        if ([string]::IsNullOrEmpty($currentStatus)) {
+            Stop-PSFFunction -Level Critical -Message "No current count status available for taskId $taskId" -EnableException $EnableException
+            return
+        }
+        $secondsRemaining = ($currentStatus."estimated-remain-sec" + 1)
+        Write-PSFMessage "`$currentStatus=$($currentStatus|ConvertTo-Json -Compress)"
+        Write-Progress -Activity "Waiting for logsearch to be finished" -SecondsRemaining $secondsRemaining
+        Start-Sleep -Seconds $secondsRemaining
+    }while ($currentStatus."progress-percent" -ne 100 -and $Wait )
+    Write-PSFMessage "Result-Status: $($currentStatus.status)"
+    return $currentStatus
 }

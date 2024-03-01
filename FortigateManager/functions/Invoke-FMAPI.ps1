@@ -87,6 +87,8 @@
         [ValidateSet("Critical", "Important", "Output", "Host", "Significant", "VeryVerbose", "Verbose", "SomewhatVerbose", "System", "Debug", "InternalComment", "Warning")]
         [string]$LoggingLevel = (Get-PSFConfigValue -FullName "FortigateManager.Logging.Api" -Fallback "Verbose"),
         [string[]]$LoggingActionValues = "",
+        [int]$RetryCountOnEmptyResult = (Get-PSFConfigValue -FullName 'FortigateManager.Default.RetryCountForStatus'),
+        [timespan]$RetryWaitOnEmptyResult = (Get-PSFConfigValue -FullName 'FortigateManager.Default.RetryWaitForStatus'),
         [string]$RevisionNote
     )
     if (-not $Connection) {
@@ -164,7 +166,8 @@
         # }
         # elseif (-not $EnableException) { return $true }
 
-        if ($null -eq $result) {
+        # if ($null -eq $result) {
+        if ([string]::IsNullOrEmpty($result)) {
             Stop-PSFFunction -Message "No Result delivered" -EnableException $true
             return $false
         }
@@ -178,7 +181,7 @@
         return $result
 
         # } -PSCmdlet $PSCmdlet  -EnableException $EnableException -Level (Get-PSFConfigValue -FullName "FortigateManager.Logging.Api" -Fallback "Verbose")
-    } -PSCmdlet $PSCmdlet  -EnableException $false -Level $LoggingLevel
+    } -PSCmdlet $PSCmdlet  -EnableException $false -Level $LoggingLevel -RetryCount $RetryCountOnEmptyResult -RetryWait $RetryWaitOnEmptyResult
     if ((Test-PSFFunctionInterrupt) -and $EnableException) {
         Throw "API-Error, statusCode: $statusCode, Message $($result.result.status.Message)" #-EnableException $true -StepsUpward 3 #-AlwaysWarning
     }
