@@ -95,11 +95,13 @@
         [long]$TargetLogCount,
         [string]$Timezone,
         [ValidateSet('date', 'time', 'id', 'itime', 'euid', 'epid', 'dsteuid', 'dstepid', 'logflag', 'logver', 'type', 'subtype', 'level', 'action', 'policyid', 'sessionid', 'srcip', 'dstip', 'srcport', 'dstport', 'trandisp', 'duration', 'proto', 'sentbyte', 'rcvdbyte', 'sentpkt', 'rcvdpkt', 'logid', 'service', 'app', 'appcat', 'srcintfrole', 'dstintfrole', 'srcserver', 'dstserver', 'policytype', 'eventtime', 'poluuid', 'srcmac', 'mastersrcmac', 'dstmac', 'masterdstmac', 'srchwvendor', 'srcswversion', 'dsthwvendor', 'dstswversion', 'devtype', 'osname', 'dstosname', 'srccountry', 'dstcountry', 'srcintf', 'dstintf', 'policyname', 'tz', 'devid', 'vd', 'dtime', 'itime_t', 'devname')]
-        [string[]]$Fields
+        [string[]]$Fields,
+        [long]$MaxLogEntries=[long]::MaxValue
     )
     $PageSize = 1000
     # if ($PSCmdlet.ParameterSetName -eq )
-    $searchParam = $PSBoundParameters | ConvertTo-PSFHashtable -Exclude Fields, TargetLogCount,Last
+    $searchParam = $PSBoundParameters | ConvertTo-PSFHashtable -Exclude Fields, TargetLogCount, Last, MaxLogEntries
+    $searchParam.TimeOrder='desc'
     if ($PSCmdlet.ParameterSetName -ne 'timeRange'){
         $tempHash = $PSBoundParameters | ConvertTo-PSFHashtable -Include TimeRangeStart, TimeRangeEnd, TargetLogCount, Last -IncludeEmpty
         $tempHash.last = $tempHash.last.ToString("g")
@@ -118,6 +120,10 @@
         }
         'MaxLogCount' {
             $searchWindowDuration = Get-PSFConfigValue -FullName 'FortigateManager.Search.DefaultMaxRowDuration'
+            If ($MaxLogEntries -eq [long]::MaxValue) {
+                $MaxLogEntries = [long]($TargetLogCount*1.1)
+                Write-PSFMessage "Adjusting MaxLogEntries from Max([long]) to TargetLogCount plus 10% (=$MaxLogEntries)" -Level Host
+            }
         }
         'MaxLogCount$' {
             $searchParam.TimeRangeEnd = Get-Date
@@ -144,6 +150,7 @@
         $matchedLogs = $currentStatus."matched-logs"
         if ($matchedLogs -eq 0){
             Write-PSFMessage "Found 0 logs in timespan $($searchWindowDuration.ToString('g')), cannot auto adjust" -Level Warning
+            return
         }
         $timeMultiplier=$TargetLogCount/$matchedLogs
         $usedDurationInSeconds = $searchWindowDuration.TotalSeconds
@@ -167,7 +174,6 @@
     if ($PSCmdlet.ParameterSetName -ne 'timeRange') {
         Write-PSFMessage "Result of calculation: $($searchParam | ConvertTo-PSFHashtable -Include TimeRangeStart,TimeRangeEnd|ConvertTo-Json -Compress)"
     }
-    # return
     $taskId = start-fmalogsearch @searchParam
     if ($taskId -eq 0) {
         Stop-PSFFunction -Level Critical -Message "Could not obtain a taskId/start the logsearch"
@@ -235,7 +241,8 @@
         # $dataCollector += $response.result.data
         $Parameter.Offset = $dataCollector.Count
         $apiCallParameter.LoggingActionValues = @($Parameter.limit, $Parameter.offset)
-    }while (($dataCollector.Count -lt $maxRows) -and ($response.result.data.Count -gt 0) -and ($collectedRecords -lt $maxRows))
+    }while (($dataCollector.Count -lt $maxRows) -and ($response.result.data.Count -gt 0) -and ($collectedRecords -lt $maxRows) -and ($dataCollector.Count -lt $MaxLogEntries))
+    if ($dataCollector.Count -gt $MaxLogEntries) { Write-PSFMessage -Level Warning "Stopped at $($dataCollector.Count) logs as only $MaxLogEntries should have been retrieved"}
     Remove-FMALogSearch -TaskId $taskId
     return $dataCollector.ToArray()
 }
