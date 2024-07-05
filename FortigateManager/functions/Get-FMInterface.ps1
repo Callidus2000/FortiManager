@@ -80,6 +80,11 @@
         [parameter(mandatory = $false, ParameterSetName = "default")]
         [System.Object[]]$Sortings
     )
+    # TODO Device Interfaces
+    # VLAN und Tunnel
+    # "/pm/config/device/TKBEDC1FW001/vdom/TKBE/system/interface"
+    # Static Routes
+    # "/pm/config/device/TKBEDC1FW001/vdom/TKBE/router/static"
     $Parameter = @{
         'attr'     = "$Attr"
         'fields'   = @($Fields)
