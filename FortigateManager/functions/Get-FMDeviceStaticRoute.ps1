@@ -35,7 +35,8 @@
         [parameter(mandatory = $true, ParameterSetName = "default")]
         [String]$VDOM,
         [parameter(mandatory = $true, ParameterSetName = "default")]
-        [String]$DeviceName
+        [String]$DeviceName,
+        [switch]$AddVDOM
     )
     $Parameter = @{
         'filter'   = ($Filter | ConvertTo-FMFilterArray)
@@ -52,5 +53,8 @@
 
     $result = Invoke-FMAPI @apiCallParameter
     Write-PSFMessage "Result-Status: $($result.result.status)"
+    if ($AddVDOM){
+        return $result.result.data|Select-Object -Property *,@{n='vdom';E={$VDOM}}
+    }
     return $result.result.data
 }
