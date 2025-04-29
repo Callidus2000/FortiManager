@@ -144,8 +144,11 @@
             Stop-PSFFunction -Level Critical -Message "Could not obtain a taskId/start the logsearch"
             return
         }
-        $currentStatus = Get-FMALogSearchStatus -TaskId $taskId -Connection $Connection -Adom $ADOM -LoggingLevel Verbose -Wait
+        $currentStatus = Get-FMALogSearchStatus -TaskId $taskId -Connection $Connection -Adom $ADOM -LoggingLevel Verbose -Wait -EnableException $false
         Remove-FMALogSearch -TaskId $taskId
+        if($null -eq $currentStatus){
+            Stop-PSFFunction -Level Critical -Message "No current count status available for taskId $taskId" -EnableException $EnableException
+        }
         # Applying the Rule of three
         $matchedLogs = $currentStatus."matched-logs"
         if ($matchedLogs -eq 0){

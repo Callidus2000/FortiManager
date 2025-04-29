@@ -92,6 +92,7 @@
 	}
 	end {
 		$connection = Get-ARAHConnection -Url $Url -APISubPath ""
+		$connection.HttpVersion=[version]"2.0"
 		if ($SkipCheck) { $connection.SkipCheck = $SkipCheck }
 		Add-Member -InputObject $connection -MemberType NoteProperty -Name "forti" -Value $additionalParams
 		$connection.credential = $Credential

@@ -67,13 +67,15 @@
         }
 
         if ([string]::IsNullOrEmpty($currentStatus)) {
-            Stop-PSFFunction -Level Critical -Message "No current count status available for taskId $taskId" -EnableException $EnableException
-            return
+            Stop-PSFFunction -Level Critical -Message "No current count status available for taskId $taskId, `$EnableException=$EnableException" -EnableException $EnableException
+            Write-PSFMessage "Returnin PreviousStatus" -Level Host
+            return $previousStatus
         }
         $secondsRemaining = ($currentStatus."estimated-remain-sec" + 1)
         Write-PSFMessage "`$currentStatus=$($currentStatus|ConvertTo-Json -Compress)"
         Write-Progress -Activity "Waiting for logsearch to be finished" -SecondsRemaining $secondsRemaining
         Start-Sleep -Seconds $secondsRemaining
+        $previousStatus=$currentStatus
     }while ($currentStatus."progress-percent" -ne 100 -and $Wait )
     Write-PSFMessage "Result-Status: $($currentStatus.status)"
     return $currentStatus
