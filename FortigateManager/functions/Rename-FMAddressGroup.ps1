@@ -50,6 +50,7 @@
     aware that this might happen ;-)
 
     #>
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param (
         [parameter(Mandatory = $false)]
         $Connection = (Get-FMLastConnection),

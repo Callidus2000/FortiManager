@@ -45,6 +45,7 @@
     .NOTES
     General notes
     #>
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param (
         $Connection = (Get-FMLastConnection),
         [string]$ADOM,
