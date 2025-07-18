@@ -18,6 +18,8 @@
 	  -contain (NO LIKE COMPARISON, checks if something is contained within an array)
 	  -ne
 	  -notlike
+	  -in      (value can be a comma-separated list, e.g. "name -in a,b,c")
+	  -notin   (value can be a comma-separated list, e.g. "name -notin a,b,c")
 	- The value is the value used for filtering
 
 	Example:
@@ -45,6 +47,9 @@
             "-like"     = "like"
             "-notlike"  = "!like"
             "-contains" = "contain"
+            "-notcontains" = "!contain"
+            "-in" = "in"
+            "-notin" = "!in"
         }
     }
 
@@ -55,7 +60,9 @@
     end {
         foreach ($filterString in $filterInputArray) {
             Write-PSFMessage "Analysiere '$filterString'"
-            $regexResults = [regex]::Matches($filterString, "(?<attribute>.*) (?<operator>-eq|-ne|-notlike|-like|-contains) (?<value>.*)")
+            $operatorRegex = $operatorTranslation.Keys -join '|'
+            # $regexResults = [regex]::Matches($filterString, "(?<attribute>.*) (?<operator>-eq|-ne|-notlike|-like|-contains) (?<value>.*)")
+            $regexResults = [regex]::Matches($filterString, "(?<attribute>.*) (?<operator>$operatorRegex) (?<value>.*)")
             Write-PSFMessage "`$regexResults=$($regexResults)"
             if ($regexResults) {
                 $attribute = $regexResults[0].Groups["attribute"].value
@@ -68,7 +75,13 @@
                 else {
                     $currentFilter = @()
                 }
-                $currentFilter += @($attribute, $operator, $value)
+                if($operator -in 'in', '!in') {
+                    $value = $value -split ',' | ForEach-Object { $_.Trim() }
+                }
+                else {
+                    $value = $value.Trim()
+                }
+                $currentFilter += @($attribute, $operator)+ $value
                 $resultArray += , ($currentFilter)
             }
             else {

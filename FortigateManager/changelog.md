@@ -29,6 +29,13 @@
 - Version 2.3.0
 ## 3.0.0 (2024-02-23)
 ### Added
-- Search-FMALog for search a Forti Analyzer Logfile
+- Search-FMALog for searching a Forti Analyzer Logfile
 ### Changed
 - Connect-FM allows to connect to a Forti Analyzer
+## 3.1.0 (2025-07-18)
+### Added
+- Support for the `-in` and `-notin` operators in filter parameters (see about_FortigateManagerFilter)
+- Help texts and examples for `-in` and `-notin` added
+### Changed
+- ConvertTo-FMFilterArray now correctly processes `-in` and `-notin` as arrays
+- Documentation and help texts updated
